@@ -21,7 +21,6 @@ func _ready() -> void:
 	add_child(shape)
 	_origin = position
 	_t = fmod(position.x * 0.021 + position.y * 0.017, TAU)
-	body_entered.connect(_on_body_entered)
 
 
 func _physics_process(delta: float) -> void:
@@ -31,11 +30,10 @@ func _physics_process(delta: float) -> void:
 	else:
 		position = _origin + Vector2(sin(_t * speed) * travel, sin(_t * 3.0) * 5.0)
 	queue_redraw()
-
-
-func _on_body_entered(body: Node2D) -> void:
-	if body.is_in_group("player"):
-		body.die()
+	# checked every frame so it still counts after the respawn grace period
+	for body in get_overlapping_bodies():
+		if body.is_in_group("player"):
+			body.hurt()
 
 
 func _draw() -> void:

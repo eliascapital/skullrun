@@ -11,6 +11,7 @@ var is_solid: Callable
 var _dir := -1.0
 var _t := 0.0
 var _dead := false
+var _hitbox: Area2D
 
 
 func _ready() -> void:
@@ -22,17 +23,16 @@ func _ready() -> void:
 	shape.shape = rect
 	add_child(shape)
 
-	var hitbox := Area2D.new()
-	hitbox.collision_layer = 0
-	hitbox.collision_mask = 2
-	hitbox.monitorable = false
+	_hitbox = Area2D.new()
+	_hitbox.collision_layer = 0
+	_hitbox.collision_mask = 2
+	_hitbox.monitorable = false
 	var hs := CollisionShape2D.new()
 	var hr := RectangleShape2D.new()
 	hr.size = Vector2(22, 30)
 	hs.shape = hr
-	hitbox.add_child(hs)
-	hitbox.body_entered.connect(_on_hitbox_body_entered)
-	add_child(hitbox)
+	_hitbox.add_child(hs)
+	add_child(_hitbox)
 
 
 func _physics_process(delta: float) -> void:
@@ -47,16 +47,13 @@ func _physics_process(delta: float) -> void:
 		if is_on_wall() or (is_solid.is_valid() and not is_solid.call(ahead)):
 			_dir = -_dir
 	queue_redraw()
-
-
-func _on_hitbox_body_entered(body: Node2D) -> void:
-	if _dead or not body.is_in_group("player") or body.dead:
-		return
-	if body.is_falling_onto(global_position.y - 8.0):
-		body.bounce()
-		_defeat()
-	else:
-		body.die()
+	for body in _hitbox.get_overlapping_bodies():
+		if body.is_in_group("player") and not body.dead:
+			if body.is_falling_onto(global_position.y - 8.0):
+				body.bounce()
+				_defeat()
+				return
+			body.hurt()
 
 
 func _defeat() -> void:

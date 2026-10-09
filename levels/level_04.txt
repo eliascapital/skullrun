@@ -7,9 +7,10 @@ sign3: Bone springs work over lava too.\nHold right after you bounce!
 sign4: Dash past the ghosts and bats.
 sign5: Platforms over lava. Stay calm!
 
-; Map key:  . air   # ground   - wooden ledge (jump up through)   X crumbling block
-;           ^ spikes   ~ lava/acid   o soul gem   P start   E exit portal   C checkpoint
-;           G ghost (left/right)   B bat (up/down)   S skeleton (stomp it!)   J jump pad
+; Map key:  . air   # ground   - wooden ledge (jump up through)   X crumbling block   I ice
+;           ^ spikes   ~ lava/acid   o soul gem   P start   E exit portal   C checkpoint   K boss
+;           G ghost (left/right)   B bat (up/down)   S skeleton (stomp it!)   R wraith (chases you)
+;           J jump pad   W soul vent
 ;           M moving platform (left/right)   V moving platform (up/down)   1-9 hint signs
 ; Blocks separated by a blank line are placed left-to-right. See levels/README.md.
 ---

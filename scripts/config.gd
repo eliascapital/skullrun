@@ -82,6 +82,38 @@ const THEMES := {
 		"hazard": Color("ece4d0"), "liquid": Color("c13cff"),
 		"moon": true, "scenery": "spires",
 	},
+	"frost": {
+		"sky_top": Color("0a1428"), "sky_bottom": Color("2b4a6a"),
+		"far": Color("1a2c46"), "near": Color("223a58"),
+		"tile": Color("3c4a63"), "tile_dark": Color("2a3448"), "tile_light": Color("52627e"),
+		"tile_top": Color("e8f6ff"), "platform": Color("7a8aa0"),
+		"hazard": Color("cfefff"), "liquid": Color("5ec8ff"),
+		"moon": true, "scenery": "icepeaks",
+	},
+	"wells": {
+		"sky_top": Color("071410"), "sky_bottom": Color("17302a"),
+		"far": Color("0f221d"), "near": Color("152c25"),
+		"tile": Color("2f4040"), "tile_dark": Color("1f2c2c"), "tile_light": Color("405656"),
+		"tile_top": Color("6bd49a"), "platform": Color("6b5a44"),
+		"hazard": Color("e6efe0"), "liquid": Color("7cff6b"),
+		"moon": false, "scenery": "arches",
+	},
+	"ossuary": {
+		"sky_top": Color("140e14"), "sky_bottom": Color("33242e"),
+		"far": Color("201720"), "near": Color("2a1e28"),
+		"tile": Color("6a5a4c"), "tile_dark": Color("4a3e34"), "tile_light": Color("806c5a"),
+		"tile_top": Color("efe4cc"), "platform": Color("b8a27e"),
+		"hazard": Color("efe4cc"), "liquid": Color("c13cff"),
+		"moon": false, "scenery": "skulls",
+	},
+	"throne": {
+		"sky_top": Color("100508"), "sky_bottom": Color("3a0c16"),
+		"far": Color("220a10"), "near": Color("2e0d16"),
+		"tile": Color("3a2a30"), "tile_dark": Color("281c22"), "tile_light": Color("4e3840"),
+		"tile_top": Color("ffd166"), "platform": Color("7a4a3a"),
+		"hazard": Color("ffe6b0"), "liquid": Color("ff3b3b"),
+		"moon": true, "scenery": "pillars",
+	},
 }
 
 const DEFAULT_THEME := "crypt"

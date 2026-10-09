@@ -20,6 +20,11 @@ var _pause_first: Button
 var _complete_layer: Control
 var _complete_box: VBoxContainer
 var _is_complete := false
+var _boss_box: VBoxContainer
+var _boss_label: Label
+var _boss_bar: Control
+var _boss_hp := 0
+var _boss_max := 1
 
 
 func _ready() -> void:
@@ -68,6 +73,7 @@ func _ready() -> void:
 	_banner.modulate.a = 0.0
 	root.add_child(_banner)
 
+	_build_boss_bar(root)
 	_build_pause(root)
 	_build_complete(root)
 
@@ -91,6 +97,56 @@ func show_banner(text: String, duration: float = 3.0, size: int = 26) -> void:
 	_banner_tween.tween_property(_banner, "modulate:a", 1.0, 0.3)
 	_banner_tween.tween_interval(duration)
 	_banner_tween.tween_property(_banner, "modulate:a", 0.0, 0.6)
+
+
+# ---------------------------------------------------------------------
+#  Boss health bar
+# ---------------------------------------------------------------------
+func show_boss_bar(boss_name: String, max_hp: int) -> void:
+	_boss_label.text = boss_name
+	_boss_max = max_hp
+	_boss_hp = max_hp
+	_boss_bar.queue_redraw()
+	_boss_box.visible = true
+	_boss_box.modulate.a = 0.0
+	create_tween().tween_property(_boss_box, "modulate:a", 1.0, 0.5)
+
+
+func set_boss_hp(hp: int) -> void:
+	_boss_hp = hp
+	_boss_bar.queue_redraw()
+
+
+func hide_boss_bar() -> void:
+	_boss_box.visible = false
+
+
+func _build_boss_bar(root: Control) -> void:
+	_boss_box = VBoxContainer.new()
+	_boss_box.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_boss_box.offset_top = 44
+	_boss_box.offset_bottom = 96
+	_boss_box.offset_left = -200
+	_boss_box.offset_right = 200
+	_boss_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boss_box.visible = false
+	root.add_child(_boss_box)
+	_boss_label = UI.make_title("", 26)
+	_boss_label.add_theme_constant_override("shadow_offset_y", 3)
+	_boss_box.add_child(_boss_label)
+	_boss_bar = Control.new()
+	_boss_bar.custom_minimum_size = Vector2(400, 16)
+	_boss_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_boss_bar.draw.connect(func():
+		var w := _boss_bar.size.x
+		_boss_bar.draw_rect(Rect2(0, 0, w, 16), Color(0, 0, 0, 0.6))
+		var seg := (w - 4.0) / _boss_max
+		for i in _boss_hp:
+			_boss_bar.draw_rect(Rect2(2 + i * seg + 1, 2, seg - 2, 12), Config.COLOR_ACCENT)
+			_boss_bar.draw_rect(Rect2(2 + i * seg + 1, 2, seg - 2, 4), Config.COLOR_ACCENT.lightened(0.3))
+		_boss_bar.draw_rect(Rect2(0, 0, w, 16), Config.COLOR_BONE, false, 2.0)
+	)
+	_boss_box.add_child(_boss_bar)
 
 
 # ---------------------------------------------------------------------

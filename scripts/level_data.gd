@@ -4,7 +4,7 @@ extends RefCounted
 
 const MIN_HEIGHT := 20  # levels shorter than this get empty sky added on top
 
-const KNOWN_CHARS := ".#-X^~oPECGBSMVJ123456789 "
+const KNOWN_CHARS := ".#-X^~IoPECGBSMVJKWR123456789 "
 
 
 static func list_level_files() -> PackedStringArray:
@@ -37,7 +37,7 @@ static func load_level(path: String) -> Dictionary:
 	var data := {
 		"name": path.get_file().get_basename(),
 		"theme": Config.DEFAULT_THEME,
-		"abilities": "jump double dash",
+		"abilities": "jump double dash wall",
 		"banner": "",
 		"signs": {},
 		"grid": [],

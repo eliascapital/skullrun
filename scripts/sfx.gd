@@ -28,6 +28,10 @@ func _ready() -> void:
 	_streams["bounce"] = _make([[200, 900, 0.2, "triangle", 0.4]])
 	_streams["crumble"] = _make([[180, 60, 0.25, "noise", 0.2]])
 	_streams["win"] = _make([[523, 523, 0.1, "square", 0.2], [659, 659, 0.1, "square", 0.2], [784, 784, 0.1, "square", 0.2], [1046, 1046, 0.3, "square", 0.2]])
+	_streams["roar"] = _make([[140, 60, 0.7, "saw", 0.35], [70, 40, 0.4, "noise", 0.3]])
+	_streams["slam"] = _make([[120, 30, 0.35, "noise", 0.45], [80, 40, 0.2, "saw", 0.3]])
+	_streams["boss_hit"] = _make([[500, 120, 0.25, "square", 0.3], [200, 60, 0.25, "noise", 0.3]])
+	_streams["wall_jump"] = _make([[400, 800, 0.1, "triangle", 0.3]])
 	_streams["click"] = _make([[660, 660, 0.04, "square", 0.15]])
 	_streams["hover"] = _make([[440, 440, 0.025, "triangle", 0.12]])
 
