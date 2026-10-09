@@ -64,6 +64,36 @@ func _draw() -> void:
 			for i in 4:
 				var x := rng.randf_range(0, SEGMENT - 160)
 				draw_rect(Rect2(x, ground - 70, 160, 80), color)
+		"icepeaks":
+			for i in 6:
+				var x := rng.randf_range(-100, SEGMENT)
+				var ph := rng.randf_range(160, 300) * (0.6 + depth * 0.5)
+				var pw := rng.randf_range(120, 220)
+				var tip := Vector2(x + pw * 0.5, ground - ph)
+				draw_colored_polygon(PackedVector2Array([Vector2(x, ground + 20), tip, Vector2(x + pw, ground + 20)]), color)
+				var snow := Color(color.lightened(0.35), 0.8)
+				draw_colored_polygon(PackedVector2Array([tip, tip + Vector2(pw * 0.14, ph * 0.22),
+					tip + Vector2(0, ph * 0.16), tip + Vector2(-pw * 0.14, ph * 0.22)]), snow)
+		"skulls":
+			for i in 10:
+				var x := rng.randf_range(0, SEGMENT - 120)
+				var mh := rng.randf_range(50, 110) * (0.6 + depth * 0.6)
+				draw_circle(Vector2(x + 60, ground - 10), mh, color)
+				for k in 4:
+					var sp := Vector2(x + 60 + rng.randf_range(-mh * 0.6, mh * 0.6), ground - 10 - rng.randf_range(0, mh * 0.8))
+					var r := rng.randf_range(6, 11) * (0.7 + depth * 0.5)
+					draw_circle(sp, r, color.lightened(0.12))
+					draw_circle(sp + Vector2(-r * 0.35, r * 0.1), r * 0.25, color.darkened(0.3))
+					draw_circle(sp + Vector2(r * 0.35, r * 0.1), r * 0.25, color.darkened(0.3))
+		"pillars":
+			for i in 7:
+				var x := i * SEGMENT / 7.0 + rng.randf_range(0, 30)
+				var ph := rng.randf_range(220, 340) * (0.7 + depth * 0.4)
+				draw_rect(Rect2(x, ground - ph, 34, ph + 20), color)
+				draw_rect(Rect2(x - 8, ground - ph - 10, 50, 12), color)
+				draw_rect(Rect2(x + 6, ground - ph + 24, 22, 60), Color(Config.COLOR_ACCENT, 0.18))
+				draw_colored_polygon(PackedVector2Array([Vector2(x + 6, ground - ph + 84),
+					Vector2(x + 17, ground - ph + 70), Vector2(x + 28, ground - ph + 84)]), Color(Config.COLOR_ACCENT, 0.18))
 		"spires":
 			for i in 8:
 				var x := rng.randf_range(0, SEGMENT - 60)

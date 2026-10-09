@@ -20,6 +20,9 @@ const CrumbleBlock = preload("res://scripts/objects/crumble_block.gd")
 const JumpPad = preload("res://scripts/objects/jump_pad.gd")
 const Hazard = preload("res://scripts/objects/hazard.gd")
 const HintSign = preload("res://scripts/objects/hint_sign.gd")
+const BoneKing = preload("res://scripts/objects/bone_king.gd")
+const SoulVent = preload("res://scripts/objects/soul_vent.gd")
+const Wraith = preload("res://scripts/objects/wraith.gd")
 
 var data := {}
 var colors := {}
@@ -29,6 +32,9 @@ var height := 0
 
 var player: Player
 var hud: Hud
+var boss: BoneKing
+var exit_portal: Area2D
+var wraiths: Array = []
 
 var total_gems := 0
 var gems := 0
@@ -67,9 +73,10 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if running:
+	# the clock only starts once you first move
+	if running and player.has_moved:
 		time += delta
-		hud.update_stats(gems, total_gems, time, deaths)
+	hud.update_stats(gems, total_gems, time, deaths)
 
 
 ## True if the world position is inside a solid ground tile.
@@ -81,7 +88,27 @@ func is_solid_at(world_pos: Vector2) -> bool:
 	if y >= height:
 		return true
 	var c: String = (grid[y] as String)[x]
-	return c == "#" or c == "-" or c == "X"
+	return c == "#" or c == "-" or c == "X" or c == "I"
+
+
+## The map character at a world position ("." outside the map).
+func tile_at(world_pos: Vector2) -> String:
+	var x := floori(world_pos.x / T)
+	var y := floori(world_pos.y / T)
+	if x < 0 or x >= width or y < 0 or y >= height:
+		return "."
+	return (grid[y] as String)[x]
+
+
+## Gives the camera a quick shake (used by the boss).
+func shake(strength: float = 8.0, duration: float = 0.35) -> void:
+	var cam := player.camera
+	var tw := create_tween()
+	var steps := int(duration / 0.04)
+	for i in steps:
+		var k := 1.0 - float(i) / steps
+		tw.tween_property(cam, "offset", Vector2(randf_range(-1, 1), randf_range(-1, 1)) * strength * k, 0.04)
+	tw.tween_property(cam, "offset", Vector2.ZERO, 0.04)
 
 
 # ---------------------------------------------------------------------
@@ -127,7 +154,7 @@ func _build_tiles() -> void:
 	body.collision_layer = 1
 	body.collision_mask = 0
 	add_child(body)
-	for ch in ["#", "-"]:
+	for ch in ["#", "I", "-"]:
 		var open := {}  # "x0,x1" -> Rect2i of rows above that can grow down
 		var done: Array[Rect2i] = []
 		for y in height:
@@ -145,7 +172,7 @@ func _build_tiles() -> void:
 			var next_open := {}
 			for key in runs:
 				var r: Vector2i = runs[key]
-				if ch == "#" and open.has(key):
+				if ch != "-" and open.has(key):
 					var rect: Rect2i = open[key]
 					rect.size.y += 1
 					next_open[key] = rect
@@ -214,10 +241,16 @@ func _build_objects() -> Vector2:
 					cp.activated.connect(_on_checkpoint)
 					objects.add_child(cp)
 				"E":
-					var e := ExitPortal.new()
-					e.position = center
-					e.reached.connect(_on_exit_reached)
-					objects.add_child(e)
+					exit_portal = ExitPortal.new()
+					exit_portal.position = center
+					exit_portal.reached.connect(_on_exit_reached)
+					objects.add_child(exit_portal)
+				"K":
+					boss = BoneKing.new()
+					boss.position = center + Vector2(0, -28)
+					boss.level = self
+					boss.defeated.connect(_on_boss_defeated)
+					objects.add_child(boss)
 				"G", "B":
 					var gh := Ghost.new()
 					gh.kind = "bat" if c == "B" else "ghost"
@@ -234,6 +267,19 @@ func _build_objects() -> Vector2:
 					cb.position = corner
 					cb.color = colors["tile_light"]
 					objects.add_child(cb)
+				"R":
+					var wr := Wraith.new()
+					wr.position = center
+					objects.add_child(wr)
+					wraiths.append(wr)
+				"W":
+					var v := SoulVent.new()
+					var h := 0
+					while h < 9 and y - h - 1 >= 0 and not is_solid_at(center + Vector2(0, -(h + 1) * T)):
+						h += 1
+					v.height_tiles = h + 1
+					v.position = center
+					objects.add_child(v)
 				"J":
 					var jp := JumpPad.new()
 					jp.position = center
@@ -261,6 +307,10 @@ func _build_objects() -> Vector2:
 						s.position = center
 						objects.add_child(s)
 			x += run
+	# in a boss level the exit only appears once the boss is beaten
+	if boss and exit_portal:
+		exit_portal.visible = false
+		exit_portal.process_mode = Node.PROCESS_MODE_DISABLED
 	return start
 
 
@@ -271,9 +321,16 @@ func _build_player(start: Vector2) -> void:
 	var abilities: String = data["abilities"]
 	player.can_double_jump = abilities.contains("double")
 	player.can_dash = abilities.contains("dash")
+	player.can_wall_jump = abilities.contains("wall")
+	player.tile_at = tile_at
 	player.kill_y = height * T + 64
 	player.died.connect(func(): deaths += 1)
 	add_child(player)
+	if boss:
+		player.respawned.connect(boss.reset)
+	for wr in wraiths:
+		wr.player = player
+		player.respawned.connect(wr.reset)
 	var cam: Camera2D = player.camera
 	cam.limit_left = 0
 	cam.limit_right = width * T
@@ -290,6 +347,16 @@ func _on_gem_collected() -> void:
 
 func _on_checkpoint(cp: Node2D) -> void:
 	player.respawn_point = cp.global_position
+
+
+func _on_boss_defeated() -> void:
+	hud.show_banner("THE BONE KING IS DEFEATED!\nThe way out is open.", 3.5, 26)
+	if exit_portal:
+		exit_portal.visible = true
+		exit_portal.process_mode = Node.PROCESS_MODE_INHERIT
+		exit_portal.scale = Vector2.ZERO
+		create_tween().tween_property(exit_portal, "scale", Vector2.ONE, 0.6) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _on_exit_reached() -> void:
