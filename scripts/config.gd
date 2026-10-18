@@ -114,6 +114,14 @@ const THEMES := {
 		"hazard": Color("ffe6b0"), "liquid": Color("ff3b3b"),
 		"moon": true, "scenery": "pillars",
 	},
+	"abyss": {
+		"sky_top": Color("04070f"), "sky_bottom": Color("1d1640"),
+		"far": Color("0e1230"), "near": Color("151a3e"),
+		"tile": Color("2b3150"), "tile_dark": Color("1c2036"), "tile_light": Color("3c446c"),
+		"tile_top": Color("4ff0d0"), "platform": Color("5a6890"),
+		"hazard": Color("d8f0ff"), "liquid": Color("ff4fd8"),
+		"moon": false, "scenery": "islands",
+	},
 }
 
 const DEFAULT_THEME := "crypt"

@@ -56,6 +56,12 @@ func _physics_process(delta: float) -> void:
 			body.hurt()
 
 
+## Flattened by a nearby ground slam.
+func slam_hit() -> void:
+	if not _dead:
+		_defeat()
+
+
 func _defeat() -> void:
 	_dead = true
 	Sfx.play("stomp")

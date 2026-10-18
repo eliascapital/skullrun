@@ -1,6 +1,7 @@
 extends CharacterBody2D
 ## The runaway skull. Handles running, jumping, double jumping, dashing,
-## wall jumping, sliding on ice, dying and respawning at the last checkpoint.
+## wall jumping, ground slams, sliding on ice, upside-down gravity, dying and
+## respawning at the last checkpoint.
 
 signal died
 signal respawned
@@ -29,12 +30,20 @@ const WALL_JUMP_LOCK := 0.16  # seconds you can't steer after a wall jump
 const WALL_COYOTE := 0.1
 const ICE_SPEED := 250.0  # on ice you always slide at this speed
 const WIND_LIFT := -340.0  # how fast soul vents carry you upward
+const SLAM_SPEED := 1100.0  # ground slam: press DOWN in mid-air
 const RESPAWN_DELAY := 0.8
 const RESPAWN_SAFE_TIME := 1.5  # enemies can't hurt you right after respawning
 
 var can_double_jump := true
 var can_dash := true
 var can_wall_jump := true
+var can_slam := true
+
+## 1 = normal gravity, -1 = upside down (inside a reverse-gravity zone).
+var gravity_dir := 1.0
+## Set by the level: called with the feet position when a slam lands;
+## returns true if it smashed a block (the slam then keeps going).
+var on_slam: Callable
 
 ## Set by the level: returns the map character at a world position.
 var tile_at: Callable
@@ -62,8 +71,11 @@ var _wall_side := 0.0  # -1 = touching a wall on the left, 1 = on the right
 var _wall_coyote := 0.0
 var _wall_lock := 0.0
 var _wall_sliding := false
+var _last_wall_jump_side := 0.0  # can't kick off the same side twice in a row
 var _safe_time := 0.0
 var _wind_time := 0.0
+var _flip_time := 0.0
+var _slamming := false
 
 var camera: Camera2D
 var _particles: CPUParticles2D
@@ -128,15 +140,17 @@ func _physics_process(delta: float) -> void:
 
 	if dead:
 		return
+	_update_gravity_zone(delta)
+	var g := gravity_dir
 	if frozen:
 		velocity.x = move_toward(velocity.x, 0.0, GROUND_FRICTION * delta)
-		velocity.y = minf(velocity.y + GRAVITY * delta, MAX_FALL_SPEED)
+		_fall(delta, g)
 		move_and_slide()
 		return
 
 	var dir := Input.get_axis("move_left", "move_right")
 	if not has_moved and (not is_zero_approx(dir) or Input.is_action_just_pressed("jump")
-			or Input.is_action_just_pressed("dash")):
+			or Input.is_action_just_pressed("dash") or Input.is_action_just_pressed("move_down")):
 		has_moved = true
 		first_move.emit()
 
@@ -148,6 +162,7 @@ func _physics_process(delta: float) -> void:
 		_air_jumps = 1 if can_double_jump else 0
 		_dash_ready = true
 		_launched = false
+		_last_wall_jump_side = 0.0
 	else:
 		_coyote -= delta
 
@@ -167,7 +182,16 @@ func _physics_process(delta: float) -> void:
 		_buffer -= delta
 
 	_wall_sliding = false
-	if _dash_time > 0.0:
+	# ground slam: press DOWN in mid-air
+	if can_slam and not on_floor and not _slamming and Input.is_action_just_pressed("move_down"):
+		_slamming = true
+		_dash_time = 0.0
+		_squash = Vector2(0.7, 1.35)
+		Sfx.play("dash", 0.55)
+
+	if _slamming:
+		velocity = Vector2(0.0, SLAM_SPEED * g)
+	elif _dash_time > 0.0:
 		_dash_time -= delta
 		velocity = Vector2(_dash_dir * DASH_SPEED, 0.0)
 		if _dash_time <= 0.0:
@@ -194,23 +218,23 @@ func _physics_process(delta: float) -> void:
 			var lift_accel := 7000.0 if velocity.y > 0.0 else 2600.0
 			velocity.y = move_toward(velocity.y, WIND_LIFT, lift_accel * delta)
 		else:
-			velocity.y = minf(velocity.y + GRAVITY * delta, MAX_FALL_SPEED)
-		if side != 0.0 and signf(dir) == side and velocity.y > WALL_SLIDE_SPEED:
-			velocity.y = WALL_SLIDE_SPEED
+			_fall(delta, g)
+		if side != 0.0 and signf(dir) == side and velocity.y * g > WALL_SLIDE_SPEED:
+			velocity.y = WALL_SLIDE_SPEED * g
 			_wall_sliding = true
 		# jump (never on ice)
 		if _buffer > 0.0 and not _on_ice:
 			if _coyote > 0.0:
-				_jump(JUMP_VELOCITY)
+				_jump(JUMP_VELOCITY * g)
 				Sfx.play("jump")
-			elif can_wall_jump and _wall_coyote > 0.0:
+			elif can_wall_jump and _wall_coyote > 0.0 and _wall_side != _last_wall_jump_side:
 				_wall_jump()
 			elif _air_jumps > 0:
 				_air_jumps -= 1
-				_jump(DOUBLE_JUMP_VELOCITY)
+				_jump(DOUBLE_JUMP_VELOCITY * g)
 				Sfx.play("double_jump")
 				_burst(Config.COLOR_PURPLE, 8)
-		if Input.is_action_just_released("jump") and velocity.y < 0.0 and not _launched:
+		if Input.is_action_just_released("jump") and velocity.y * g < 0.0 and not _launched:
 			velocity.y *= JUMP_CUT
 		# dash (never on ice)
 		if can_dash and _dash_ready and not _on_ice and Input.is_action_just_pressed("dash"):
@@ -230,20 +254,63 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+	if _slamming and is_on_floor():
+		_land_slam(g)
+
 	if is_on_floor() and not _was_on_floor:
 		_squash = Vector2(1.25, 0.78)
 	_was_on_floor = is_on_floor()
 
 	camera.position.x = lerpf(camera.position.x, facing * 70.0, 2.5 * delta)
 
-	if global_position.y > kill_y:
+	if global_position.y > kill_y or global_position.y < -160.0:
 		die()
+
+
+func _fall(delta: float, g: float) -> void:
+	velocity.y += GRAVITY * g * delta
+	if velocity.y * g > MAX_FALL_SPEED:
+		velocity.y = MAX_FALL_SPEED * g
+
+
+func _land_slam(g: float) -> void:
+	var feet := global_position + Vector2(0, 13.0 * g)
+	var smashed: bool = on_slam.is_valid() and on_slam.call(feet)
+	if smashed:
+		# broke through a cracked block: keep drilling
+		velocity = Vector2(0.0, SLAM_SPEED * g)
+		return
+	_slamming = false
+	velocity = Vector2.ZERO
+	_squash = Vector2(1.45, 0.6)
+	_burst(Config.COLOR_BONE, 14)
+	Sfx.play("slam", 1.3)
+
+
+## Reverse-gravity zones call this every frame while the skull is inside.
+func in_flip_zone() -> void:
+	_flip_time = 0.05
+
+
+func _update_gravity_zone(delta: float) -> void:
+	_flip_time -= delta
+	var want := -1.0 if _flip_time > 0.0 else 1.0
+	if want != gravity_dir and not dead:
+		_set_gravity(want)
+		Sfx.play("wall_jump", 0.6 if want < 0.0 else 0.8)
+		_squash = Vector2(0.8, 1.2)
+
+
+func _set_gravity(g: float) -> void:
+	gravity_dir = g
+	up_direction = Vector2(0, -g)
+	_slamming = false
 
 
 func _tile_below() -> String:
 	if not tile_at.is_valid():
 		return ""
-	return tile_at.call(global_position + Vector2(0, 20))
+	return tile_at.call(global_position + Vector2(0, 20 * gravity_dir))
 
 
 ## Returns -1 or 1 if a (non-icy) wall is right next to us, preferring the
@@ -259,7 +326,8 @@ func _touching_wall(dir: float) -> float:
 
 
 func _wall_jump() -> void:
-	velocity = Vector2(-_wall_side * WALL_JUMP_VELOCITY.x, WALL_JUMP_VELOCITY.y)
+	velocity = Vector2(-_wall_side * WALL_JUMP_VELOCITY.x, WALL_JUMP_VELOCITY.y * gravity_dir)
+	_last_wall_jump_side = _wall_side
 	_wall_lock = WALL_JUMP_LOCK
 	_wall_coyote = 0.0
 	_coyote = 0.0
@@ -285,6 +353,7 @@ func _jump(v: float) -> void:
 func launch(v: float) -> void:
 	velocity.y = v
 	_launched = true
+	_slamming = false
 	_air_jumps = 1 if can_double_jump else 0
 	_dash_ready = true
 	_dash_time = 0.0
@@ -293,8 +362,9 @@ func launch(v: float) -> void:
 
 ## Called when the skull lands on an enemy's head.
 func bounce() -> void:
-	velocity.y = STOMP_BOUNCE * (1.3 if Input.is_action_pressed("jump") else 1.0)
+	velocity.y = STOMP_BOUNCE * gravity_dir * (1.3 if Input.is_action_pressed("jump") else 1.0)
 	_launched = true
+	_slamming = false
 	_air_jumps = 1 if can_double_jump else 0
 	_dash_ready = true
 	_dash_time = 0.0
@@ -306,6 +376,7 @@ func ride_wind() -> void:
 	if dead or frozen:
 		return
 	_wind_time = 0.05
+	_slamming = false
 	_air_jumps = 1 if can_double_jump else 0
 	_dash_ready = true
 	_launched = true
@@ -318,7 +389,14 @@ func knockback(vx: float) -> void:
 
 
 func is_falling_onto(target_y: float) -> bool:
+	if gravity_dir < 0.0:
+		return false
 	return velocity.y > -50.0 and global_position.y < target_y
+
+
+## True while a ground slam is crashing down.
+func is_slamming() -> bool:
+	return _slamming
 
 
 ## True for a moment after respawning, while enemies can't hurt you.
@@ -339,6 +417,7 @@ func die() -> void:
 	dead = true
 	velocity = Vector2.ZERO
 	_dash_time = 0.0
+	_slamming = false
 	_trail.clear()
 	Sfx.play("death")
 	_burst(Config.COLOR_BONE, 22)
@@ -353,6 +432,9 @@ func respawn() -> void:
 	_squash = Vector2(0.6, 1.4)
 	_was_on_floor = false
 	_wall_lock = 0.0
+	_last_wall_jump_side = 0.0
+	_set_gravity(1.0)
+	_flip_time = 0.0
 	_safe_time = RESPAWN_SAFE_TIME
 	camera.reset_smoothing()
 	respawned.emit()
@@ -385,11 +467,18 @@ func _draw() -> void:
 	# soft glow
 	draw_circle(Vector2(0, 0), 18.0, Color(Config.COLOR_ACCENT, 0.08))
 	# squash & stretch around the feet, lean into the run
-	var lean := clampf(velocity.x / RUN_SPEED, -1.0, 1.0) * 0.12
+	var g := gravity_dir
+	if _slamming:
+		for i in 4:
+			var x := -9.0 + i * 6.0
+			draw_line(Vector2(x, -18.0 * g), Vector2(x, -40.0 * g), Color(Config.COLOR_BONE, 0.35), 2.0)
+	var lean := clampf(velocity.x / RUN_SPEED, -1.0, 1.0) * 0.12 * g
 	var bob := 0.0
 	if is_on_floor() and absf(velocity.x) > 20.0:
 		bob = absf(sin(_time * 16.0)) * -2.5
-	draw_set_transform(Vector2(0, 13.0 * (1.0 - _squash.y) + bob), lean, _squash)
+	var body_offset := Vector2(0, (13.0 * (1.0 - _squash.y) + bob) * g)
+	var body_scale := Vector2(_squash.x, _squash.y * g)
+	draw_set_transform(body_offset, lean, body_scale)
 	var eye := Config.COLOR_ACCENT.lerp(Color.WHITE, 0.25 + 0.15 * sin(_time * 6.0))
 	if not _dash_ready and can_dash:
 		eye = Config.COLOR_PURPLE
@@ -398,6 +487,6 @@ func _draw() -> void:
 		for i in 3:
 			var y := fmod(_time * 90.0 + i * 9.0, 26.0) - 13.0
 			draw_circle(Vector2(_wall_side * 11.0, y), 1.5, Color(Config.COLOR_BONE, 0.5))
-		draw_set_transform(Vector2(0, 13.0 * (1.0 - _squash.y) + bob), lean, _squash)
+		draw_set_transform(body_offset, lean, body_scale)
 	SkullArt.draw_skull(self, Vector2(0, 0.5), 12.5, Config.COLOR_BONE, eye, facing)
 	draw_set_transform(Vector2.ZERO)

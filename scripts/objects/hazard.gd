@@ -19,13 +19,16 @@ func _ready() -> void:
 	if kind == "spikes":
 		rect.size = Vector2(w - 10, 12)
 		shape.position = Vector2(w * 0.5, 25)
+	elif kind == "ceiling_spikes":
+		rect.size = Vector2(w - 10, 12)
+		shape.position = Vector2(w * 0.5, 7)
 	else:
 		rect.size = Vector2(w - 4, 18)
 		shape.position = Vector2(w * 0.5, 22)
 	shape.shape = rect
 	add_child(shape)
 	body_entered.connect(_on_body_entered)
-	set_process(kind != "spikes")
+	set_process(kind == "liquid")
 
 
 func _on_body_entered(body: Node2D) -> void:
@@ -45,6 +48,12 @@ func _draw() -> void:
 			var x := i * 16.0
 			draw_colored_polygon(PackedVector2Array([Vector2(x + 1, 32), Vector2(x + 8, 14), Vector2(x + 15, 32)]), color.darkened(0.35))
 			draw_colored_polygon(PackedVector2Array([Vector2(x + 4, 32), Vector2(x + 8, 14), Vector2(x + 12, 32)]), color)
+		return
+	if kind == "ceiling_spikes":
+		for i in width_tiles * 2:
+			var x := i * 16.0
+			draw_colored_polygon(PackedVector2Array([Vector2(x + 1, 0), Vector2(x + 8, 18), Vector2(x + 15, 0)]), color.darkened(0.35))
+			draw_colored_polygon(PackedVector2Array([Vector2(x + 4, 0), Vector2(x + 8, 18), Vector2(x + 12, 0)]), color)
 		return
 	# liquid: glow, wavy surface, bubbles
 	draw_rect(Rect2(0, -6, w, 38), Color(color, 0.08))

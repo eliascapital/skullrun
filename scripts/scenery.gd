@@ -94,6 +94,26 @@ func _draw() -> void:
 				draw_rect(Rect2(x + 6, ground - ph + 24, 22, 60), Color(Config.COLOR_ACCENT, 0.18))
 				draw_colored_polygon(PackedVector2Array([Vector2(x + 6, ground - ph + 84),
 					Vector2(x + 17, ground - ph + 70), Vector2(x + 28, ground - ph + 84)]), Color(Config.COLOR_ACCENT, 0.18))
+		"islands":
+			# floating rocks, some of them upside down
+			for i in 9:
+				var x := rng.randf_range(0, SEGMENT - 140)
+				var w := rng.randf_range(60, 150) * (0.7 + depth * 0.4)
+				var y := rng.randf_range(h * 0.15, h * 0.7)
+				var flip := -1.0 if rng.randf() < 0.4 else 1.0
+				var ipts := PackedVector2Array([Vector2(x, y), Vector2(x + w, y)])
+				var steps := 5
+				for k in steps:
+					var t := 1.0 - (k + 0.5) / steps
+					ipts.append(Vector2(x + w * t, y + flip * rng.randf_range(15, 45) * (0.3 + 0.7 * sin(PI * t))))
+				draw_colored_polygon(ipts, color)
+				draw_line(Vector2(x, y), Vector2(x + w, y), Color(Color("4ff0d0"), 0.12 + depth * 0.1), 2.0)
+				for k in 3:
+					var rx := x + rng.randf_range(10, w - 10)
+					draw_line(Vector2(rx, y), Vector2(rx + rng.randf_range(-6, 6), y + flip * rng.randf_range(25, 60)), color, 2.0)
+			for i in 30:
+				draw_circle(Vector2(rng.randf_range(0, SEGMENT), rng.randf_range(0, h)), rng.randf_range(1, 2.5),
+					Color(Color("4ff0d0"), 0.15 + depth * 0.1))
 		"spires":
 			for i in 8:
 				var x := rng.randf_range(0, SEGMENT - 60)

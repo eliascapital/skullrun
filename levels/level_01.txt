@@ -14,7 +14,8 @@ sign9: The exit portal is just ahead!\nJump in to escape the crypt.
 ; Map key:  . air   # ground   - wooden ledge (jump up through)   X crumbling block   I ice
 ;           ^ spikes   ~ lava/acid   o soul gem   P start   E exit portal   C checkpoint   K boss
 ;           G ghost (left/right)   B bat (up/down)   S skeleton (stomp it!)   R wraith (chases you)
-;           J jump pad   W soul vent
+;           J jump pad   W soul vent   T skull spitter   H cracked block (slam it!)
+;           : reverse-gravity zone   v ceiling spikes
 ;           M moving platform (left/right)   V moving platform (up/down)   1-9 hint signs
 ; Blocks separated by a blank line are placed left-to-right. See levels/README.md.
 ---
