@@ -23,6 +23,9 @@ const HintSign = preload("res://scripts/objects/hint_sign.gd")
 const BoneKing = preload("res://scripts/objects/bone_king.gd")
 const SoulVent = preload("res://scripts/objects/soul_vent.gd")
 const Wraith = preload("res://scripts/objects/wraith.gd")
+const GravityZone = preload("res://scripts/objects/gravity_zone.gd")
+const CrackedBlock = preload("res://scripts/objects/cracked_block.gd")
+const SkullSpitter = preload("res://scripts/objects/skull_spitter.gd")
 
 var data := {}
 var colors := {}
@@ -35,6 +38,8 @@ var hud: Hud
 var boss: BoneKing
 var exit_portal: Area2D
 var wraiths: Array = []
+var spitters: Array = []
+var cracked := {}  # Vector2i cell -> cracked block
 
 var total_gems := 0
 var gems := 0
@@ -88,7 +93,7 @@ func is_solid_at(world_pos: Vector2) -> bool:
 	if y >= height:
 		return true
 	var c: String = (grid[y] as String)[x]
-	return c == "#" or c == "-" or c == "X" or c == "I"
+	return c == "#" or c == "-" or c == "X" or c == "I" or c == "H"
 
 
 ## The map character at a world position ("." outside the map).
@@ -223,7 +228,7 @@ func _build_objects() -> Vector2:
 			var center := Vector2(x * T + T * 0.5, y * T + T * 0.5)
 			var corner := Vector2(x * T, y * T)
 			var run := 1
-			if c in ["^", "~", "M", "V"]:
+			if c in ["^", "v", "~", "M", "V"]:
 				while x + run < width and row[x + run] == c:
 					run += 1
 			match c:
@@ -267,6 +272,18 @@ func _build_objects() -> Vector2:
 					cb.position = corner
 					cb.color = colors["tile_light"]
 					objects.add_child(cb)
+				"H":
+					var cb2 := CrackedBlock.new()
+					cb2.position = corner
+					cb2.color = (colors["tile_light"] as Color).lerp(Color("8a7aa0"), 0.4)
+					objects.add_child(cb2)
+					cracked[Vector2i(x, y)] = cb2
+				"T":
+					var sp := SkullSpitter.new()
+					sp.position = center
+					sp.is_solid = is_solid_at
+					objects.add_child(sp)
+					spitters.append(sp)
 				"R":
 					var wr := Wraith.new()
 					wr.position = center
@@ -284,11 +301,11 @@ func _build_objects() -> Vector2:
 					var jp := JumpPad.new()
 					jp.position = center
 					objects.add_child(jp)
-				"^", "~":
+				"^", "v", "~":
 					var hz := Hazard.new()
-					hz.kind = "spikes" if c == "^" else "liquid"
+					hz.kind = {"^": "spikes", "v": "ceiling_spikes", "~": "liquid"}[c]
 					hz.width_tiles = run
-					hz.color = colors["hazard"] if c == "^" else colors["liquid"]
+					hz.color = colors["liquid"] if c == "~" else colors["hazard"]
 					hz.position = corner
 					objects.add_child(hz)
 				"M", "V":
@@ -307,6 +324,7 @@ func _build_objects() -> Vector2:
 						s.position = center
 						objects.add_child(s)
 			x += run
+	_build_gravity_zones(objects)
 	# in a boss level the exit only appears once the boss is beaten
 	if boss and exit_portal:
 		exit_portal.visible = false
@@ -322,12 +340,16 @@ func _build_player(start: Vector2) -> void:
 	player.can_double_jump = abilities.contains("double")
 	player.can_dash = abilities.contains("dash")
 	player.can_wall_jump = abilities.contains("wall")
+	player.can_slam = abilities.contains("slam")
+	player.on_slam = _on_slam
 	player.tile_at = tile_at
 	player.kill_y = height * T + 64
 	player.died.connect(func(): deaths += 1)
 	add_child(player)
 	if boss:
 		player.respawned.connect(boss.reset)
+	for sp in spitters:
+		sp.player = player
 	for wr in wraiths:
 		wr.player = player
 		player.respawned.connect(wr.reset)
@@ -347,6 +369,64 @@ func _on_gem_collected() -> void:
 
 func _on_checkpoint(cp: Node2D) -> void:
 	player.respawn_point = cp.global_position
+
+
+## One reverse-gravity zone per connected patch of `:` cells (covering the
+## patch's bounding box, so gems or enemies inside a patch are fine).
+func _build_gravity_zones(parent: Node) -> void:
+	var seen := {}
+	for y in height:
+		for x in width:
+			if seen.has(Vector2i(x, y)) or (grid[y] as String)[x] != ":":
+				continue
+			var lo := Vector2i(x, y)
+			var hi := Vector2i(x, y)
+			var stack := [Vector2i(x, y)]
+			seen[Vector2i(x, y)] = true
+			while not stack.is_empty():
+				var c: Vector2i = stack.pop_back()
+				lo = Vector2i(mini(lo.x, c.x), mini(lo.y, c.y))
+				hi = Vector2i(maxi(hi.x, c.x), maxi(hi.y, c.y))
+				for dy in [-1, 0, 1]:
+					for dx in [-1, 0, 1]:
+						var n := c + Vector2i(dx, dy)
+						if n.x < 0 or n.y < 0 or n.x >= width or n.y >= height or seen.has(n):
+							continue
+						if (grid[n.y] as String)[n.x] == ":":
+							seen[n] = true
+							stack.append(n)
+			var z := GravityZone.new()
+			z.position = Vector2(lo) * T
+			z.size = Vector2(hi - lo + Vector2i.ONE) * T
+			parent.add_child(z)
+
+
+## Called by the player when a ground slam lands. Smashes cracked blocks under
+## the skull's feet and flattens enemies close by. Returns true if a block broke.
+func _on_slam(feet: Vector2) -> bool:
+	var g := player.gravity_dir
+	var broke := false
+	for dx in [-9.0, 0.0, 9.0]:
+		var p := feet + Vector2(dx, 6.0 * g)
+		var cell := Vector2i(floori(p.x / T), floori(p.y / T))
+		if cracked.has(cell):
+			var block: Node = cracked[cell]
+			cracked.erase(cell)
+			_set_cell(cell, ".")
+			if is_instance_valid(block):
+				block.smash()
+			broke = true
+	if not broke:
+		shake(6.0, 0.25)
+		for o in get_node("Objects").get_children():
+			if o.has_method("slam_hit") and o.global_position.distance_to(feet) < 2.6 * T:
+				o.slam_hit()
+	return broke
+
+
+func _set_cell(cell: Vector2i, c: String) -> void:
+	var row: String = grid[cell.y]
+	grid[cell.y] = row.substr(0, cell.x) + c + row.substr(cell.x + 1)
 
 
 func _on_boss_defeated() -> void:

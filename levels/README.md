@@ -2,7 +2,7 @@
 
 Every level is a plain text file in this folder. The game finds them on its own:
 any file named `level_XX.txt` becomes a level, in alphabetical order. So to add
-level 11, copy `level_09.txt` (a normal level; `level_10` is the boss) to `level_11.txt` and start editing. Use two digits
+level 16, copy `level_15.txt` to `level_16.txt` and start editing (`level_10` is the boss level, so don't copy that one). Use two digits
 (`level_06`, `level_42`), or three if you ever go past 99 (`level_100` would sort
 before `level_11`, so rename them all to `level_001` and so on).
 
@@ -11,8 +11,8 @@ before `level_11`, so rename them all to `level_001` and so on).
 ```
 name: Moonlit Graveyard          <- shown on the level menu and HUD
 theme: graveyard                 <- crypt, graveyard, bonecaves, forge, tower,
-                                    frost, wells, ossuary or throne
-abilities: jump double           <- any of: jump double dash wall (leave it out for all four)
+                                    frost, wells, ossuary, throne or abyss
+abilities: jump double           <- any of: jump double dash wall slam (leave it out for all of them)
 banner: NEW POWER: DOUBLE JUMP!  <- optional message shown at the start
 sign1: Text for sign 1\nUse \n for a new line
 sign2: ...
@@ -42,6 +42,9 @@ that their bottoms line up.
 | `X`  | crumbling block: falls apart shortly after you stand on it, then grows back |
 | `I`  | ice: solid like ground, but on it you can't jump, dash or turn — you slide until you're off it. You can't wall jump off icy walls either |
 | `^`  | spikes (deadly) |
+| `v`  | hanging spikes, pointing down from a ceiling (deadly) |
+| `H`  | cracked block: solid, but a ground slam smashes through it (and keeps going through a stack of them) |
+| `:`  | reverse-gravity zone: fill an area with `:` and the skull falls UP inside it. One zone covers the bounding box of each connected patch of `:`, so gems or enemies inside are fine. Always let a zone touch a ceiling (`#` right above its top row), otherwise the skull bobs at the zone's top edge. Wooden ledges `-` don't hold you upside down, and checkpoints shouldn't go inside a zone |
 | `~`  | lava / acid (deadly; colour comes from the theme) |
 | `o`  | soul gem (collectible) |
 | `P`  | player start (one per level) |
@@ -50,6 +53,7 @@ that their bottoms line up.
 | `G`  | ghost: floats 3 tiles left and right; can't be stomped |
 | `B`  | bat: flies about 2.5 tiles up and down |
 | `S`  | skeleton: walks back and forth; stomp it from above |
+| `T`  | skull spitter: a totem that spits fireballs along its row when you're within 14 tiles. Jump the fireballs; stomp it or slam near it to smash it. Fireballs stop at walls, so a 1-tile post shields a checkpoint |
 | `R`  | wraith: wakes up when you come within ~7 tiles and drifts after you, straight through walls. Slower than you, can't be stomped, goes home if you get 12 tiles away or respawn. Keep it 12+ tiles from checkpoints |
 | `J`  | jump pad: launches you about 8 tiles up |
 | `W`  | soul vent: a column of purple wind that lifts you up to 10 tiles (until it hits a ceiling). Riding it refills your double jump and dash. Put one at the very bottom of a pit to catch falling players |
@@ -70,9 +74,10 @@ directly above a `#`. Lava `~` usually goes in the top ground row, with `#` unde
 | Jump + double jump + dash | about 7 tiles | 9–10 tiles |
 | Jump pad | about 8 tiles | n/a |
 | Wall jump | climb any height between two stone walls 3–6 tiles apart | n/a |
+| Ground slam | drills down through any number of cracked `H` blocks | n/a |
 
-A single wall can't be climbed by itself, so a wall-jump climb needs two walls facing
-each other. A nice way to build one: a wall hanging from the top (with a gap of
+A single wall can't be climbed by itself (you can't kick off the same side twice in a
+row without landing), so a wall-jump climb needs two walls facing each other. A nice way to build one: a wall hanging from the top (with a gap of
 at least 3 tiles under it to walk through) and a full-height wall a few tiles to its right.
 
 Stick to the "plan for" numbers so jumps never need to be pixel-perfect.

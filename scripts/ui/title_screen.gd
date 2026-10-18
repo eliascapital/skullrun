@@ -110,6 +110,7 @@ func _build_help() -> void:
 		["Double jump", "Jump again in mid-air  (from level 2)"],
 		["Dash", "SHIFT / X  (from level 3)"],
 		["Wall jump", "Jump at a wall, then jump again  (from level 7)"],
+		["Ground slam", "S / Down arrow in mid-air  (from level 12)"],
 		["Pause", "ESC / P"],
 		["Restart level", "R"],
 	]
@@ -122,7 +123,7 @@ func _build_help() -> void:
 		grid.add_child(UI.make_label(l[1], 16, Config.COLOR_BONE, HORIZONTAL_ALIGNMENT_LEFT))
 	box.add_child(grid)
 	box.add_child(_spacer(6))
-	var tips := UI.make_label("Collect the glowing soul gems, light the lanterns (checkpoints)\nand jump into the swirling portal to finish each level.\nStomp skeletons from above, but never touch ghosts or wraiths!\nOn ice you can't jump, dash or turn. Purple soul vents lift you up.", 14, Config.COLOR_MUTED)
+	var tips := UI.make_label("Collect the glowing soul gems, light the lanterns (checkpoints)\nand jump into the swirling portal to finish each level.\nStomp skeletons from above, but never touch ghosts or wraiths!\nIce: no jumping or turning. Purple vents lift you. Blue zones flip gravity.", 14, Config.COLOR_MUTED)
 	box.add_child(tips)
 	box.add_child(_spacer(8))
 	var back := UI.make_button("GOT IT", true, 180)

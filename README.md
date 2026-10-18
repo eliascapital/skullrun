@@ -1,8 +1,8 @@
 # SKULLRUN
 
 A spooky 2D platformer made with **Godot 4.3**. You play a runaway skull that
-escapes a haunted crypt. You run, jump, double jump, dash and wall jump through 10 levels,
-collect soul gems, and face the Bone King at the end.
+escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 15 levels,
+collect soul gems, defeat the Bone King, and fall upward through the Abyss.
 
 ## Play it
 
@@ -19,6 +19,7 @@ collect soul gems, and face the Bone King at the end.
 | Double jump | Jump again in mid-air (from level 2) | A |
 | Dash | Shift, X or K (from level 3) | X / RB |
 | Wall jump | Jump at a wall, then jump again (from level 7) | A |
+| Ground slam | S or ↓ while in the air (from level 12) | D-pad down |
 | Pause | Esc or P | Start |
 | Restart level | R | Back |
 
@@ -36,6 +37,11 @@ collect soul gems, and face the Bone King at the end.
 | 8 | Glacier Tombs | Ice + wall jumps (icy walls are too slippery to grab) |
 | 9 | The Ossuary | **Soul vents**: purple updrafts that lift you and refill your powers. **Wraiths**: little reapers that chase you through walls |
 | 10 | Throne of Bones | **Boss**: the Bone King. Stomp his head 3 times! |
+| 11 | The Upside Abyss | **Reverse-gravity zones**: fall up and walk on the ceiling |
+| 12 | Shattered Depths | **Ground slam**: smash through cracked blocks and flatten enemies |
+| 13 | Spitter Hollows | **Skull Spitters**: totems that spit fireballs along the ground |
+| 14 | Topsy-Turvy Tombs | Gravity + slams + spitters, including slamming *up* through ceilings |
+| 15 | Heart of the Abyss | Everything together, even upside-down ice |
 
 Each level should take about 2–4 minutes the first time through, and each has
 checkpoints, hint signs and optional soul gems. Your progress and best times are saved.
@@ -57,7 +63,7 @@ sending shockwaves along the floor (jump them). If you die, he resets to full he
 * **Colours**: also in `scripts/config.gd`, both the menu colours and the per-level themes.
 * **Levels**: the levels are plain text files in [`levels/`](levels/). Read
   [`levels/README.md`](levels/README.md) to learn how to make new ones. To add
-  level 11, create `levels/level_11.txt` and it shows up in the game automatically.
+  level 16, create `levels/level_16.txt` and it shows up in the game automatically.
 * **Controls**: `_setup_input()` in `scripts/game.gd`.
 * **How the skull moves** (speed, jump height, dash): the constants at the top of `scripts/player.gd`.
 
@@ -72,7 +78,7 @@ scripts/level.gd       builds a level from its text file
 scripts/player.gd      the skull
 scripts/objects/       gems, checkpoints, enemies, platforms, hazards…
 scripts/ui/            menus and the in-game HUD
-levels/                level_01.txt … level_10.txt
+levels/                level_01.txt … level_15.txt
 assets/fonts/          Creepster (title) and Rubik (text), both free OFL fonts
 ```
 
@@ -88,7 +94,6 @@ it, the level files are left out of the exported game.
 
 * **The Reaper chase**: the Grim Reaper slowly sweeps in from the left, so you can't dawdle.
 * **Keys and bone doors**: grab a key to open a gate somewhere else in the level.
-* **Flip-gravity zones** where the skull runs on the ceiling.
 * **Collapsing floors** that crumble one after another behind you as you run.
 * **More bosses** every 10 levels (the Bone King's code in `scripts/objects/bone_king.gd` is a good starting point).
 * **Skins**: unlock new skull colours (gold, crystal, flaming) by collecting every gem.
