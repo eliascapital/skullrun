@@ -13,7 +13,7 @@ const GAME_TITLE := "SKULLRUN"
 const TAGLINE := "ESCAPE THE CRYPT. OUTRUN THE REAPER."
 
 # You can write several lines. Use \n for a new line.
-const DESCRIPTION := "You are a cursed skull that just woke up deep inside a forgotten crypt.\nRun, jump and dash through haunted lands, collect glowing soul gems,\nand find the way out before the Reaper notices you're gone."
+const DESCRIPTION := "One ordinary morning, the Reaper and his army of the dead took over the world.\nNow you're a skull, locked in a tomb deep underground... but somehow still awake.\nPush open the door, run through haunted lands and escape before the Reaper notices!"
 
 const VERSION_TEXT := "v0.1  •  made with Godot"
 

@@ -7,6 +7,7 @@ const SAVE_PATH := "user://skullrun_save.cfg"
 const TITLE_SCENE := "res://scenes/title.tscn"
 const LEVEL_SELECT_SCENE := "res://scenes/level_select.tscn"
 const LEVEL_SCENE := "res://scenes/level.tscn"
+const INTRO_SCENE := "res://scenes/intro.tscn"
 
 var level_paths: PackedStringArray = []
 var level_headers: Array = []
@@ -16,6 +17,7 @@ var current_level := 0
 var unlocked := 1  # number of levels you can play
 var best_times := {}  # level index (String) -> seconds
 var best_gems := {}  # level index (String) -> gems
+var seen_intro := false
 
 
 func _ready() -> void:
@@ -61,6 +63,27 @@ func next_level() -> void:
 		start_level(current_level + 1)
 
 
+## The opening story. It ends by starting level 1.
+func play_story() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file(INTRO_SCENE)
+
+
+func finish_intro() -> void:
+	if not seen_intro:
+		seen_intro = true
+		save_progress()
+	start_level(0)
+
+
+## What the PLAY button does: the story first on a brand-new game.
+func play() -> void:
+	if not seen_intro and continue_level() == 0:
+		play_story()
+	else:
+		start_level(continue_level())
+
+
 func goto_title() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file(TITLE_SCENE)
@@ -94,6 +117,7 @@ func save_progress() -> void:
 	cfg.set_value("progress", "unlocked", unlocked)
 	cfg.set_value("progress", "best_times", best_times)
 	cfg.set_value("progress", "best_gems", best_gems)
+	cfg.set_value("progress", "seen_intro", seen_intro)
 	cfg.save(SAVE_PATH)
 
 
@@ -104,6 +128,7 @@ func load_progress() -> void:
 	unlocked = clampi(int(cfg.get_value("progress", "unlocked", 1)), 1, maxi(level_count(), 1))
 	best_times = cfg.get_value("progress", "best_times", {})
 	best_gems = cfg.get_value("progress", "best_gems", {})
+	seen_intro = cfg.get_value("progress", "seen_intro", unlocked > 1)
 
 
 func reset_progress() -> void:

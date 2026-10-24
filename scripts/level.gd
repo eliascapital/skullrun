@@ -322,6 +322,8 @@ func _build_objects() -> Vector2:
 						var s := HintSign.new()
 						s.text = signs.get(c, "")
 						s.position = center
+						s.min_x = 8.0
+						s.max_x = width * T - 8.0
 						objects.add_child(s)
 			x += run
 	_build_gravity_zones(objects)
