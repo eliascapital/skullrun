@@ -1,5 +1,6 @@
 name: Spitter Hollows
 theme: abyss
+about: Skull Spitters
 abilities: jump double dash wall slam
 banner: NEW ENEMY: SKULL SPITTERS!\nJump their fireballs, then stomp or slam them.
 sign1: A SKULL SPITTER! It spits fireballs along the ground.\nJump over them, then jump on its head!

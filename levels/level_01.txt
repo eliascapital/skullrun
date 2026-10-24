@@ -1,5 +1,6 @@
 name: The Crypt
 theme: crypt
+about: Running, jumping, spikes and ghosts
 abilities: jump
 sign1: Welcome, little skull!\nMove with A / D or the arrow keys.
 sign2: Press SPACE to jump.\nHold it down to jump higher!

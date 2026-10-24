@@ -1,5 +1,6 @@
 name: Heart of the Abyss
 theme: abyss
+about: The grand finale
 abilities: jump double dash wall slam
 sign1: The Heart of the Abyss.\nEverything you've learned, all at once!
 sign2: A wall blocks the way. Drill down,\nand slam close to the spitters to smash them!

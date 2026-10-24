@@ -1,5 +1,6 @@
 name: Glacier Tombs
 theme: frost
+about: Ice and wall jumps
 abilities: jump double dash wall
 sign1: Ice AND wall jumps!\nClimb the stone shaft, then enjoy the slide.
 sign2: Icy walls are too slippery to wall jump.\nClimb between the STONE walls instead.

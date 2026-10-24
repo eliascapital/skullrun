@@ -1,5 +1,6 @@
 name: The Ember Forge
 theme: forge
+about: Lava and rising platforms
 abilities: jump double dash
 sign1: The forge floor is molten LAVA.\nDon't touch it!
 sign2: These platforms rise and sink.\nRide them up to the pillars.
