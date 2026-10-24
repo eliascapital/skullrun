@@ -2,6 +2,7 @@
 # Builds the SKULLRUN website into ./build:
 #   build/index.html ...  the landing page (copied from website/)
 #   build/play/           the game, exported for the web by Godot
+#                         (plus play/fullscreen.js, the full screen button for phones)
 # Usage: website/build.sh [path-to-godot]   (needs Godot 4.3 + its web export templates)
 set -euo pipefail
 cd "$(dirname "$0")/.."
