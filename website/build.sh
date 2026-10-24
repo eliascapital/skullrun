@@ -16,6 +16,7 @@ test -s build/play/index.wasm
 test -s build/play/index.pck
 
 cp -r website/. build/
-rm -f build/build.sh build/.gdignore
+rm -f build/build.sh build/.gdignore build/gen_levels.py
+python3 website/gen_levels.py build/index.html
 touch build/.nojekyll
 echo "Website built in ./build"

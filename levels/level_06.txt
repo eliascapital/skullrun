@@ -1,5 +1,6 @@
 name: Frozen Catacombs
 theme: frost
+about: Slippery ice
 abilities: jump double dash
 banner: WATCH OUT FOR ICE!\nOn ice you can't jump, dash or turn around.
 sign1: Slippery ICE! Once you step on it you can't\njump, dash or turn. You slide to the end.

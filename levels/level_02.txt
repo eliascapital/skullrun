@@ -1,5 +1,6 @@
 name: Moonlit Graveyard
 theme: graveyard
+about: Double jump, skeletons, jump pads
 abilities: jump double
 banner: NEW POWER: DOUBLE JUMP!\nPress jump again while in the air.
 sign1: Your skull feels lighter...\nJump, then jump AGAIN in mid-air!

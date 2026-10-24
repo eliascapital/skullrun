@@ -1,5 +1,6 @@
 name: Topsy-Turvy Tombs
 theme: abyss
+about: Gravity, slams and spitters
 abilities: jump double dash wall slam
 sign1: Jump into the zone, then GROUND SLAM\nUPWARD through the cracked ceiling!
 sign2: Spitters below can't reach you on the ceiling.\nHop over the hanging spikes.

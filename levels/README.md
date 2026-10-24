@@ -12,6 +12,7 @@ before `level_11`, so rename them all to `level_001` and so on).
 name: Moonlit Graveyard          <- shown on the level menu and HUD
 theme: graveyard                 <- crypt, graveyard, bonecaves, forge, tower,
                                     frost, wells, ossuary, throne or abyss
+about: Double jump, skeletons     <- short description for the website's level list
 abilities: jump double           <- any of: jump double dash wall slam (leave it out for all of them)
 banner: NEW POWER: DOUBLE JUMP!  <- optional message shown at the start
 sign1: Text for sign 1\nUse \n for a new line

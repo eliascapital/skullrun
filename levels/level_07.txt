@@ -1,5 +1,6 @@
 name: The Hollow Wells
 theme: wells
+about: Wall jumps
 abilities: jump double dash wall
 banner: NEW POWER: WALL JUMP!\nJump at a wall, then press jump again to kick off it.
 sign1: Walls too high? Jump into the gap, touch a wall,\nthen press JUMP again to kick off it!

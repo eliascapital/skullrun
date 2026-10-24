@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SKULLRUN — escape the crypt</title>
-<meta name="description" content="SKULLRUN is a free spooky platformer. Run, jump, dash and wall jump as a runaway skull through 15 haunted levels. Play it right in your browser.">
+<meta name="description" content="SKULLRUN is a free spooky platformer. Run, jump, dash and wall jump as a runaway skull through {{LEVEL_COUNT}} haunted levels. Play it right in your browser.">
 <meta property="og:title" content="SKULLRUN">
 <meta property="og:description" content="Escape the crypt. Outrun the Reaper. A free spooky platformer you can play in your browser.">
 <meta property="og:image" content="img/boss.webp">
@@ -41,7 +41,7 @@
       <a class="btn btn-primary" href="play/">&#9654;&nbsp; Play in your browser</a>
       <a class="btn" href="https://github.com/eliascapital/skullrun/archive/refs/heads/main.zip">Download for Godot</a>
     </div>
-    <p class="facts">Free &nbsp;•&nbsp; 15 levels &nbsp;•&nbsp; a boss fight &nbsp;•&nbsp; keyboard or gamepad</p>
+    <p class="facts">Free &nbsp;•&nbsp; {{LEVEL_COUNT}} levels &nbsp;•&nbsp; a boss fight &nbsp;•&nbsp; keyboard or gamepad</p>
     <figure class="hero-shot">
       <img src="img/boss.webp" alt="The skull facing the Bone King in his throne room" width="1280" height="720">
     </figure>
@@ -49,7 +49,7 @@
 </section>
 
 <section id="worlds" class="section">
-  <h2>15 haunted levels</h2>
+  <h2>{{LEVEL_COUNT}} haunted levels</h2>
   <p class="section-lead">Every level teaches something new, then mixes it with everything you already know.
     Each one takes a few minutes, with checkpoints, hint signs and hidden soul gems to find.</p>
 
@@ -66,21 +66,7 @@
   </div>
 
   <ol class="levels">
-    <li style="--c:#6d5f8f"><b>The Crypt</b><span>Running, jumping, spikes and ghosts</span></li>
-    <li style="--c:#3f7a4a"><b>Moonlit Graveyard</b><span>Double jump, skeletons, jump pads</span></li>
-    <li style="--c:#d8c9a8"><b>Bone Caves</b><span>Dash, crumbling blocks, bats</span></li>
-    <li style="--c:#ff7b2e"><b>The Ember Forge</b><span>Lava and rising platforms</span></li>
-    <li style="--c:#e63946"><b>Reaper's Gate</b><span>Everything so far, all together</span></li>
-    <li style="--c:#8fd8f0"><b>Frozen Catacombs</b><span>Slippery ice</span></li>
-    <li style="--c:#6bd49a"><b>The Hollow Wells</b><span>Wall jumps</span></li>
-    <li style="--c:#e8f6ff"><b>Glacier Tombs</b><span>Ice and wall jumps</span></li>
-    <li style="--c:#efe4cc"><b>The Ossuary</b><span>Soul vents and wraiths</span></li>
-    <li style="--c:#ffd166" class="boss"><b>Throne of Bones</b><span>Boss: the Bone King</span></li>
-    <li style="--c:#4ff0d0"><b>The Upside Abyss</b><span>Reverse-gravity zones</span></li>
-    <li style="--c:#4ff0d0"><b>Shattered Depths</b><span>Ground slam</span></li>
-    <li style="--c:#4ff0d0"><b>Spitter Hollows</b><span>Skull Spitters</span></li>
-    <li style="--c:#4ff0d0"><b>Topsy-Turvy Tombs</b><span>Gravity, slams and spitters</span></li>
-    <li style="--c:#4ff0d0"><b>Heart of the Abyss</b><span>The grand finale</span></li>
+<!-- LEVEL_LIST -->
   </ol>
 </section>
 

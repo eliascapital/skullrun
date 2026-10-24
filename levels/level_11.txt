@@ -1,5 +1,6 @@
 name: The Upside Abyss
 theme: abyss
+about: Reverse-gravity zones
 abilities: jump double dash wall
 banner: GRAVITY ZONES!\nInside the blue zones you fall UP.
 sign1: See the blue zone? Walk in and you'll fall UP\nonto the ceiling. Walk out the other end to drop back down.

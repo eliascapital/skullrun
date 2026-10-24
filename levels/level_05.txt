@@ -1,5 +1,6 @@
 name: Reaper's Gate
 theme: tower
+about: Everything so far, all together
 abilities: jump double dash
 sign1: The Reaper's Gate.\nEverything you've learned, all in one place.
 sign2: Crumbling bridge! Keep hopping.

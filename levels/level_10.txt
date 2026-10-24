@@ -1,5 +1,6 @@
 name: Throne of Bones
 theme: throne
+about: Boss: the Bone King
 abilities: jump double dash wall
 banner: BOSS LEVEL\nThe Bone King waits at the end of the road.
 sign1: The road to the Bone King's throne.\nEverything you've learned will help.

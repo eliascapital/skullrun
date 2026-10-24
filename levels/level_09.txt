@@ -1,5 +1,6 @@
 name: The Ossuary
 theme: ossuary
+about: Soul vents and wraiths
 abilities: jump double dash wall
 banner: NEW: SOUL VENTS!\nStep into the purple wind to float upward.
 sign1: A SOUL VENT! Walk into the purple wind\nand it lifts you up. Drift onto the ledge.
