@@ -10,6 +10,20 @@ collect soul gems, defeat the Bone King, and fall upward through the Abyss.
 2. Open Godot, click **Import**, and pick this folder's `project.godot`.
 3. Press **F5** (or the ▶ button) to play.
 
+## Website
+
+The game has a website where anyone can play it in their browser:
+**https://eliascapital.github.io/skullrun/** (landing page) and
+**https://eliascapital.github.io/skullrun/play/** (the game itself).
+
+It rebuilds automatically every time something is pushed to `main`, using the
+GitHub Actions workflow in `.github/workflows/website.yml`. The landing page lives in
+[`website/`](website/) (plain HTML and CSS). `website/build.sh` builds everything
+into `build/` if you want to try it on your own computer.
+
+One-time setup: on GitHub open **Settings → Pages**, and under
+**Build and deployment → Source** choose **GitHub Actions**.
+
 ## Controls
 
 | Action | Keyboard | Gamepad |
@@ -84,11 +98,12 @@ assets/fonts/          Creepster (title) and Rubik (text), both free OFL fonts
 
 All graphics and sounds are drawn or generated in code, so the game has no image or audio files.
 
-## Exporting (e.g. for the web)
+## Exporting
 
-When you export with **Project → Export**, open the **Resources** tab of your
-preset. In "Filters to export non-resource files", enter `levels/*.txt`. Without
-it, the level files are left out of the exported game.
+The project already has a **Web** export preset (`export_presets.cfg`) that includes
+the level files. If you add another preset (for example Windows), open its
+**Resources** tab and enter `levels/*.txt` in "Filters to export non-resource files",
+otherwise the levels are left out of the exported game.
 
 ## More ideas for later levels
 
