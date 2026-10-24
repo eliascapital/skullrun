@@ -2,8 +2,8 @@ name: The Crypt
 theme: crypt
 about: Running, jumping, spikes and ghosts
 abilities: jump
-sign1: Welcome, little skull!\nMove with A / D or the arrow keys.
-sign2: Press SPACE to jump.\nHold it down to jump higher!
+sign1: Welcome, little skull!\nMove with A / D, the arrow keys or the joystick.
+sign2: Press SPACE (or the jump button) to jump.\nHold it down to jump higher!
 sign3: Don't fall into the dark pits!
 sign4: Bone spikes hurt.\nJump over them!
 sign5: Lanterns are checkpoints.\nYou can jump up through wooden ledges.

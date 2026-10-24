@@ -11,15 +11,15 @@
   const style = document.createElement('style');
   style.textContent = `
     #fullscreen-btn {
-      position: fixed; right: 14px; bottom: 14px; z-index: 10;
-      width: 48px; height: 48px; padding: 10px; border-radius: 12px;
+      position: fixed; left: 12px; top: calc(9vh + 4px); z-index: 10;  /* under the level name, clear of the touch controls */
+      width: 44px; height: 44px; padding: 9px; border-radius: 12px;
       border: 2px solid rgba(236, 228, 208, 0.35); background: rgba(11, 10, 16, 0.6);
       color: #ece4d0; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
     }
     #fullscreen-btn:active { background: rgba(230, 57, 70, 0.6); }
     #fullscreen-btn svg { display: block; width: 100%; height: 100%; }
     #fullscreen-tip {
-      position: fixed; left: 50%; bottom: 76px; z-index: 10; transform: translateX(-50%);
+      position: fixed; left: 50%; top: 30vh; z-index: 10; transform: translateX(-50%);
       max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 10px;
       background: rgba(11, 10, 16, 0.9); color: #ece4d0; font: 15px/1.4 sans-serif; text-align: center;
     }

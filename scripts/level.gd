@@ -10,6 +10,7 @@ const TileChunk = preload("res://scripts/tile_chunk.gd")
 const SkyBg = preload("res://scripts/sky.gd")
 const Scenery = preload("res://scripts/scenery.gd")
 const Hud = preload("res://scripts/ui/hud.gd")
+const TouchControls = preload("res://scripts/ui/touch_controls.gd")
 const Gem = preload("res://scripts/objects/gem.gd")
 const Checkpoint = preload("res://scripts/objects/checkpoint.gd")
 const ExitPortal = preload("res://scripts/objects/exit_portal.gd")
@@ -72,6 +73,10 @@ func _ready() -> void:
 	hud.next_requested.connect(Game.next_level)
 	hud.menu_requested.connect(Game.goto_title)
 	hud.update_stats(gems, total_gems, time, deaths)
+	var touch := TouchControls.new()
+	touch.player = player
+	touch.pause_pressed.connect(hud.set_paused.bind(true))
+	add_child(touch)
 	hud.show_banner("LEVEL %d\n%s" % [index + 1, (data["name"] as String).to_upper()], 2.0, 30)
 	if not (data["banner"] as String).is_empty():
 		create_tween().tween_callback(hud.show_banner.bind(data["banner"], 4.5, 22)).set_delay(3.4)

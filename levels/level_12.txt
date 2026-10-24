@@ -2,8 +2,8 @@ name: Shattered Depths
 theme: abyss
 about: Ground slam
 abilities: jump double dash wall slam
-banner: NEW POWER: GROUND SLAM!\nPress DOWN (S) in mid-air to smash downward.
-sign1: GROUND SLAM: jump, then press DOWN (S or the down arrow).\nCracked blocks shatter. Smash into the cave below!
+banner: NEW POWER: GROUND SLAM!\nPress DOWN (S, or the joystick) in mid-air to smash downward.
+sign1: GROUND SLAM: jump, then press DOWN (S, the down arrow or the joystick).\nCracked blocks shatter. Smash into the cave below!
 sign2: Spikes up top. Drill straight through\nthe cracked blocks instead!
 sign3: Slam down next to a skeleton to flatten it.
 sign4: A cracked bridge! Walking is fine...\nbut DON'T slam on it!
