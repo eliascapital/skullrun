@@ -93,11 +93,16 @@ func _ready() -> void:
 	add_child(shape)
 
 	camera = Camera2D.new()
+	camera.process_callback = Camera2D.CAMERA2D_PROCESS_PHYSICS
 	camera.position_smoothing_enabled = true
-	camera.position_smoothing_speed = 7.0
+	camera.position_smoothing_speed = 5.0
+	# a small "dead zone" so the camera doesn't jiggle with every hop
+	camera.drag_horizontal_enabled = true
+	camera.drag_left_margin = 0.06
+	camera.drag_right_margin = 0.06
 	camera.drag_vertical_enabled = true
-	camera.drag_top_margin = 0.25
-	camera.drag_bottom_margin = 0.15
+	camera.drag_top_margin = 0.3
+	camera.drag_bottom_margin = 0.2
 	add_child(camera)
 
 	_particles = CPUParticles2D.new()
@@ -134,7 +139,7 @@ func _physics_process(delta: float) -> void:
 	queue_redraw()
 	if _safe_time > 0.0:
 		_safe_time -= delta
-		modulate.a = 0.35 if int(_time * 14.0) % 2 == 0 else 1.0
+		modulate.a = 0.55 + 0.35 * cos(_time * 12.0)  # gentle pulse, not a harsh flicker
 		if _safe_time <= 0.0:
 			modulate.a = 1.0
 
@@ -261,9 +266,12 @@ func _physics_process(delta: float) -> void:
 		_squash = Vector2(1.25, 0.78)
 	_was_on_floor = is_on_floor()
 
-	camera.position.x = lerpf(camera.position.x, facing * 70.0, 2.5 * delta)
+	# look a little ahead, but only while running, and ease in slowly
+	var look_ahead := facing * 40.0 if absf(velocity.x) > 60.0 else camera.position.x
+	camera.position.x = lerpf(camera.position.x, look_ahead, 1.2 * delta)
 
-	if global_position.y > kill_y or global_position.y < -160.0:
+	# fell out of the bottom of the level (or out of the top while upside down)
+	if global_position.y > kill_y or (gravity_dir < 0.0 and global_position.y < -320.0):
 		die()
 
 
@@ -427,6 +435,7 @@ func die() -> void:
 
 func respawn() -> void:
 	global_position = respawn_point
+	reset_physics_interpolation()
 	velocity = Vector2.ZERO
 	dead = false
 	_squash = Vector2(0.6, 1.4)

@@ -2,6 +2,10 @@ extends Area2D
 ## A wooden sign that shows a tip when you walk past it.
 
 var text := ""
+## Set by the level: the bubble is kept between these world x positions
+## so it never hangs off the edge of the screen.
+var min_x := 8.0
+var max_x := 1.0e9
 
 var _panel: PanelContainer
 
@@ -48,7 +52,8 @@ func _show(on: bool) -> void:
 	# centre the bubble above the sign
 	_panel.reset_size()
 	var s := _panel.get_combined_minimum_size()
-	_panel.position = Vector2(-s.x * 0.5, -34 - s.y)
+	var left := clampf(global_position.x - s.x * 0.5, min_x, maxf(min_x, max_x - s.x))
+	_panel.position = Vector2(left - global_position.x, -34 - s.y)
 	var tw := create_tween()
 	tw.tween_property(_panel, "modulate:a", 1.0 if on else 0.0, 0.2)
 

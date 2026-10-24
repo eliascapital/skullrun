@@ -34,6 +34,7 @@ func _ready() -> void:
 
 func reset() -> void:
 	position = _home
+	reset_physics_interpolation()
 	_vel = Vector2.ZERO
 	_chasing = false
 

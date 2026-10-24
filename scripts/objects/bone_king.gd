@@ -238,6 +238,7 @@ func reset() -> void:
 		return
 	hp = MAX_HP
 	position = _home
+	reset_physics_interpolation()
 	velocity = Vector2.ZERO
 	facing = -1.0
 	_pattern.clear()

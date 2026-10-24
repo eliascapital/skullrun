@@ -57,6 +57,10 @@ One-time setup: on GitHub open **Settings → Pages**, and under
 | 14 | Topsy-Turvy Tombs | Gravity + slams + spitters, including slamming *up* through ceilings |
 | 15 | Heart of the Abyss | Everything together, even upside-down ice |
 
+The first time you press PLAY, a short story plays (a man walking to work, the
+Reaper's army taking over the world, and a skull waking up in a sealed tomb).
+Skip it with Space or Esc, or watch it again with the **STORY** button.
+
 Each level should take about 2–4 minutes the first time through, and each has
 checkpoints, hint signs and optional soul gems. Your progress and best times are saved.
 The level timer starts when you first move, and right after a respawn you blink

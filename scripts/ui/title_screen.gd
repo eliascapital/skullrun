@@ -44,7 +44,7 @@ func _ready() -> void:
 	_play_button = UI.make_button(play_text, true, 300)
 	_play_button.add_theme_font_size_override("font_size", 24)
 	_play_button.custom_minimum_size.y = 56
-	_play_button.pressed.connect(func(): Game.start_level(Game.continue_level()))
+	_play_button.pressed.connect(Game.play)
 	box.add_child(_centered(_play_button))
 
 	box.add_child(_spacer(6))
@@ -59,6 +59,9 @@ func _ready() -> void:
 	var help := UI.make_button("HOW TO PLAY", false, 170)
 	help.pressed.connect(_show_help.bind(true))
 	row.add_child(help)
+	var story := UI.make_button("STORY", false, 130)
+	story.pressed.connect(Game.play_story)
+	row.add_child(story)
 	if OS.get_name() != "Web":
 		var quit := UI.make_button("QUIT", false, 150)
 		quit.pressed.connect(get_tree().quit)
