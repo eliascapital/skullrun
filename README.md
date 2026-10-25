@@ -38,8 +38,13 @@ One-time setup: on GitHub open **Settings → Pages**, and under
 | Restart level | R | Back | Pause, then Restart Level |
 
 The touch controls (`scripts/ui/touch_controls.gd`) only appear on touch screens,
-and hide again when you use a keyboard or gamepad. On the website, phones and tablets
-also get a full screen button (`website/play/fullscreen.js`).
+and hide again when you use a keyboard or gamepad. To put them somewhere more
+comfortable, pause and choose **MOVE TOUCH BUTTONS**, drag them around and tap DONE;
+the layout is saved. On the website, phones and tablets also get a full screen button
+(`website/play/fullscreen.js`), and on phones held sideways the level is zoomed in.
+
+The **EXIT** button in the top-left corner of every level goes back to the main
+menu (it asks first).
 
 ## The levels
 

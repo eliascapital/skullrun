@@ -5,6 +5,7 @@ extends CanvasLayer
 signal restart_requested
 signal next_requested
 signal menu_requested
+signal move_controls_requested
 
 const UI = preload("res://scripts/ui/ui.gd")
 const SkullArt = preload("res://scripts/skull_art.gd")
@@ -17,6 +18,10 @@ var _banner: Label
 var _banner_tween: Tween
 var _pause_layer: Control
 var _pause_first: Button
+var _exit_button: Button
+var _exit_layer: Control
+var _exit_first: Button
+var _moving_controls := false
 var _complete_layer: Control
 var _complete_box: VBoxContainer
 var _is_complete := false
@@ -45,6 +50,21 @@ func _ready() -> void:
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bar.add_child(row)
+	# EXIT: back to the main menu (after asking first)
+	_exit_button = UI.make_button("EXIT", false, 0)
+	_exit_button.custom_minimum_size = Vector2(62, 30)
+	_exit_button.add_theme_font_size_override("font_size", 14)
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var sb: StyleBoxFlat = _exit_button.get_theme_stylebox(state).duplicate()
+		sb.content_margin_left = 8
+		sb.content_margin_right = 8
+		sb.content_margin_top = 2
+		sb.content_margin_bottom = 2
+		_exit_button.add_theme_stylebox_override(state, sb)
+	_exit_button.focus_mode = Control.FOCUS_NONE  # so SPACE (jump) never presses it
+	_exit_button.pressed.connect(show_exit_confirm.bind(true))
+	row.add_child(_exit_button)
+	row.add_child(_gap(10))
 	_level_label = _stat_label(Config.COLOR_BONE)
 	row.add_child(_level_label)
 	var spacer := Control.new()
@@ -75,6 +95,7 @@ func _ready() -> void:
 
 	_build_boss_bar(root)
 	_build_pause(root)
+	_build_exit_confirm(root)
 	_build_complete(root)
 
 
@@ -153,7 +174,12 @@ func _build_boss_bar(root: Control) -> void:
 #  Pause menu
 # ---------------------------------------------------------------------
 func _unhandled_input(event: InputEvent) -> void:
-	if _is_complete:
+	if _is_complete or _moving_controls:
+		return
+	if _exit_layer.visible:
+		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
+			show_exit_confirm(false)
+			get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("pause"):
 		set_paused(not get_tree().paused)
@@ -187,6 +213,58 @@ func _build_pause(root: Control) -> void:
 	var menu := UI.make_button("MAIN MENU")
 	menu.pressed.connect(func(): menu_requested.emit())
 	box.add_child(menu)
+	if DisplayServer.is_touchscreen_available():
+		var move := UI.make_button("MOVE TOUCH BUTTONS")
+		move.pressed.connect(_move_controls)
+		box.add_child(move)
+
+
+## Hides the pause menu (the game stays paused) while the touch buttons are moved.
+func _move_controls() -> void:
+	_moving_controls = true
+	_pause_layer.visible = false
+	move_controls_requested.emit()
+
+
+## The touch buttons are where the player wants them: back to the pause menu.
+func controls_moved() -> void:
+	_moving_controls = false
+	set_paused(true)
+
+
+# ---------------------------------------------------------------------
+#  Exit to the main menu
+# ---------------------------------------------------------------------
+func show_exit_confirm(show: bool) -> void:
+	if _is_complete:
+		return
+	_exit_layer.visible = show
+	_pause_layer.visible = false
+	get_tree().paused = show
+	if show:
+		_exit_first.grab_focus()
+
+
+## True if a screen point is on the EXIT button (the touch controls leave it alone).
+func covers_point(p: Vector2) -> bool:
+	return _exit_button.is_visible_in_tree() and _exit_button.get_global_rect().grow(6.0).has_point(p)
+
+
+func _build_exit_confirm(root: Control) -> void:
+	_exit_layer = _dim_layer(root)
+	var panel := UI.make_panel(360)
+	_exit_layer.get_child(0).add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	panel.add_child(box)
+	box.add_child(UI.make_title("LEAVE LEVEL?", 46))
+	box.add_child(UI.make_label("You'll go back to the main menu\nand lose your progress in this level.", 16, Config.COLOR_MUTED))
+	_exit_first = UI.make_button("KEEP PLAYING", true)
+	_exit_first.pressed.connect(show_exit_confirm.bind(false))
+	box.add_child(_exit_first)
+	var leave := UI.make_button("MAIN MENU")
+	leave.pressed.connect(func(): menu_requested.emit())
+	box.add_child(leave)
 
 
 # ---------------------------------------------------------------------
@@ -194,6 +272,7 @@ func _build_pause(root: Control) -> void:
 # ---------------------------------------------------------------------
 func show_complete(time: float, gems: int, total_gems: int, deaths: int, new_best: bool, is_last: bool) -> void:
 	_is_complete = true
+	_exit_button.visible = false  # the level-complete screen has its own MAIN MENU
 	for c in _complete_box.get_children():
 		c.queue_free()
 	_complete_box.add_child(UI.make_title("LEVEL CLEAR!", 56))

@@ -91,6 +91,9 @@ func _ready() -> void:
 	var touch := TouchControls.new()
 	touch.player = player
 	touch.pause_pressed.connect(hud.set_paused.bind(true))
+	touch.is_blocked = hud.covers_point
+	hud.move_controls_requested.connect(touch.start_editing)
+	touch.editing_finished.connect(hud.controls_moved)
 	add_child(touch)
 	hud.show_banner("LEVEL %d\n%s" % [index + 1, (data["name"] as String).to_upper()], 2.0, 30)
 	if not (data["banner"] as String).is_empty():

@@ -116,7 +116,7 @@ func _build_help() -> void:
 		["Ground slam", "S / Down arrow in mid-air  (from level 12)"],
 		["Pause", "ESC / P"],
 		["Restart level", "R"],
-		["Touch screen", "Joystick to move (down in mid-air to slam),\nbuttons to jump and dash"],
+		["Touch screen", "Joystick to move (down in mid-air to slam), buttons to\njump and dash. Move them: pause, MOVE TOUCH BUTTONS"],
 	]
 	var grid := GridContainer.new()
 	grid.columns = 2
