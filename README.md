@@ -26,16 +26,20 @@ One-time setup: on GitHub open **Settings → Pages**, and under
 
 ## Controls
 
-| Action | Keyboard | Gamepad |
-|--------|----------|---------|
-| Move | A / D or ← / → | Left stick / D-pad |
-| Jump (hold for higher) | Space, W, ↑ or Z | A |
-| Double jump | Jump again in mid-air (from level 2) | A |
-| Dash | Shift, X or K (from level 3) | X / RB |
-| Wall jump | Jump at a wall, then jump again (from level 7) | A |
-| Ground slam | S or ↓ while in the air (from level 12) | D-pad down |
-| Pause | Esc or P | Start |
-| Restart level | R | Back |
+| Action | Keyboard | Gamepad | Touch screen |
+|--------|----------|---------|--------------|
+| Move | A / D or ← / → | Left stick / D-pad | Joystick (left thumb) |
+| Jump (hold for higher) | Space, W, ↑ or Z | A | Jump button (right thumb) |
+| Double jump | Jump again in mid-air (from level 2) | A | Jump button |
+| Dash | Shift, X or K (from level 3) | X / RB | Dash button |
+| Wall jump | Jump at a wall, then jump again (from level 7) | A | Jump button |
+| Ground slam | S or ↓ while in the air (from level 12) | D-pad down | Joystick down in the air |
+| Pause | Esc or P | Start | Pause button (top right) |
+| Restart level | R | Back | Pause, then Restart Level |
+
+The touch controls (`scripts/ui/touch_controls.gd`) only appear on touch screens,
+and hide again when you use a keyboard or gamepad. On the website, phones and tablets
+also get a full screen button (`website/play/fullscreen.js`).
 
 ## The levels
 
@@ -56,6 +60,11 @@ One-time setup: on GitHub open **Settings → Pages**, and under
 | 13 | Spitter Hollows | **Skull Spitters**: totems that spit fireballs along the ground |
 | 14 | Topsy-Turvy Tombs | Gravity + slams + spitters, including slamming *up* through ceilings |
 | 15 | Heart of the Abyss | Everything together, even upside-down ice |
+| 16 | The Warp Gates | **Warp portals**: step into one, come out of its twin |
+| 17 | The Soul Furnace | **Flame jets**: grates that blast fire in a steady rhythm |
+| 18 | Halls of Echoes | Portals in the sky, wraiths, crumbling blocks and fire |
+| 19 | Gates of the Keep | Everything at once: slams, wall jumps, portal chains, spitters |
+| 20 | The Reaper's Tower | **The Reaper chases you!** Then the **boss**: Mortis the Lich |
 
 The first time you press PLAY, a short story plays (a man walking to work, the
 Reaper's army taking over the world, and a skull waking up in a sealed tomb).

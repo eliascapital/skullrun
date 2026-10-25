@@ -10,6 +10,7 @@ const TileChunk = preload("res://scripts/tile_chunk.gd")
 const SkyBg = preload("res://scripts/sky.gd")
 const Scenery = preload("res://scripts/scenery.gd")
 const Hud = preload("res://scripts/ui/hud.gd")
+const TouchControls = preload("res://scripts/ui/touch_controls.gd")
 const Gem = preload("res://scripts/objects/gem.gd")
 const Checkpoint = preload("res://scripts/objects/checkpoint.gd")
 const ExitPortal = preload("res://scripts/objects/exit_portal.gd")
@@ -26,6 +27,16 @@ const Wraith = preload("res://scripts/objects/wraith.gd")
 const GravityZone = preload("res://scripts/objects/gravity_zone.gd")
 const CrackedBlock = preload("res://scripts/objects/cracked_block.gd")
 const SkullSpitter = preload("res://scripts/objects/skull_spitter.gd")
+const WarpPortal = preload("res://scripts/objects/warp_portal.gd")
+const FlameJet = preload("res://scripts/objects/flame_jet.gd")
+const Reaper = preload("res://scripts/objects/reaper.gd")
+const Lich = preload("res://scripts/objects/lich.gd")
+
+## Warp portal pairs: map letter -> colour.
+const WARP_COLORS := {
+	"a": Color("c77dff"), "b": Color("ffd166"), "c": Color("4ff0d0"), "d": Color("ff6b6b"),
+	"e": Color("ff8fd8"), "f": Color("6ba8ff"), "g": Color("ffa94d"), "h": Color("b8ff5a"),
+}
 
 var data := {}
 var colors := {}
@@ -35,10 +46,13 @@ var height := 0
 
 var player: Player
 var hud: Hud
-var boss: BoneKing
+var boss: Node2D  # the Bone King or Mortis the Lich
+var boss_name := ""
+var reaper: Reaper
 var exit_portal: Area2D
 var wraiths: Array = []
 var spitters: Array = []
+var flame_jets: Array = []
 var cracked := {}  # Vector2i cell -> cracked block
 
 var total_gems := 0
@@ -72,6 +86,10 @@ func _ready() -> void:
 	hud.next_requested.connect(Game.next_level)
 	hud.menu_requested.connect(Game.goto_title)
 	hud.update_stats(gems, total_gems, time, deaths)
+	var touch := TouchControls.new()
+	touch.player = player
+	touch.pause_pressed.connect(hud.set_paused.bind(true))
+	add_child(touch)
 	hud.show_banner("LEVEL %d\n%s" % [index + 1, (data["name"] as String).to_upper()], 2.0, 30)
 	if not (data["banner"] as String).is_empty():
 		create_tween().tween_callback(hud.show_banner.bind(data["banner"], 4.5, 22)).set_delay(3.4)
@@ -219,6 +237,9 @@ func _build_objects() -> Vector2:
 	objects.name = "Objects"
 	add_child(objects)
 	var signs: Dictionary = data["signs"]
+	var warps := {}  # letter -> portals
+	var chase_from := -1.0
+	var chase_to := -1.0
 
 	for y in height:
 		var row: String = grid[y]
@@ -228,7 +249,7 @@ func _build_objects() -> Vector2:
 			var center := Vector2(x * T + T * 0.5, y * T + T * 0.5)
 			var corner := Vector2(x * T, y * T)
 			var run := 1
-			if c in ["^", "v", "~", "M", "V"]:
+			if c in ["^", "v", "~", "M", "V", "F"]:
 				while x + run < width and row[x + run] == c:
 					run += 1
 			match c:
@@ -250,12 +271,38 @@ func _build_objects() -> Vector2:
 					exit_portal.position = center
 					exit_portal.reached.connect(_on_exit_reached)
 					objects.add_child(exit_portal)
-				"K":
-					boss = BoneKing.new()
-					boss.position = center + Vector2(0, -28)
+				"K", "L":
+					if c == "K":
+						boss = BoneKing.new()
+						boss.position = center + Vector2(0, -28)
+						boss_name = BoneKing.BOSS_NAME
+					else:
+						boss = Lich.new()
+						boss.position = center
+						boss_name = Lich.BOSS_NAME
 					boss.level = self
 					boss.defeated.connect(_on_boss_defeated)
 					objects.add_child(boss)
+				"a", "b", "c", "d", "e", "f", "g", "h":
+					var wp := WarpPortal.new()
+					wp.position = center
+					wp.color = WARP_COLORS[c]
+					objects.add_child(wp)
+					if not warps.has(c):
+						warps[c] = []
+					warps[c].append(wp)
+				"F":
+					var fj := FlameJet.new()
+					fj.width_tiles = run
+					fj.dir = 1.0 if is_solid_at(center + Vector2(0, T)) or not is_solid_at(center + Vector2(0, -T)) else -1.0
+					fj.color = colors["liquid"]
+					fj.position = corner
+					objects.add_child(fj)
+					flame_jets.append(fj)
+				"Y":
+					chase_from = center.x
+				"Z":
+					chase_to = center.x
 				"G", "B":
 					var gh := Ghost.new()
 					gh.kind = "bat" if c == "B" else "ghost"
@@ -327,6 +374,20 @@ func _build_objects() -> Vector2:
 						objects.add_child(s)
 			x += run
 	_build_gravity_zones(objects)
+	for letter in warps:
+		var pair: Array = warps[letter]
+		if pair.size() != 2:
+			push_warning("Warp portal '%s' needs exactly 2 in the level (found %d)" % [letter, pair.size()])
+			continue
+		pair[0].partner = pair[1]
+		pair[1].partner = pair[0]
+	if chase_from >= 0.0 and chase_to >= 0.0:
+		reaper = Reaper.new()
+		reaper.level = self
+		reaper.start_x = chase_from
+		reaper.end_x = chase_to
+		reaper.boss_name = boss_name if boss_name != "" else "my servants"
+		objects.add_child(reaper)
 	# in a boss level the exit only appears once the boss is beaten
 	if boss and exit_portal:
 		exit_portal.visible = false
@@ -352,6 +413,11 @@ func _build_player(start: Vector2) -> void:
 		player.respawned.connect(boss.reset)
 	for sp in spitters:
 		sp.player = player
+	for fj in flame_jets:
+		fj.player = player
+	if reaper:
+		reaper.player = player
+		player.respawned.connect(reaper.reset)
 	for wr in wraiths:
 		wr.player = player
 		player.respawned.connect(wr.reset)
@@ -432,7 +498,7 @@ func _set_cell(cell: Vector2i, c: String) -> void:
 
 
 func _on_boss_defeated() -> void:
-	hud.show_banner("THE BONE KING IS DEFEATED!\nThe way out is open.", 3.5, 26)
+	hud.show_banner("%s IS DEFEATED!\nThe way out is open." % boss_name, 3.5, 26)
 	if exit_portal:
 		exit_portal.visible = true
 		exit_portal.process_mode = Node.PROCESS_MODE_INHERIT
