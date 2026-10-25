@@ -9,6 +9,11 @@ const LEVEL_SELECT_SCENE := "res://scenes/level_select.tscn"
 const LEVEL_SCENE := "res://scenes/level.tscn"
 const INTRO_SCENE := "res://scenes/intro.tscn"
 
+## Phones held sideways are wide but short, so the whole level looks tiny.
+## On touch screens shorter than this (in CSS pixels) the level camera zooms in.
+const PHONE_ZOOM_HEIGHT := 520.0
+const PHONE_ZOOM_MAX := 1.45
+
 var level_paths: PackedStringArray = []
 var level_headers: Array = []
 var current_level := 0
@@ -97,6 +102,28 @@ func goto_level_select() -> void:
 ## The level the PLAY button starts: the furthest one you've unlocked.
 func continue_level() -> int:
 	return clampi(unlocked - 1, 0, maxi(level_count() - 1, 0))
+
+
+# ---------------------------------------------------------------------
+#  Phone zoom
+# ---------------------------------------------------------------------
+## How much the level camera zooms in: about 1.33 on a phone held sideways,
+## 1.0 on tablets, computers, and phones held upright.
+func phone_zoom() -> float:
+	if not DisplayServer.is_touchscreen_available():
+		return 1.0
+	var css_height := 0.0
+	if OS.has_feature("web"):
+		css_height = float(str(JavaScriptBridge.eval("window.innerHeight", true)))
+	else:
+		css_height = DisplayServer.window_get_size().y / maxf(DisplayServer.screen_get_scale(), 1.0)
+	return zoom_for_height(css_height)
+
+
+static func zoom_for_height(css_height: float) -> float:
+	if css_height <= 0.0:
+		return 1.0
+	return clampf(PHONE_ZOOM_HEIGHT / css_height, 1.0, PHONE_ZOOM_MAX)
 
 
 # ---------------------------------------------------------------------

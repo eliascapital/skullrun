@@ -33,17 +33,17 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if _cooldown > 0.0 or partner == null or not body.is_in_group("player") or body.dead:
+	if _cooldown > 0.0 or partner == null or not body.is_in_group("player") or body.dead or body.is_warping():
 		return
 	partner.arrive()
 	_flash = 1.0
-	body.warp_to(partner.global_position)
+	body.warp_to(global_position + Vector2(0, -6), partner.global_position)
 	Sfx.play("warp")
 
 
 ## The player is about to pop out of this portal.
 func arrive() -> void:
-	_cooldown = 0.5
+	_cooldown = 0.7
 	_flash = 1.0
 
 

@@ -27,12 +27,15 @@ const JUMP_BUFFER := 0.12  # pressing jump just before landing still counts
 const WALL_SLIDE_SPEED := 130.0  # how fast you slide down a wall you're holding
 const WALL_JUMP_VELOCITY := Vector2(300.0, -640.0)
 const WALL_JUMP_LOCK := 0.16  # seconds you can't steer after a wall jump
+const LONE_KICK := 0.5  # a kick off a lone wall after your double jump is just a little hop
 const WALL_COYOTE := 0.1
 const ICE_SPEED := 250.0  # on ice you always slide at this speed
 const WIND_LIFT := -340.0  # how fast soul vents carry you upward
 const SLAM_SPEED := 1100.0  # ground slam: press DOWN in mid-air
 const RESPAWN_DELAY := 0.8
-const RESPAWN_SAFE_TIME := 1.5  # enemies can't hurt you right after respawning
+const RESPAWN_SAFE_TIME := 1.5
+const WARP_TIME := 0.12  # shrinking into a warp portal, and again growing out of the other one
+const WARP_PAN_SPEED := 1100.0  # how fast the camera glides over to the other portal (pixels/s)  # enemies can't hurt you right after respawning
 
 var can_double_jump := true
 var can_dash := true
@@ -76,6 +79,11 @@ var _safe_time := 0.0
 var _wind_time := 0.0
 var _flip_time := 0.0
 var _slamming := false
+var _warp_t := -1.0  # time since stepping into a portal (-1 = not warping)
+var _warp_entry := Vector2.ZERO
+var _warp_exit := Vector2.ZERO
+var _warp_vel := Vector2.ZERO
+var _warp_scale := 1.0
 
 var camera: Camera2D
 var _particles: CPUParticles2D
@@ -144,6 +152,9 @@ func _physics_process(delta: float) -> void:
 			modulate.a = 1.0
 
 	if dead:
+		return
+	if _warp_t >= 0.0:
+		_update_warp(delta)
 		return
 	_update_gravity_zone(delta)
 	var g := gravity_dir
@@ -326,23 +337,44 @@ func _tile_below() -> String:
 func _touching_wall(dir: float) -> float:
 	var sides := [signf(dir), -signf(dir)] if not is_zero_approx(dir) else [facing, -facing]
 	for s in sides:
-		if test_move(global_transform, Vector2(s * 3.0, 0.0)):
-			if tile_at.is_valid() and tile_at.call(global_position + Vector2(s * 18.0, 0)) == "I":
-				continue
+		if test_move(global_transform, Vector2(s * 3.0, 0.0)) and not _icy_wall(s):
 			return s
 	return 0.0
 
 
+## True if any part of the wall beside us (level with our top, middle or
+## feet) is ice, so walls that are only partly icy can't be grabbed either.
+func _icy_wall(side: float) -> bool:
+	if not tile_at.is_valid():
+		return false
+	for dy in [-15.0, -5.0, 5.0, 15.0]:
+		if tile_at.call(global_position + Vector2(side * 18.0, dy)) == "I":
+			return true
+	return false
+
+
 func _wall_jump() -> void:
-	velocity = Vector2(-_wall_side * WALL_JUMP_VELOCITY.x, WALL_JUMP_VELOCITY.y * gravity_dir)
+	# Kicking back and forth up a shaft gives you your double jump and dash
+	# back. A kick off a lone wall doesn't: it uses up your double jump instead,
+	# and if that's already gone it's only a little hop, so one wall on its own
+	# never takes you higher than a double jump would.
+	var in_shaft := _last_wall_jump_side == -_wall_side
+	var up := WALL_JUMP_VELOCITY.y
+	if not in_shaft:
+		if _air_jumps > 0:
+			_air_jumps = 0
+		else:
+			up *= LONE_KICK
+	velocity = Vector2(-_wall_side * WALL_JUMP_VELOCITY.x, up * gravity_dir)
 	_last_wall_jump_side = _wall_side
 	_wall_lock = WALL_JUMP_LOCK
 	_wall_coyote = 0.0
 	_coyote = 0.0
 	_buffer = 0.0
 	_launched = false
-	_air_jumps = 1 if can_double_jump else 0
-	_dash_ready = true
+	if in_shaft:
+		_air_jumps = 1 if can_double_jump else 0
+		_dash_ready = true
 	facing = -_wall_side
 	_squash = Vector2(0.75, 1.3)
 	Sfx.play("wall_jump")
@@ -414,13 +446,13 @@ func is_safe() -> bool:
 
 ## Called by enemies. Ignored right after a respawn.
 func hurt() -> void:
-	if is_safe():
+	if is_safe() or is_warping():
 		return
 	die()
 
 
 func die() -> void:
-	if dead or frozen:
+	if dead or frozen or is_warping():
 		return
 	dead = true
 	velocity = Vector2.ZERO
@@ -444,19 +476,67 @@ func respawn() -> void:
 	_last_wall_jump_side = 0.0
 	_set_gravity(1.0)
 	_flip_time = 0.0
+	_warp_t = -1.0
+	_warp_scale = 1.0
 	_safe_time = RESPAWN_SAFE_TIME
 	camera.reset_smoothing()
 	respawned.emit()
 
 
-## Called by warp portals: jump straight to another spot, keeping your speed.
-func warp_to(pos: Vector2) -> void:
-	global_position = pos
-	reset_physics_interpolation()
+## Called by warp portals: get pulled into the portal at `entry`, then pop
+## out at `exit` with the speed you went in with, while the camera glides over.
+func warp_to(entry: Vector2, exit: Vector2) -> void:
+	_warp_t = 0.0
+	_warp_entry = entry
+	_warp_exit = exit
+	_warp_vel = velocity
+	velocity = Vector2.ZERO
 	_trail.clear()
-	_squash = Vector2(0.6, 1.4)
-	camera.reset_smoothing()
-	_burst(Config.COLOR_PURPLE, 10)
+
+
+func is_warping() -> bool:
+	return _warp_t >= 0.0
+
+
+func _update_warp(delta: float) -> void:
+	var was := _warp_t
+	_warp_t += delta
+	if _warp_t < WARP_TIME:
+		# sucked into the swirl, shrinking as we go
+		var k := _warp_t / WARP_TIME
+		global_position = global_position.lerp(_warp_entry, minf(1.0, k * 1.5))
+		_warp_scale = 1.0 - k
+		return
+	if was < WARP_TIME:
+		# through! jump to the other portal, and let the camera catch up smoothly
+		var from_view := camera.get_screen_center_position()
+		global_position = _warp_exit
+		reset_physics_interpolation()
+		camera.reset_smoothing()
+		camera.force_update_scroll()
+		# where the camera lands (its target kept inside the level), so we can
+		# start the view where it was and glide it over from there
+		var half := get_viewport_rect().size / camera.zoom * 0.5
+		var target := camera.get_target_position()
+		var to_view := Vector2(
+			clampf(target.x, camera.limit_left + half.x, maxf(camera.limit_left + half.x, camera.limit_right - half.x)),
+			clampf(target.y, camera.limit_top + half.y, maxf(camera.limit_top + half.y, camera.limit_bottom - half.y)))
+		camera.offset = from_view - to_view
+		var tw := create_tween()
+		var pan_time := clampf(camera.offset.length() / WARP_PAN_SPEED, 0.25, 0.7)
+		tw.tween_property(camera, "offset", Vector2.ZERO, pan_time) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		_warp_scale = 0.0
+		_burst(Config.COLOR_PURPLE, 10)
+		return
+	if _warp_t < WARP_TIME * 2.0:
+		_warp_scale = (_warp_t - WARP_TIME) / WARP_TIME
+		return
+	# out the other side, still moving the way we went in
+	_warp_t = -1.0
+	_warp_scale = 1.0
+	velocity = _warp_vel
+	_squash = Vector2(0.7, 1.3)
 
 
 func _burst(color: Color, amount: int) -> void:
@@ -491,12 +571,12 @@ func _draw() -> void:
 		for i in 4:
 			var x := -9.0 + i * 6.0
 			draw_line(Vector2(x, -18.0 * g), Vector2(x, -40.0 * g), Color(Config.COLOR_BONE, 0.35), 2.0)
-	var lean := clampf(velocity.x / RUN_SPEED, -1.0, 1.0) * 0.12 * g
+	var lean := clampf(velocity.x / RUN_SPEED, -1.0, 1.0) * 0.12 * g + (1.0 - _warp_scale) * TAU
 	var bob := 0.0
 	if is_on_floor() and absf(velocity.x) > 20.0:
 		bob = absf(sin(_time * 16.0)) * -2.5
 	var body_offset := Vector2(0, (13.0 * (1.0 - _squash.y) + bob) * g)
-	var body_scale := Vector2(_squash.x, _squash.y * g)
+	var body_scale := Vector2(_squash.x, _squash.y * g) * _warp_scale
 	draw_set_transform(body_offset, lean, body_scale)
 	var eye := Config.COLOR_ACCENT.lerp(Color.WHITE, 0.25 + 0.15 * sin(_time * 6.0))
 	if not _dash_ready and can_dash:
