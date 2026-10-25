@@ -15,9 +15,11 @@ mkdir -p build/play
 "$GODOT" --headless --path . --export-release "Web" build/play/index.html
 test -s build/play/index.wasm
 test -s build/play/index.pck
+# give the game data a new name for every version so browsers don't keep an old copy
+python3 website/cache_bust.py build/play
 
 cp -r website/. build/
-rm -f build/build.sh build/.gdignore build/gen_levels.py
+rm -f build/build.sh build/.gdignore build/gen_levels.py build/cache_bust.py
 python3 website/gen_levels.py build/index.html
 touch build/.nojekyll
 echo "Website built in ./build"
