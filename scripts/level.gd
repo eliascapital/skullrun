@@ -86,6 +86,8 @@ func _ready() -> void:
 	hud.next_requested.connect(Game.next_level)
 	hud.menu_requested.connect(Game.goto_title)
 	hud.update_stats(gems, total_gems, time, deaths)
+	_apply_zoom()
+	get_viewport().size_changed.connect(_apply_zoom)
 	var touch := TouchControls.new()
 	touch.player = player
 	touch.pause_pressed.connect(hud.set_paused.bind(true))
@@ -100,6 +102,13 @@ func _process(delta: float) -> void:
 	if running and player.has_moved:
 		time += delta
 	hud.update_stats(gems, total_gems, time, deaths)
+
+
+## Zooms the camera in on phones (see Game.phone_zoom), again whenever the
+## screen is turned.
+func _apply_zoom() -> void:
+	var z := Game.phone_zoom()
+	player.camera.zoom = Vector2(z, z)
 
 
 ## True if the world position is inside a solid ground tile.

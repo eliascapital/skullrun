@@ -74,7 +74,7 @@ func _physics_process(delta: float) -> void:
 			_grace -= delta
 			if _grace <= 0.0 and not player.dead:
 				var gap := player.global_position.x - global_position.x
-				_drift(delta, CATCH_UP_SPEED if gap > MAX_GAP else SPEED)
+				_drift(delta, CATCH_UP_SPEED if gap > _max_gap() else SPEED)
 			for body in get_overlapping_bodies():
 				if body == player:
 					player.hurt()
@@ -91,6 +91,14 @@ func _physics_process(delta: float) -> void:
 			if _state_time > 0.6:
 				_set_state(State.GONE)
 				visible = false
+
+
+## How far behind he may fall: MAX_GAP, or less if the screen is narrower
+## (a zoomed-in phone), so he always stays in view.
+func _max_gap() -> float:
+	var cam: Camera2D = player.camera
+	var half_view := get_viewport_rect().size.x / cam.zoom.x * 0.5
+	return minf(MAX_GAP, half_view - 48.0)
 
 
 ## Moves right at `speed`, and up or down towards the player.
