@@ -32,6 +32,11 @@ func _ready() -> void:
 	_streams["slam"] = _make([[120, 30, 0.35, "noise", 0.45], [80, 40, 0.2, "saw", 0.3]])
 	_streams["boss_hit"] = _make([[500, 120, 0.25, "square", 0.3], [200, 60, 0.25, "noise", 0.3]])
 	_streams["wall_jump"] = _make([[400, 800, 0.1, "triangle", 0.3]])
+	_streams["warp"] = _make([[300, 1200, 0.12, "triangle", 0.3], [1200, 500, 0.12, "triangle", 0.25]])
+	_streams["flame"] = _make([[600, 200, 0.45, "noise", 0.22]])
+	_streams["cast"] = _make([[200, 700, 0.18, "saw", 0.2], [700, 350, 0.12, "triangle", 0.2]])
+	_streams["vanish"] = _make([[900, 150, 0.3, "triangle", 0.3]])
+	_streams["laugh"] = _make([[180, 150, 0.12, "saw", 0.3], [170, 140, 0.12, "saw", 0.3], [160, 120, 0.2, "saw", 0.3]])
 	_streams["click"] = _make([[660, 660, 0.04, "square", 0.15]])
 	_streams["hover"] = _make([[440, 440, 0.025, "triangle", 0.12]])
 

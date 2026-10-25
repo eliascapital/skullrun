@@ -60,6 +60,11 @@ also get a full screen button (`website/play/fullscreen.js`).
 | 13 | Spitter Hollows | **Skull Spitters**: totems that spit fireballs along the ground |
 | 14 | Topsy-Turvy Tombs | Gravity + slams + spitters, including slamming *up* through ceilings |
 | 15 | Heart of the Abyss | Everything together, even upside-down ice |
+| 16 | The Warp Gates | **Warp portals**: step into one, come out of its twin |
+| 17 | The Soul Furnace | **Flame jets**: grates that blast fire in a steady rhythm |
+| 18 | Halls of Echoes | Portals in the sky, wraiths, crumbling blocks and fire |
+| 19 | Gates of the Keep | Everything at once: slams, wall jumps, portal chains, spitters |
+| 20 | The Reaper's Tower | **The Reaper chases you!** Then the **boss**: Mortis the Lich |
 
 The first time you press PLAY, a short story plays (a man walking to work, the
 Reaper's army taking over the world, and a skull waking up in a sealed tomb).

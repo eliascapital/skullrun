@@ -74,6 +74,14 @@ a { color: inherit; }
   50% { text-shadow: 0 9px 0 var(--accent), 0 0 60px rgba(230, 57, 70, 0.5); }
 }
 @media (prefers-reduced-motion: reduce) { .title { animation: none; } }
+.from {
+  margin: 0 0 6px; color: var(--muted); font-size: 14px;
+  text-transform: uppercase; letter-spacing: 2px;
+}
+.from b {
+  font-family: "Creepster", cursive; font-weight: 400; font-size: 22px;
+  letter-spacing: 1.5px; color: var(--bone); vertical-align: -2px;
+}
 .tagline {
   margin: 14px 0 0; color: var(--accent);
   text-transform: uppercase; letter-spacing: 2px; font-weight: 500;
@@ -171,7 +179,7 @@ a { color: inherit; }
 .tags b { color: var(--bone); margin-right: 6px; }
 
 /* enemies */
-.enemies { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.enemies { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 @media (max-width: 820px) { .enemies { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 460px) { .enemies { grid-template-columns: 1fr; } }
 .enemies article {

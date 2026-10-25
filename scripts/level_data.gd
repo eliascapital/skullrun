@@ -4,7 +4,7 @@ extends RefCounted
 
 const MIN_HEIGHT := 20  # levels shorter than this get empty sky added on top
 
-const KNOWN_CHARS := ".#-X^v~IoPECGBSMVJKWRHT:123456789 "
+const KNOWN_CHARS := ".#-X^v~IoPECGBSMVJKLWRHTFYZabcdefgh:123456789 "
 
 
 static func list_level_files() -> PackedStringArray:

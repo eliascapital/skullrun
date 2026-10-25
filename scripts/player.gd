@@ -449,6 +449,16 @@ func respawn() -> void:
 	respawned.emit()
 
 
+## Called by warp portals: jump straight to another spot, keeping your speed.
+func warp_to(pos: Vector2) -> void:
+	global_position = pos
+	reset_physics_interpolation()
+	_trail.clear()
+	_squash = Vector2(0.6, 1.4)
+	camera.reset_smoothing()
+	_burst(Config.COLOR_PURPLE, 10)
+
+
 func _burst(color: Color, amount: int) -> void:
 	_particles.color = color
 	_particles.amount = amount
