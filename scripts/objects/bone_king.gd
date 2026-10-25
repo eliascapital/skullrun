@@ -14,6 +14,7 @@ const SkullArt = preload("res://scripts/skull_art.gd")
 const BossBone = preload("res://scripts/objects/boss_bone.gd")
 const BossShockwave = preload("res://scripts/objects/boss_shockwave.gd")
 
+const BOSS_NAME := "THE BONE KING"
 const MAX_HP := 3
 const GRAVITY := 1800.0
 const WAKE_DISTANCE := 30.0 * 32.0
@@ -91,7 +92,7 @@ func _physics_process(delta: float) -> void:
 				_set_state(State.INTRO)
 				Sfx.play("roar")
 				level.shake(10.0, 0.8)
-				level.hud.show_boss_bar("THE BONE KING", MAX_HP)
+				level.hud.show_boss_bar(BOSS_NAME, MAX_HP)
 		State.INTRO:
 			if _state_time > 1.4:
 				_next_attack()

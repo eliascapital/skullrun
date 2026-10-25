@@ -13,7 +13,7 @@ import sys
 THEME_COLORS = {
     "crypt": "#6d5f8f", "graveyard": "#3f7a4a", "bonecaves": "#d8c9a8", "forge": "#ff7b2e",
     "tower": "#e63946", "frost": "#8fd8f0", "wells": "#6bd49a", "ossuary": "#efe4cc",
-    "throne": "#ffd166", "abyss": "#4ff0d0",
+    "throne": "#ffd166", "abyss": "#4ff0d0", "keep": "#59ff8a",
 }
 
 
@@ -27,7 +27,7 @@ def read_level(path):
             in_map = True
             continue
         if in_map:
-            if not line.startswith(";") and "K" in line:
+            if not line.startswith(";") and ("K" in line or "L" in line):  # the two bosses
                 is_boss = True
         elif ":" in line and not line.startswith(";"):
             key, value = line.split(":", 1)

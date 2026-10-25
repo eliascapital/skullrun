@@ -2,8 +2,8 @@ name: Bone Caves
 theme: bonecaves
 about: Dash, crumbling blocks, bats
 abilities: jump double dash
-banner: NEW POWER: DASH!\nPress SHIFT or X to dash forward.
-sign1: A burst of speed!\nPress SHIFT or X to DASH over the spikes.
+banner: NEW POWER: DASH!\nPress SHIFT, X or the dash button to dash forward.
+sign1: A burst of speed!\nPress SHIFT, X or the dash button to DASH over the spikes.
 sign2: Long gap ahead! Jump, double jump,\nthen DASH at the very top.
 sign3: Cracked blocks crumble when you stand on them.\nKeep moving!
 sign4: Bats swoop up and down.\nWait for a gap, then run!

@@ -2,7 +2,7 @@
 
 Every level is a plain text file in this folder. The game finds them on its own:
 any file named `level_XX.txt` becomes a level, in alphabetical order. So to add
-level 16, copy `level_15.txt` to `level_16.txt` and start editing (`level_10` is the boss level, so don't copy that one). Use two digits
+level 16, copy `level_15.txt` to `level_16.txt` and start editing (`level_10` and `level_20` are boss levels, so don't copy those). Use two digits
 (`level_06`, `level_42`), or three if you ever go past 99 (`level_100` would sort
 before `level_11`, so rename them all to `level_001` and so on).
 
@@ -11,7 +11,7 @@ before `level_11`, so rename them all to `level_001` and so on).
 ```
 name: Moonlit Graveyard          <- shown on the level menu and HUD
 theme: graveyard                 <- crypt, graveyard, bonecaves, forge, tower,
-                                    frost, wells, ossuary, throne or abyss
+                                    frost, wells, ossuary, throne, abyss or keep
 about: Double jump, skeletons     <- short description for the website's level list
 abilities: jump double           <- any of: jump double dash wall slam (leave it out for all of them)
 banner: NEW POWER: DOUBLE JUMP!  <- optional message shown at the start
@@ -59,6 +59,10 @@ that their bottoms line up.
 | `J`  | jump pad: launches you about 8 tiles up |
 | `W`  | soul vent: a column of purple wind that lifts you up to 10 tiles (until it hits a ceiling). Riding it refills your double jump and dash. Put one at the very bottom of a pit to catch falling players |
 | `K`  | the Bone King boss (one per level). The exit `E` stays hidden until he's defeated. Give him a flat arena with a wall at each end — he gets dizzy when he charges into a wall |
+| `L`  | Mortis the Lich boss (one boss per level). Put him on the floor of an arena with a wall at each end (the arena is the space between those walls). He floats around casting spells, then sinks to the floor, drained, for you to stomp. The exit `E` stays hidden until he's defeated |
+| `a`–`h` | warp portals. Put exactly two of the same letter in a level: walking (or jumping) into one pops you out of the other, still moving the way you were going. Each letter has its own colour. A portal can float in the air too |
+| `F`  | flame jet: a grate that blasts fire 3 tiles long every 3 seconds (it glows just before). On a floor it fires up, under a ceiling it fires down. A row like `FF` is one wide jet. Every jet in a level fires at the same time |
+| `Y`, `Z` | the Reaper's chase: once you pass the `Y` column the Reaper appears behind you and chases you (a bit slower than you run, straight through walls). At the `Z` column he teleports next to you, says his piece about the level's boss, and leaves. Only run-forward obstacles in between, since you can't stop for long |
 | `M`  | moving platform (left/right). A row like `MMM` is one 3-wide platform; it moves 4 tiles right and back |
 | `V`  | moving platform (up/down). Moves 4 tiles up from where you draw it, and back |
 | `1`–`9` | hint sign that shows the matching `signN:` text |

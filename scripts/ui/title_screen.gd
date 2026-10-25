@@ -116,6 +116,7 @@ func _build_help() -> void:
 		["Ground slam", "S / Down arrow in mid-air  (from level 12)"],
 		["Pause", "ESC / P"],
 		["Restart level", "R"],
+		["Touch screen", "Joystick to move (down in mid-air to slam),\nbuttons to jump and dash"],
 	]
 	var grid := GridContainer.new()
 	grid.columns = 2
@@ -126,7 +127,7 @@ func _build_help() -> void:
 		grid.add_child(UI.make_label(l[1], 16, Config.COLOR_BONE, HORIZONTAL_ALIGNMENT_LEFT))
 	box.add_child(grid)
 	box.add_child(_spacer(6))
-	var tips := UI.make_label("Collect the glowing soul gems, light the lanterns (checkpoints)\nand jump into the swirling portal to finish each level.\nStomp skeletons from above, but never touch ghosts or wraiths!\nIce: no jumping or turning. Purple vents lift you. Blue zones flip gravity.", 14, Config.COLOR_MUTED)
+	var tips := UI.make_label("Collect the glowing soul gems, light the lanterns (checkpoints)\nand jump into the swirling portal to finish each level.\nStomp skeletons, but never touch ghosts! Ice: no jumping or turning.\nVents lift you, blue zones flip gravity, coloured portals warp you.", 14, Config.COLOR_MUTED)
 	box.add_child(tips)
 	box.add_child(_spacer(8))
 	var back := UI.make_button("GOT IT", true, 180)

@@ -122,6 +122,14 @@ const THEMES := {
 		"hazard": Color("d8f0ff"), "liquid": Color("ff4fd8"),
 		"moon": false, "scenery": "islands",
 	},
+	"keep": {
+		"sky_top": Color("06040c"), "sky_bottom": Color("1e1430"),
+		"far": Color("120c1e"), "near": Color("1a1128"),
+		"tile": Color("2c2636"), "tile_dark": Color("1d1926"), "tile_light": Color("3c3449"),
+		"tile_top": Color("59ff8a"), "platform": Color("4a3a52"),
+		"hazard": Color("d6ffe2"), "liquid": Color("59ff8a"),
+		"moon": true, "scenery": "spires",
+	},
 }
 
 const DEFAULT_THEME := "crypt"

@@ -32,6 +32,7 @@
 <section class="hero">
   <canvas id="skulls" aria-hidden="true"></canvas>
   <div class="hero-inner">
+    <p class="from">From the same creators of <b>SKULLFALL</b></p>
     <h1 class="title">SKULLRUN</h1>
     <p class="tagline">Escape the crypt. Outrun the Reaper.</p>
     <p class="lead">One ordinary morning, the Reaper and his army of the dead took over the world.
@@ -42,7 +43,7 @@
       <a class="btn btn-primary" href="play/">&#9654;&nbsp; Play in your browser</a>
       <a class="btn" href="https://github.com/eliascapital/skullrun/archive/refs/heads/main.zip">Download for Godot</a>
     </div>
-    <p class="facts">Free &nbsp;•&nbsp; {{LEVEL_COUNT}} levels &nbsp;•&nbsp; a boss fight &nbsp;•&nbsp; keyboard or gamepad</p>
+    <p class="facts">Free &nbsp;•&nbsp; {{LEVEL_COUNT}} levels &nbsp;•&nbsp; two boss fights &nbsp;•&nbsp; keyboard, gamepad or touch screen</p>
     <figure class="hero-shot">
       <img src="img/boss.webp" alt="The skull facing the Bone King in his throne room" width="1280" height="720">
     </figure>
@@ -64,6 +65,9 @@
     <button class="shot" data-full="img/boss.webp"><img src="img/boss.webp" alt="Throne of Bones" loading="lazy"><span>Throne of Bones</span></button>
     <button class="shot" data-full="img/abyss.webp"><img src="img/abyss.webp" alt="The Upside Abyss" loading="lazy"><span>The Upside Abyss</span></button>
     <button class="shot" data-full="img/spitter.webp"><img src="img/spitter.webp" alt="Spitter Hollows" loading="lazy"><span>Spitter Hollows</span></button>
+    <button class="shot" data-full="img/keep.webp"><img src="img/keep.webp" alt="The Warp Gates" loading="lazy"><span>The Reaper's Keep</span></button>
+    <button class="shot" data-full="img/chase.webp"><img src="img/chase.webp" alt="The Reaper chasing the skull" loading="lazy"><span>The Reaper's Chase</span></button>
+    <button class="shot" data-full="img/sanctum.webp"><img src="img/sanctum.webp" alt="The skull facing Mortis the Lich" loading="lazy"><span>Mortis's Sanctum</span></button>
   </div>
 
   <ol class="levels">
@@ -100,6 +104,9 @@
     <span><b>Lava &amp; acid</b> don't touch</span>
     <span><b>Crumbling blocks</b> keep moving</span>
     <span><b>Jump pads</b> sky-high bounces</span>
+    <span><b>Warp portals</b> in one, out the other</span>
+    <span><b>Flame jets</b> run when the grates go dark</span>
+    <span><b>The Reaper's chase</b> don't stop running</span>
   </div>
 </section>
 
@@ -111,7 +118,9 @@
     <article><img src="img/e_bat.webp" alt=""><h3>Bat</h3><p>Swoops up and down. Watch the rhythm.</p></article>
     <article><img src="img/e_wraith.webp" alt=""><h3>Wraith</h3><p>Wakes when you're close and drifts after you through walls.</p></article>
     <article><img src="img/e_spitter.webp" alt=""><h3>Skull Spitter</h3><p>Spits fireballs along the ground. Jump them, then smash it.</p></article>
+    <article><img src="img/e_reaper.webp" alt=""><h3>The Reaper</h3><p>He's found you! Drifts after you through walls. Slow down and he'll catch you.</p></article>
     <article class="boss-card"><img src="img/e_boneking.webp" alt=""><h3>The Bone King</h3><p>Throws bones, charges and slams the ground. Make him crash into a wall, then stomp his crown three times.</p></article>
+    <article class="boss-card"><img src="img/e_lich.webp" alt=""><h3>Mortis the Lich</h3><p>Floats out of reach casting soul bolts and soul rain. When his magic runs out he sinks down: stomp him!</p></article>
   </div>
 </section>
 
@@ -125,8 +134,15 @@
     <div><kbd>Esc</kbd> <kbd>P</kbd><span>Pause</span></div>
     <div><kbd>R</kbd><span>Restart level</span></div>
   </div>
-  <p class="note">Gamepads work too. SKULLRUN needs a keyboard or gamepad, so it's best on a computer.
-    On a phone or tablet with a gamepad, tap the button in the corner to play full screen.</p>
+  <h3 class="sub">On a phone or tablet</h3>
+  <div class="controls">
+    <div><kbd>Joystick</kbd><span>Move (left thumb)</span></div>
+    <div><kbd>Jump</kbd><span>Jump (hold for higher)</span></div>
+    <div><kbd>Dash</kbd><span>Dash</span></div>
+    <div><kbd>Joystick</kbd> down in the air<span>Ground slam</span></div>
+  </div>
+  <p class="note">Gamepads work too. On a phone or tablet, tap the full screen button in the top-left corner,
+    and turn your phone sideways.</p>
 </section>
 
 <section class="section make">
