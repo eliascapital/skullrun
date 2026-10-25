@@ -81,8 +81,11 @@ directly above a `#`. Lava `~` usually goes in the top ground row, with `#` unde
 | Wall jump | climb any height between two stone walls 3–6 tiles apart | n/a |
 | Ground slam | drills down through any number of cracked `H` blocks | n/a |
 
-A single wall can't be climbed by itself (you can't kick off the same side twice in a
-row without landing), so a wall-jump climb needs two walls facing each other. A nice way to build one: a wall hanging from the top (with a gap of
+A single wall can't be climbed by itself: you can't kick off the same side twice in a
+row without landing, and a kick off a lone wall uses up your double jump (or is only a
+small hop if that's already gone), so one wall never gets you higher than a double jump.
+Kicking back and forth between two walls gives your double jump and dash back, so a
+wall-jump climb needs two walls facing each other. Walls with any ice on them can't be grabbed. A nice way to build one: a wall hanging from the top (with a gap of
 at least 3 tiles under it to walk through) and a full-height wall a few tiles to its right.
 
 Stick to the "plan for" numbers so jumps never need to be pixel-perfect.
