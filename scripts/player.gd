@@ -33,9 +33,9 @@ const ICE_SPEED := 250.0  # on ice you always slide at this speed
 const WIND_LIFT := -340.0  # how fast soul vents carry you upward
 const SLAM_SPEED := 1100.0  # ground slam: press DOWN in mid-air
 const RESPAWN_DELAY := 0.8
-const RESPAWN_SAFE_TIME := 1.5
+const RESPAWN_SAFE_TIME := 1.5  # enemies can't hurt you right after respawning
 const WARP_TIME := 0.12  # shrinking into a warp portal, and again growing out of the other one
-const WARP_PAN_SPEED := 1100.0  # how fast the camera glides over to the other portal (pixels/s)  # enemies can't hurt you right after respawning
+const WARP_PAN_SPEED := 1100.0  # how fast the camera glides over to the other portal (pixels/s)
 
 var can_double_jump := true
 var can_dash := true
