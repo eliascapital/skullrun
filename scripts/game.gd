@@ -23,6 +23,9 @@ var unlocked := 1  # number of levels you can play
 var best_times := {}  # level index (String) -> seconds
 var best_gems := {}  # level index (String) -> gems
 var seen_intro := false
+## Where the player has moved the touch buttons (see scripts/ui/touch_controls.gd).
+## Empty = the standard layout.
+var touch_layout := {}
 
 
 func _ready() -> void:
@@ -145,6 +148,7 @@ func save_progress() -> void:
 	cfg.set_value("progress", "best_times", best_times)
 	cfg.set_value("progress", "best_gems", best_gems)
 	cfg.set_value("progress", "seen_intro", seen_intro)
+	cfg.set_value("settings", "touch_layout", touch_layout)
 	cfg.save(SAVE_PATH)
 
 
@@ -156,6 +160,7 @@ func load_progress() -> void:
 	best_times = cfg.get_value("progress", "best_times", {})
 	best_gems = cfg.get_value("progress", "best_gems", {})
 	seen_intro = cfg.get_value("progress", "seen_intro", unlocked > 1)
+	touch_layout = cfg.get_value("settings", "touch_layout", {})
 
 
 func reset_progress() -> void:
