@@ -1,7 +1,35 @@
-// Full screen button for phones and tablets. The Web export's head include
-// (export_presets.cfg) loads this into the game page at build/play/.
+// Helpers for phones and tablets on the game page: a "turn your phone sideways"
+// message on phones held upright, and a full screen button. The Web export's head
+// include (export_presets.cfg) loads this into the game page at build/play/.
 (function () {
   if (!window.matchMedia('(pointer: coarse)').matches) return;  // touch screens only
+
+  // Phones (not tablets) held upright: ask the player to turn the phone sideways.
+  // Web pages can't force the turn themselves (iPhones don't allow it at all).
+  if (Math.min(screen.width, screen.height) < 600) {
+    const turnStyle = document.createElement('style');
+    turnStyle.textContent = `
+      #turn-phone {
+        position: fixed; inset: 0; z-index: 30; display: none;
+        flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+        padding: 24px; background: #0b0a10; color: #ece4d0; text-align: center;
+        font: 600 20px/1.4 sans-serif;
+      }
+      #turn-phone small { font-weight: 400; font-size: 15px; color: #9a92a8; }
+      #turn-phone svg { width: 96px; height: 96px; animation: turn-phone 2.4s ease-in-out infinite; }
+      @keyframes turn-phone { 0%, 25% { transform: rotate(0deg); } 55%, 100% { transform: rotate(-90deg); } }
+      @media (orientation: portrait) { #turn-phone { display: flex; } }
+    `;
+    document.head.appendChild(turnStyle);
+    const turn = document.createElement('div');
+    turn.id = 'turn-phone';
+    turn.innerHTML = '<svg viewBox="0 0 48 48" fill="none" stroke="#ece4d0" stroke-width="3" stroke-linejoin="round">'
+      + '<rect x="14" y="4" width="20" height="40" rx="4"/><circle cx="24" cy="38" r="1.5" fill="#e63946" stroke="none"/></svg>'
+      + '<div>Turn your phone sideways to play SKULLRUN</div>'
+      + '<small>If it won\'t turn, switch off your phone\'s rotation lock.</small>';
+    document.body.appendChild(turn);
+  }
+
   if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) return;
 
   const root = document.documentElement;
