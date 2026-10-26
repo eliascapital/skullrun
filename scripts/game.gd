@@ -35,6 +35,8 @@ func _ready() -> void:
 	for p in level_paths:
 		level_headers.append(LevelData.read_header(p))
 	load_progress()
+	get_tree().root.size_changed.connect(_fit_to_screen)
+	_fit_to_screen()
 
 
 func level_count() -> int:
@@ -127,6 +129,15 @@ static func zoom_for_height(css_height: float) -> float:
 	if css_height <= 0.0:
 		return 1.0
 	return clampf(PHONE_ZOOM_HEIGHT / css_height, 1.0, PHONE_ZOOM_MAX)
+
+
+## Wide screens show a bit more of the level at the sides ("expand"). An upright
+## screen (a phone held the tall way) would show a huge, tall slice of the level,
+## so it gets the normal widescreen picture with bars above and below instead.
+func _fit_to_screen() -> void:
+	var win := get_tree().root
+	var upright := win.size.y > win.size.x
+	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP if upright else Window.CONTENT_SCALE_ASPECT_EXPAND
 
 
 # ---------------------------------------------------------------------

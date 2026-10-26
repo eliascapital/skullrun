@@ -89,9 +89,13 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - Phones held sideways are short, so `Game.phone_zoom()` zooms the level camera in
   (≈1.33× at 390 CSS px tall, 1.0 on iPads/computers). Menus are not scaled — the How to
   Play panel already nearly fills a 540 px tall screen.
+- Upright screens (taller than wide) switch the window to the "keep" aspect, so they show
+  the normal 960×540 view with bars instead of a huge tall slice (`Game._fit_to_screen`).
 - Website-only: `website/play/fullscreen.js` (loaded via the Web export's `head_include`
   in `export_presets.cfg`) adds a full-screen button on touch devices, top-left under the
-  level name. iPhones can't go full screen; it shows "Add to Home Screen" instead.
+  level name (iPhones can't go full screen; it shows "Add to Home Screen" instead), and on
+  phones held upright covers the game with "Turn your phone sideways". Web pages can't
+  force the turn themselves.
 
 ## Website build
 `website/build.sh [godot]` exports the game to `build/play/`, renames the `.pck` by content
