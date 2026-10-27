@@ -1,6 +1,6 @@
 # SKULLRUN — notes for Claude
 
-A Godot 4.3 platformer about a cursed skull escaping the Reaper. 20 levels, two bosses,
+A Godot 4.3 platformer about a cursed skull escaping the Reaper. 25 levels, two bosses,
 playable in the browser (also on phones). Levels are text files in `levels/` (format in
 `levels/README.md`). The website (`website/`) is published to GitHub Pages by
 `.github/workflows/website.yml` on every push to `main`.
@@ -24,7 +24,8 @@ The owner wants the website to grow with the game, with no empty placeholder slo
   game's own drawing code, cropped and saved as `website/img/e_<name>.webp`.
   Give drawing code a `static func draw_<name>(ci: CanvasItem, ...)` so it can be reused
   for that picture (see `reaper.gd`, `lich.gd`). The enemy grid is 4 columns (2 on phones):
-  keep the card count a multiple of 4, or the last row has a hole.
+  keep the rows full, or the last row has a hole. Cards with class `wide` (the Reaper and
+  both bosses) fill 2 columns, so count them as 2 (it's 12 now: 6 small + 3 wide).
 - **New world/theme:** consider adding a screenshot to the gallery (`website/img/<name>.webp`,
   1280×720 in-game capture with the HUD). The gallery is 3 wide: add shots in threes.
 - Also update the level table in `README.md`, and hint signs that name keys should
@@ -64,7 +65,8 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - `a`–`h` warp portals (exactly two of a letter). The player shrinks into the portal,
   reappears at its twin with the same velocity, and the camera glides over (offset tween).
   The arriving portal ignores the player for a moment so they don't bounce back.
-- `F` flame jet: fires up from floors / down from ceilings, 3 tiles long; every jet in a
+- `F` flame jet: fires up from floors / down from ceilings, 9 tiles (taller than a double
+  jump) or until the first solid tile (`level._flame_length`); every jet in a
   level shares one 3-second rhythm (glows at 1.6 s, fires 2.0–3.0 s).
 - `Y` / `Z` the Reaper chase (`reaper.gd`): past column Y he chases through walls at 150 px/s
   (player runs 250), catching up fast if more than ~14 tiles behind (less on zoomed phones,
@@ -76,6 +78,18 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
   (always to a spot with nothing overhead) to be stomped. 3 hits. `K` is the Bone King.
   Each boss has `BOSS_NAME`; the level keeps `boss_name`; the exit stays hidden until the
   boss is beaten; on player respawn the boss resets.
+
+### Map characters added in levels 21–25
+- `Q` witch (`witch.gd`, drawing in `draw_witch`): hovers on a broom, throws a potion
+  (`potion.gd`, smiley face in `draw_potion`) every 2.6 s when the skull is within 12×8 tiles,
+  aimed to land where the skull is now, so it misses a skull that keeps moving. It explodes on
+  ground, walls or the skull (blast radius 46 px). Stomp or slam to defeat her. Her hitbox
+  spans about 1.5 tiles under her centre, so place her with two empty rows above the ground.
+  Never put witches where players must stand still (jet waits, moving platforms).
+  With witches in a chase level the Reaper says "my witches" instead of "my servants".
+- `m` hidden magma (`magma_block.gd`): solid like `#` and drawn as a plain block by the tile
+  slices; each block fades in a glow when the skull is within 6 tiles (full at 3) and kills on
+  touch. Single jumps over patches wider than 3 get tight, so keep jumped patches ≤ 3 wide.
 
 ### Touch screens and phones
 - `touch_controls.gd`: joystick + jump + dash + pause, pressing the normal input actions

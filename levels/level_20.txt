@@ -2,7 +2,7 @@ name: The Reaper's Tower
 theme: keep
 about: Boss: Mortis the Lich (and the Reaper!)
 abilities: jump double dash wall slam
-banner: FINAL LEVEL\nClimb the Reaper's tower and face its master.
+banner: Climb the Reaper's tower\nand face its master.
 sign1: The Reaper's tower. Something cold is watching you...\nWhen it comes for you, DON'T STOP RUNNING!
 sign2: MORTIS THE LICH rules this tower.\nStomp his head when he's DRAINED and sinks to the floor!
 

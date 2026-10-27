@@ -114,6 +114,44 @@ func _draw() -> void:
 			for i in 30:
 				draw_circle(Vector2(rng.randf_range(0, SEGMENT), rng.randf_range(0, h)), rng.randf_range(1, 2.5),
 					Color(Color("4ff0d0"), 0.15 + depth * 0.1))
+		"bog":
+			# twisted trees and crooked witch huts on stilts
+			for i in 5:
+				_tree(rng.randf_range(0, SEGMENT), ground - 20, rng)
+			for i in 2:
+				var x := rng.randf_range(0, SEGMENT - 120)
+				var hw := rng.randf_range(60, 90) * (0.7 + depth * 0.4)
+				var base := ground - 40.0
+				for k in 3:
+					draw_line(Vector2(x + 8 + k * (hw - 16) * 0.5, base), Vector2(x + 8 + k * (hw - 16) * 0.5, ground), color, 4.0)
+				draw_rect(Rect2(x, base - hw * 0.7, hw, hw * 0.7), color)
+				draw_colored_polygon(PackedVector2Array([Vector2(x - 10, base - hw * 0.68),
+					Vector2(x + hw * 0.4, base - hw * 1.5), Vector2(x + hw + 12, base - hw * 0.62)]), color)
+				draw_rect(Rect2(x + hw * 0.6, base - hw * 0.5, 12, 10), Color(Color("c46bff"), 0.22))
+			for i in 24:
+				draw_circle(Vector2(rng.randf_range(0, SEGMENT), rng.randf_range(h * 0.3, ground)), rng.randf_range(1, 2),
+					Color(Color("c6ff6b"), 0.18 + depth * 0.12))
+		"cauldrons":
+			# jagged rocks with big bubbling pots on top
+			for i in 6:
+				var x := rng.randf_range(-60, SEGMENT)
+				var rh := rng.randf_range(110, 230) * (0.6 + depth * 0.5)
+				var rw := rng.randf_range(90, 170)
+				draw_colored_polygon(PackedVector2Array([Vector2(x, ground + 20), Vector2(x + rw * 0.3, ground - rh),
+					Vector2(x + rw * 0.55, ground - rh * 0.8), Vector2(x + rw * 0.75, ground - rh * 1.05),
+					Vector2(x + rw, ground + 20)]), color)
+			for i in 3:
+				var x := rng.randf_range(40, SEGMENT - 80)
+				var r := rng.randf_range(26, 40) * (0.7 + depth * 0.4)
+				var cy := ground - r
+				var brew := Color("ff4fd8")
+				draw_circle(Vector2(x, cy), r, color)
+				for s in [-1.0, 1.0]:
+					draw_line(Vector2(x + s * r * 0.6, cy + r * 0.6), Vector2(x + s * r * 0.9, ground + 6), color, 6.0)
+				draw_rect(Rect2(x - r * 0.95, cy - r * 0.86, r * 1.9, 5), Color(brew, 0.22 + depth * 0.12))
+				draw_rect(Rect2(x - r * 1.1, cy - r * 0.8, r * 2.2, r * 0.3), color)
+				for k in 3:
+					draw_circle(Vector2(x + (k - 1) * r * 0.45, cy - r - 6.0 - k * 10.0), 2.0 + k, Color(brew, 0.1 + depth * 0.08))
 		"spires":
 			for i in 8:
 				var x := rng.randf_range(0, SEGMENT - 60)

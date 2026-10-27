@@ -1,7 +1,7 @@
 # SKULLRUN
 
 A spooky 2D platformer made with **Godot 4.3**. You play a runaway skull that
-escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 15 levels,
+escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 25 levels,
 collect soul gems, defeat the Bone King, and fall upward through the Abyss.
 
 ## Play it
@@ -71,6 +71,11 @@ menu (it asks first).
 | 18 | Halls of Echoes | Portals in the sky, wraiths, crumbling blocks and fire |
 | 19 | Gates of the Keep | Everything at once: slams, wall jumps, portal chains, spitters |
 | 20 | The Reaper's Tower | **The Reaper chases you!** Then the **boss**: Mortis the Lich |
+| 21 | The Witch's Bog | **Witches**: they fly on brooms and throw smiley potions that explode. Keep moving, or stomp them |
+| 22 | Ember Hollow | **Hidden magma**: blocks that look like stone until you get close, then glow. Touching one is deadly |
+| 23 | Brewing Marsh | Witches and magma together, plus crumbling bridges and a ground slam |
+| 24 | The Bubbling Cauldron | Magma, flame jets (too tall to jump over), portals and a magma lake |
+| 25 | The Witches' Wood | Everything at once, and the Reaper chases you again |
 
 The first time you press PLAY, a short story plays (a man walking to work, the
 Reaper's army taking over the world, and a skull waking up in a sealed tomb).
@@ -111,7 +116,7 @@ scripts/level.gd       builds a level from its text file
 scripts/player.gd      the skull
 scripts/objects/       gems, checkpoints, enemies, platforms, hazards…
 scripts/ui/            menus and the in-game HUD
-levels/                level_01.txt … level_15.txt
+levels/                level_01.txt … level_25.txt
 assets/fonts/          Creepster (title) and Rubik (text), both free OFL fonts
 ```
 

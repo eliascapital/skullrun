@@ -1,14 +1,19 @@
 extends Area2D
-## A flame jet: a grate in the floor (or ceiling) that blasts a column of
-## fire 3 tiles long every few seconds. The grate glows just before it fires.
-## Every jet in a level fires at the same time, so you can learn the rhythm.
+## A flame jet: a grate in the floor (or ceiling) that blasts a tall column of
+## fire every few seconds, up to a ceiling (or down to the floor). It's taller
+## than a double jump, so you can't hop over it: wait for it to stop, then run.
+## The grate glows just before it fires. Every jet in a level fires at the
+## same time, so you can learn the rhythm.
 
 const PERIOD := 3.0
 const WARN_AT := 1.6  # the grate starts glowing
 const FIRE_AT := 2.0  # flames on until the end of the cycle
-const LENGTH := 3.0 * 32.0
+## Tallest a jet can be (a double jump reaches about 7.5 tiles).
+const MAX_TILES := 9
 
 var width_tiles := 1
+## Set by the level: how many tiles the fire reaches before it hits something solid.
+var length_tiles := MAX_TILES
 ## 1 = flames shoot up from the floor, -1 = down from a ceiling.
 var dir := 1.0
 var color := Color("ff7b2e")
@@ -25,14 +30,20 @@ func _ready() -> void:
 	collision_mask = 2
 	monitorable = false
 	var w := width_tiles * 32.0
+	var length := _length()
 	_shape = CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
-	rect.size = Vector2(w - 8.0, LENGTH - 8.0)
+	# a little short of the flame tips, so a near miss isn't a hit
+	rect.size = Vector2(w - 8.0, length - 16.0)
 	_shape.shape = rect
 	# position is the top-left of the tile the jet sits in
 	var base_y := 32.0 if dir > 0.0 else 0.0
-	_shape.position = Vector2(w * 0.5, base_y - dir * LENGTH * 0.5)
+	_shape.position = Vector2(w * 0.5, base_y - dir * (length * 0.5 - 4.0))
 	add_child(_shape)
+
+
+func _length() -> float:
+	return length_tiles * 32.0
 
 
 func is_on() -> bool:
@@ -70,7 +81,7 @@ func _draw() -> void:
 		return
 	# the fire: flickering tongues, hot core
 	var k := clampf((_clock - FIRE_AT) / 0.12, 0.15, 1.0)
-	var length := LENGTH * k
+	var length := _length() * k
 	var t := _clock * 30.0
 	for layer in 3:
 		var shrink := layer * 5.0
@@ -79,8 +90,8 @@ func _draw() -> void:
 		var steps := width_tiles * 4
 		for i in steps + 1:
 			var x := shrink + i * (w - shrink * 2.0) / steps
-			var tip := length * (0.75 + 0.25 * sin(t + i * 2.1 + layer)) * (1.0 - layer * 0.22)
-			pts.append(Vector2(x, base_y - dir * (tip if i % 2 == 1 else tip * 0.8)))
+			var tip := length * (0.92 + 0.08 * sin(t + i * 2.1 + layer)) * (1.0 - layer * 0.18)
+			pts.append(Vector2(x, base_y - dir * (tip if i % 2 == 1 else tip - minf(18.0, tip * 0.2))))
 		pts.append(Vector2(w - shrink, base_y))
 		pts.append(Vector2(shrink, base_y))
 		draw_colored_polygon(pts, col)

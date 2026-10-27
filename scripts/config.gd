@@ -130,6 +130,22 @@ const THEMES := {
 		"hazard": Color("d6ffe2"), "liquid": Color("59ff8a"),
 		"moon": true, "scenery": "spires",
 	},
+	"bog": {
+		"sky_top": Color("070d0c"), "sky_bottom": Color("23362a"),
+		"far": Color("12201a"), "near": Color("182a20"),
+		"tile": Color("38392e"), "tile_dark": Color("26271f"), "tile_light": Color("4a4b3c"),
+		"tile_top": Color("a3d94a"), "platform": Color("6a5034"),
+		"hazard": Color("e4ecc8"), "liquid": Color("c46bff"),
+		"moon": true, "scenery": "bog",
+	},
+	"cauldron": {
+		"sky_top": Color("0e0610"), "sky_bottom": Color("3a1224"),
+		"far": Color("1e0a18"), "near": Color("2a0e1e"),
+		"tile": Color("34303a"), "tile_dark": Color("232028"), "tile_light": Color("46404e"),
+		"tile_top": Color("b07cff"), "platform": Color("5a3e48"),
+		"hazard": Color("f0dcff"), "liquid": Color("ff4fd8"),
+		"moon": false, "scenery": "cauldrons",
+	},
 }
 
 const DEFAULT_THEME := "crypt"
