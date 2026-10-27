@@ -31,6 +31,8 @@ const WarpPortal = preload("res://scripts/objects/warp_portal.gd")
 const FlameJet = preload("res://scripts/objects/flame_jet.gd")
 const Reaper = preload("res://scripts/objects/reaper.gd")
 const Lich = preload("res://scripts/objects/lich.gd")
+const Witch = preload("res://scripts/objects/witch.gd")
+const MagmaBlock = preload("res://scripts/objects/magma_block.gd")
 
 ## Warp portal pairs: map letter -> colour.
 const WARP_COLORS := {
@@ -53,6 +55,8 @@ var exit_portal: Area2D
 var wraiths: Array = []
 var spitters: Array = []
 var flame_jets: Array = []
+var witches: Array = []
+var magma: Array = []
 var cracked := {}  # Vector2i cell -> cracked block
 
 var total_gems := 0
@@ -123,7 +127,7 @@ func is_solid_at(world_pos: Vector2) -> bool:
 	if y >= height:
 		return true
 	var c: String = (grid[y] as String)[x]
-	return c == "#" or c == "-" or c == "X" or c == "I" or c == "H"
+	return c == "#" or c == "-" or c == "X" or c == "I" or c == "H" or c == "m"
 
 
 ## The map character at a world position ("." outside the map).
@@ -189,7 +193,7 @@ func _build_tiles() -> void:
 	body.collision_layer = 1
 	body.collision_mask = 0
 	add_child(body)
-	for ch in ["#", "I", "-"]:
+	for ch in ["#", "I", "-", "m"]:
 		var open := {}  # "x0,x1" -> Rect2i of rows above that can grow down
 		var done: Array[Rect2i] = []
 		for y in height:
@@ -261,7 +265,7 @@ func _build_objects() -> Vector2:
 			var center := Vector2(x * T + T * 0.5, y * T + T * 0.5)
 			var corner := Vector2(x * T, y * T)
 			var run := 1
-			if c in ["^", "v", "~", "M", "V", "F"]:
+			if c in ["^", "v", "~", "M", "V", "F", "m"]:
 				while x + run < width and row[x + run] == c:
 					run += 1
 			match c:
@@ -307,6 +311,7 @@ func _build_objects() -> Vector2:
 					var fj := FlameJet.new()
 					fj.width_tiles = run
 					fj.dir = 1.0 if is_solid_at(center + Vector2(0, T)) or not is_solid_at(center + Vector2(0, -T)) else -1.0
+					fj.length_tiles = _flame_length(x, y, run, fj.dir)
 					fj.color = colors["liquid"]
 					fj.position = corner
 					objects.add_child(fj)
@@ -343,6 +348,18 @@ func _build_objects() -> Vector2:
 					sp.is_solid = is_solid_at
 					objects.add_child(sp)
 					spitters.append(sp)
+				"Q":
+					var wi := Witch.new()
+					wi.position = center
+					wi.is_solid = is_solid_at
+					objects.add_child(wi)
+					witches.append(wi)
+				"m":
+					var mb := MagmaBlock.new()
+					mb.width_tiles = run
+					mb.position = corner
+					objects.add_child(mb)
+					magma.append(mb)
 				"R":
 					var wr := Wraith.new()
 					wr.position = center
@@ -398,13 +415,26 @@ func _build_objects() -> Vector2:
 		reaper.level = self
 		reaper.start_x = chase_from
 		reaper.end_x = chase_to
-		reaper.boss_name = boss_name if boss_name != "" else "my servants"
+		reaper.boss_name = boss_name if boss_name != "" else ("my witches" if not witches.is_empty() else "my servants")
 		objects.add_child(reaper)
 	# in a boss level the exit only appears once the boss is beaten
 	if boss and exit_portal:
 		exit_portal.visible = false
 		exit_portal.process_mode = Node.PROCESS_MODE_DISABLED
 	return start
+
+
+## How many tiles a flame jet at (x, y), `run` tiles wide, reaches before its
+## fire hits something solid (it counts its own tile).
+func _flame_length(x: int, y: int, run: int, dir: float) -> int:
+	var n := 1
+	while n < FlameJet.MAX_TILES:
+		var row_y := (y - dir * n) * T + T * 0.5
+		for i in run:
+			if is_solid_at(Vector2((x + i) * T + T * 0.5, row_y)):
+				return n
+		n += 1
+	return n
 
 
 func _build_player(start: Vector2) -> void:
@@ -427,6 +457,10 @@ func _build_player(start: Vector2) -> void:
 		sp.player = player
 	for fj in flame_jets:
 		fj.player = player
+	for wi in witches:
+		wi.player = player
+	for mb in magma:
+		mb.player = player
 	if reaper:
 		reaper.player = player
 		player.respawned.connect(reaper.reset)

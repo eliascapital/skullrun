@@ -18,7 +18,7 @@ func _is_solid(x: int, y: int) -> bool:
 	var row: String = grid[y]
 	if x < 0 or x >= row.length():
 		return true
-	return row[x] == "#" or row[x] == "I"
+	return row[x] == "#" or row[x] == "I" or row[x] == "m"
 
 
 func _hash(x: int, y: int) -> int:
@@ -36,7 +36,7 @@ func _draw() -> void:
 		for x in range(x_from, mini(x_to, row.length())):
 			var c := row[x]
 			var p := Vector2(x * T, y * T)
-			if c == "#":
+			if c == "#" or c == "m":  # hidden magma looks just like ground (see magma_block.gd)
 				_draw_block(x, y, p, tile, dark, light, top)
 			elif c == "I":
 				_draw_ice(x, y, p)
