@@ -190,6 +190,9 @@ a { color: inherit; }
 .enemies img { height: 110px; width: auto; margin: 0 auto 10px; object-fit: contain; }
 .enemies h3 { margin: 0 0 4px; }
 .enemies p { margin: 0; color: var(--muted); font-size: 15px; }
+/* a wide card fills two columns, so count it as two when keeping rows full */
+.enemies .wide { grid-column: span 2; }
+@media (max-width: 460px) { .enemies .wide { grid-column: auto; } }
 .enemies .boss-card {
   background: radial-gradient(circle at 50% 30%, rgba(230, 57, 70, 0.22), var(--panel) 70%);
   border-color: rgba(255, 209, 102, 0.45);

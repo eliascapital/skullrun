@@ -79,7 +79,9 @@ func _throw() -> void:
 	_thrown += 1
 	var target: Vector2 = player.global_position + Vector2(0, 8)
 	var d := target - p.position
-	var flight := clampf(absf(d.x) / 260.0, 0.7, 1.3)
+	# a high, slow arc: the potion drops steeply onto the spot, so a skull that
+	# keeps running (even towards her) is long gone when it lands
+	var flight := clampf(1.0 + absf(d.x) / 600.0, 1.0, 1.5)
 	p.velocity = Vector2(d.x / flight, d.y / flight - 0.5 * Potion.GRAVITY * flight)
 	get_parent().add_child(p)
 	Sfx.play("dash", 1.4)

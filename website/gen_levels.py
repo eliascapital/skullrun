@@ -13,7 +13,8 @@ import sys
 THEME_COLORS = {
     "crypt": "#6d5f8f", "graveyard": "#3f7a4a", "bonecaves": "#d8c9a8", "forge": "#ff7b2e",
     "tower": "#e63946", "frost": "#8fd8f0", "wells": "#6bd49a", "ossuary": "#efe4cc",
-    "throne": "#ffd166", "abyss": "#4ff0d0", "keep": "#59ff8a",
+    "throne": "#ffd166", "abyss": "#4ff0d0", "keep": "#59ff8a", "bog": "#a3d94a",
+    "cauldron": "#b07cff",
 }
 
 

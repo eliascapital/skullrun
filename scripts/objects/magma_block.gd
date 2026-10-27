@@ -14,7 +14,7 @@ var width_tiles := 1
 var player: Node2D
 
 var _t := 0.0
-var _reveal := 0.0
+var _reveal: Array[float] = []  # 0 = hidden … 1 = glowing, one per block
 
 
 func _ready() -> void:
@@ -29,20 +29,28 @@ func _ready() -> void:
 	shape.shape = rect
 	shape.position = Vector2(w * 0.5, T * 0.5)
 	add_child(shape)
+	_reveal.resize(width_tiles)
+	_reveal.fill(0.0)
 
 
 func _physics_process(delta: float) -> void:
 	_t += delta
-	var target := 0.0
-	if player:
-		var box := Rect2(global_position, Vector2(width_tiles * T, T))
-		var p := player.global_position
-		var nearest := Vector2(clampf(p.x, box.position.x, box.end.x), clampf(p.y, box.position.y, box.end.y))
-		var d := p.distance_to(nearest)
-		target = clampf((HIDE_DIST - d) / (HIDE_DIST - SHOW_DIST), 0.0, 1.0)
-	# fade in quickly, fade out slowly
-	_reveal = move_toward(_reveal, target, delta * (4.0 if target > _reveal else 1.0))
-	if _reveal > 0.0 or target > 0.0:
+	# each block glows on its own, so a long strip only shows the part near you
+	var any := false
+	for i in width_tiles:
+		var target := 0.0
+		if player:
+			var box := Rect2(global_position + Vector2(i * T, 0), Vector2(T, T))
+			var p := player.global_position
+			var nearest := Vector2(clampf(p.x, box.position.x, box.end.x), clampf(p.y, box.position.y, box.end.y))
+			var d := p.distance_to(nearest)
+			target = clampf((HIDE_DIST - d) / (HIDE_DIST - SHOW_DIST), 0.0, 1.0)
+		# fade in quickly, fade out slowly
+		var r: float = _reveal[i]
+		if r > 0.0 or target > 0.0:
+			any = true
+		_reveal[i] = move_toward(r, target, delta * (4.0 if target > r else 1.0))
+	if any:
 		queue_redraw()
 	for body in get_overlapping_bodies():
 		if body.is_in_group("player"):
@@ -54,15 +62,19 @@ func _hash(i: int) -> int:
 
 
 func _draw() -> void:
-	if _reveal <= 0.0:
-		return
-	var a := _reveal * _reveal * (3.0 - 2.0 * _reveal)  # smooth fade
 	var hot := Color("ff5a1f")
 	var glow := Color("ffb23e")
-	for i in width_tiles:
+	for i in _reveal.size():
+		var r: float = _reveal[i]
+		if r <= 0.0:
+			continue
+		var a := r * r * (3.0 - 2.0 * r)  # smooth fade
 		var p := Vector2(i * T, 0)
 		var h := _hash(i)
 		var pulse := 0.5 + 0.5 * sin(_t * 3.0 + i * 1.7)
+		# heat shimmer around it
+		draw_rect(Rect2(p + Vector2(-2, -10), Vector2(T + 4, 10)), Color(hot, 0.12 * a))
+		draw_rect(Rect2(p + Vector2(-3, -3), Vector2(T + 6, T + 6)), Color(glow, 0.08 * a))
 		# the stone turns dark red and glows through
 		draw_rect(Rect2(p, Vector2(T, T)), Color(Color("3a0c06"), a * 0.85))
 		draw_rect(Rect2(p + Vector2(3, 3), Vector2(T - 6, T - 6)), Color(hot.darkened(0.3 - pulse * 0.2), a * 0.9))
@@ -76,7 +88,3 @@ func _draw() -> void:
 		# bubbles
 		var k := fmod(_t * 0.8 + (h % 10) * 0.1, 1.0)
 		draw_circle(p + Vector2(8 + h % 16, 26 - k * 20.0), 2.5 * (1.0 - k), Color(Color("fff1b0"), a * (1.0 - k)))
-	# heat shimmer above
-	var w := width_tiles * T
-	draw_rect(Rect2(-2, -10, w + 4, 10), Color(hot, 0.12 * a))
-	draw_rect(Rect2(-4, -4, w + 8, T + 8), Color(glow, 0.08 * a))

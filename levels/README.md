@@ -11,7 +11,8 @@ before `level_11`, so rename them all to `level_001` and so on).
 ```
 name: Moonlit Graveyard          <- shown on the level menu and HUD
 theme: graveyard                 <- crypt, graveyard, bonecaves, forge, tower,
-                                    frost, wells, ossuary, throne, abyss or keep
+                                    frost, wells, ossuary, throne, abyss, keep,
+                                    bog or cauldron
 about: Double jump, skeletons     <- short description for the website's level list
 abilities: jump double           <- any of: jump double dash wall slam (leave it out for all of them)
 banner: NEW POWER: DOUBLE JUMP!  <- optional message shown at the start
@@ -61,8 +62,10 @@ that their bottoms line up.
 | `K`  | the Bone King boss (one per level). The exit `E` stays hidden until he's defeated. Give him a flat arena with a wall at each end — he gets dizzy when he charges into a wall |
 | `L`  | Mortis the Lich boss (one boss per level). Put him on the floor of an arena with a wall at each end (the arena is the space between those walls). He floats around casting spells, then sinks to the floor, drained, for you to stomp. The exit `E` stays hidden until he's defeated |
 | `a`–`h` | warp portals. Put exactly two of the same letter in a level: walking (or jumping) into one pops you out of the other, still moving the way you were going. Each letter has its own colour. A portal can float in the air too |
-| `F`  | flame jet: a grate that blasts fire 3 tiles long every 3 seconds (it glows just before). On a floor it fires up, under a ceiling it fires down. A row like `FF` is one wide jet. Every jet in a level fires at the same time |
+| `F`  | flame jet: a grate that blasts fire every 3 seconds (it glows just before). On a floor it fires up, under a ceiling it fires down. The fire is 9 tiles tall (too tall to double jump over) or stops at the first solid tile. A row like `FF` is one wide jet. Every jet in a level fires at the same time, so leave a safe spot to wait between jets |
 | `Y`, `Z` | the Reaper's chase: once you pass the `Y` column the Reaper appears behind you and chases you (a bit slower than you run, straight through walls). At the `Z` column he teleports next to you, says his piece about the level's boss, and leaves. Only run-forward obstacles in between, since you can't stop for long |
+| `Q`  | witch: hovers on her broom and throws smiley-face potions that explode where they land (aimed at where you are, so they miss if you keep moving). Stomp her, or slam near her. Leave two empty rows between her and the ground so the skull can walk underneath (and jump onto her), and keep her 13+ tiles from checkpoints and away from spots where players must wait |
+| `m`  | hidden magma: looks exactly like `#` until the skull comes within about 6 tiles, then glows (fully at 3 tiles). Touching it kills straight away. It's solid, so skeletons can walk on it. Keep patches 3 wide or less where players have to jump them |
 | `M`  | moving platform (left/right). A row like `MMM` is one 3-wide platform; it moves 4 tiles right and back |
 | `V`  | moving platform (up/down). Moves 4 tiles up from where you draw it, and back |
 | `1`–`9` | hint sign that shows the matching `signN:` text |
