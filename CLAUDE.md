@@ -83,10 +83,12 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - `Q` witch (`witch.gd`, drawing in `draw_witch`): hovers on a broom, throws a potion
   (`potion.gd`, smiley face in `draw_potion`) every 2.6 s when the skull is within 12×8 tiles,
   aimed to land where the skull is now, so it misses a skull that keeps moving. It explodes on
-  ground, walls or the skull (blast radius 46 px). Stomp or slam to defeat her. Her hitbox
+  ground, walls or the skull (blast radius 46 px). She won't throw at a skull within 3 tiles
+  (the potion would pop out inside it as it stomps her). Stomp or slam to defeat her; she
+  comes back when the skull respawns (`reset`), so level 25 uses witches over magma pits as
+  trampolines (bounce + double jump up cliffs too tall to double jump). Her hitbox
   spans about 1.5 tiles under her centre, so place her with two empty rows above the ground.
   Never put witches where players must stand still (jet waits, moving platforms).
-  With witches in a chase level the Reaper says "my witches" instead of "my servants".
 - `m` hidden magma (`magma_block.gd`): solid like `#` and drawn as a plain block by the tile
   slices; each block fades in a glow when the skull is within 6 tiles (full at 3) and kills on
   touch. Single jumps over patches wider than 3 get tight, so keep jumped patches ≤ 3 wide.
