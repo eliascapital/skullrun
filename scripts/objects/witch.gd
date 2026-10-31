@@ -2,12 +2,15 @@ extends Area2D
 ## A WITCH on a broomstick. She hovers in one spot, and when you come near she
 ## throws smiley-face potions at you in a high arc. They explode where they
 ## land, so keep moving! Stomp her (or slam close by) to send her packing.
+## She flies back when the skull respawns, so a witch over a pit can be used
+## as a trampoline (stomp her to bounce up and get your double jump back).
 
 const Potion = preload("res://scripts/objects/potion.gd")
 
 const RANGE := Vector2(12.0 * 32.0, 8.0 * 32.0)
 const COOLDOWN := 2.6
 const WINDUP := 0.55
+const CLOSE := 3.0 * 32.0
 const POTION_COLORS := [Color("ff5fd2"), Color("8cff5a"), Color("ffb23e"), Color("6bd7ff")]
 
 var player: Node2D
@@ -19,6 +22,7 @@ var _windup := 0.0
 var _t := 0.0
 var _dead := false
 var _thrown := 0
+var _tween: Tween
 
 
 func _ready() -> void:
@@ -46,13 +50,19 @@ func _physics_process(delta: float) -> void:
 	var near: bool = absf(d.x) < RANGE.x and absf(d.y) < RANGE.y and not player.dead
 	if near and absf(d.x) > 4.0:
 		facing = signf(d.x)
+	# no throwing at a skull right next to her (the potion would pop out inside it,
+	# just as it lands on her head)
+	var too_close := d.length() < CLOSE
 	if _windup > 0.0:
 		_windup -= delta
 		if _windup <= 0.0:
-			_throw()
+			if too_close:
+				_cooldown = 0.4
+			else:
+				_throw()
 	else:
 		_cooldown -= delta
-		if near and _cooldown <= 0.0:
+		if near and not too_close and _cooldown <= 0.0:
 			_windup = WINDUP
 			if _thrown % 3 == 0:
 				Sfx.play("laugh", 1.7)
@@ -95,11 +105,26 @@ func defeat() -> void:
 	Sfx.play("stomp", 1.2)
 	Sfx.play("vanish", 1.3)
 	set_deferred("monitoring", false)
-	var tw := create_tween()
-	tw.tween_property(self, "scale", Vector2(1.3, 0.3), 0.12)
-	tw.tween_property(self, "scale", Vector2(0.2, 1.6), 0.15)
-	tw.parallel().tween_property(self, "modulate:a", 0.0, 0.25)
-	tw.tween_callback(queue_free)
+	_tween = create_tween()
+	_tween.tween_property(self, "scale", Vector2(1.3, 0.3), 0.12)
+	_tween.tween_property(self, "scale", Vector2(0.2, 1.6), 0.15)
+	_tween.parallel().tween_property(self, "modulate:a", 0.0, 0.25)
+	_tween.tween_callback(hide)
+
+
+## Called when the skull respawns: a stomped witch flies back.
+func reset() -> void:
+	if not _dead:
+		return
+	if _tween:
+		_tween.kill()
+	_dead = false
+	_windup = 0.0
+	_cooldown = 1.0
+	scale = Vector2.ONE
+	modulate.a = 1.0
+	show()
+	set_deferred("monitoring", true)
 
 
 func slam_hit() -> void:
