@@ -75,7 +75,7 @@ menu (it asks first).
 | 22 | Ember Hollow | **Hidden magma**: blocks that look like stone until you get close, then glow. Touching one is deadly |
 | 23 | Brewing Marsh | Witches and magma together, plus crumbling bridges and a ground slam |
 | 24 | The Bubbling Cauldron | Magma, flame jets (too tall to jump over), portals and a magma lake |
-| 25 | The Witches' Wood | Everything at once, and the Reaper chases you again |
+| 25 | The Witches' Wood | Magic tricks: slam the trapdoor that doesn't glow, walk upside down past ceiling magma, ride a vent up a magma chimney, leap magma pillars off jump pads, and bounce off witches' heads up cliffs |
 
 The first time you press PLAY, a short story plays (a man walking to work, the
 Reaper's army taking over the world, and a skull waking up in a sealed tomb).

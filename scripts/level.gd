@@ -415,7 +415,7 @@ func _build_objects() -> Vector2:
 		reaper.level = self
 		reaper.start_x = chase_from
 		reaper.end_x = chase_to
-		reaper.boss_name = boss_name if boss_name != "" else ("my witches" if not witches.is_empty() else "my servants")
+		reaper.boss_name = boss_name if boss_name != "" else "my servants"
 		objects.add_child(reaper)
 	# in a boss level the exit only appears once the boss is beaten
 	if boss and exit_portal:
@@ -459,6 +459,7 @@ func _build_player(start: Vector2) -> void:
 		fj.player = player
 	for wi in witches:
 		wi.player = player
+		player.respawned.connect(wi.reset)
 	for mb in magma:
 		mb.player = player
 	if reaper:
