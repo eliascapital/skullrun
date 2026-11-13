@@ -7,8 +7,8 @@ extends Area2D
 ##   soul bolts (aimed at you) and soul rain (flames fall where the floor glows),
 ##   and from the second hit on he teleports around the arena.
 ## After each round of spells his magic runs out and he sinks to the floor,
-## DRAINED: that's the time to jump on his head. Three hits and he's done.
-## You can also catch him in the air with a well-timed double jump.
+## DRAINED: that's the only time jumping on his head hurts him (any other
+## time you bounce off his magic). Three hits and he's done.
 ## If you die, he goes back to sleep at full health.
 
 signal defeated
@@ -277,7 +277,13 @@ func _check_player_contact(p: Node2D) -> void:
 		if body != p:
 			continue
 		if p.is_falling_onto(global_position.y - HALF_HEIGHT + 20.0):
-			_take_hit(p)
+			if state == State.DRAINED:
+				_take_hit(p)
+			else:
+				# still full of magic: you bounce off, and he isn't hurt
+				p.bounce()
+				p.knockback(signf(p.global_position.x - global_position.x + 0.01) * 300.0)
+				Sfx.play("stomp", 1.5)
 		elif state != State.DRAINED:  # drained, he's too weak to hurt you
 			p.hurt()
 

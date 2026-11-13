@@ -146,6 +146,14 @@ const THEMES := {
 		"hazard": Color("f0dcff"), "liquid": Color("ff4fd8"),
 		"moon": false, "scenery": "cauldrons",
 	},
+	"circus": {
+		"sky_top": Color("0c0818"), "sky_bottom": Color("3a1838"),
+		"far": Color("1e1030"), "near": Color("2a1438"),
+		"tile": Color("3a2c44"), "tile_dark": Color("281e30"), "tile_light": Color("4c3c58"),
+		"tile_top": Color("ffd166"), "platform": Color("b0452e"),
+		"hazard": Color("fff1d6"), "liquid": Color("ff5fd2"),
+		"moon": true, "scenery": "tents",
+	},
 }
 
 const DEFAULT_THEME := "crypt"

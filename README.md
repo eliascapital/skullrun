@@ -1,8 +1,8 @@
 # SKULLRUN
 
 A spooky 2D platformer made with **Godot 4.3**. You play a runaway skull that
-escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 25 levels,
-collect soul gems, defeat the Bone King, and fall upward through the Abyss.
+escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 30 levels,
+collect soul gems, defeat three bosses, and fall upward through the Abyss.
 
 ## Play it
 
@@ -76,6 +76,11 @@ menu (it asks first).
 | 23 | Brewing Marsh | Witches and magma together, plus crumbling bridges and a ground slam |
 | 24 | The Bubbling Cauldron | Magma, flame jets (too tall to jump over), portals and a magma lake |
 | 25 | The Witches' Wood | Magic tricks: slam the trapdoor that doesn't glow, walk upside down past ceiling magma, ride a vent up a magma chimney, leap magma pillars off jump pads, and bounce off witches' heads up cliffs |
+| 26 | The Circus Gates | **Cannons**: walk into one and it shoots you far and high. Hold forward to fly further, push back to land sooner |
+| 27 | Bone Parade | **Skeleton guards**: they stab with long spears and take two stomps |
+| 28 | The Funhouse | Mirror portals, cannons that point backwards, cannon ping-pong up a tower |
+| 29 | Tightrope Terror | Crumbling tightropes, fire hoops, trapezes and cannons onto tightropes |
+| 30 | Alethea's Big Top | **Boss**: Alethea the Happy Clown. Stomp her only when she's dizzy, 5 times. At 3 she goes crazy! |
 
 The first time you press PLAY, a short story plays (a man walking to work, the
 Reaper's army taking over the world, and a skull waking up in a sealed tomb).
@@ -90,7 +95,7 @@ for a moment while enemies can't hurt you.
 
 He sleeps on his throne until you drop into the arena, then cycles through attacks:
 walking at you, throwing arcs of bones, and charging. When a charge ends against a
-wall he's dizzy for a couple of seconds, which is the best time to jump on his head. Each hit
+wall he's dizzy for a couple of seconds, which is the only time jumping on his head hurts him. Each hit
 makes him faster, and from the second phase he also leaps and slams the ground,
 sending shockwaves along the floor (jump them). If you die, he resets to full health.
 
@@ -116,7 +121,7 @@ scripts/level.gd       builds a level from its text file
 scripts/player.gd      the skull
 scripts/objects/       gems, checkpoints, enemies, platforms, hazards…
 scripts/ui/            menus and the in-game HUD
-levels/                level_01.txt … level_25.txt
+levels/                level_01.txt … level_30.txt
 assets/fonts/          Creepster (title) and Rubik (text), both free OFL fonts
 ```
 

@@ -36,6 +36,8 @@ const RESPAWN_DELAY := 0.8
 const RESPAWN_SAFE_TIME := 1.5  # enemies can't hurt you right after respawning
 const WARP_TIME := 0.12  # shrinking into a warp portal, and again growing out of the other one
 const WARP_PAN_SPEED := 1100.0  # how fast the camera glides over to the other portal (pixels/s)
+const CANNON_STEER := 260.0  # how much you can steer while flying out of a cannon
+const BLAST_TIME := 2.0
 
 var can_double_jump := true
 var can_dash := true
@@ -77,6 +79,7 @@ var _wall_sliding := false
 var _last_wall_jump_side := 0.0  # can't kick off the same side twice in a row
 var _safe_time := 0.0
 var _wind_time := 0.0
+var _blast_time := 0.0  # flying out of a cannon: steering is only gentle
 var _flip_time := 0.0
 var _slamming := false
 var _warp_t := -1.0  # time since stepping into a portal (-1 = not warping)
@@ -201,6 +204,7 @@ func _physics_process(delta: float) -> void:
 	# ground slam: press DOWN in mid-air
 	if can_slam and not on_floor and not _slamming and Input.is_action_just_pressed("move_down"):
 		_slamming = true
+		_blast_time = 0.0
 		_dash_time = 0.0
 		_squash = Vector2(0.7, 1.35)
 		Sfx.play("dash", 0.55)
@@ -214,7 +218,18 @@ func _physics_process(delta: float) -> void:
 			velocity.x = _dash_dir * RUN_SPEED
 	else:
 		# run
-		if _wall_lock > 0.0:
+		if _blast_time > 0.0:
+			# shot out of a cannon: keep most of the speed, steer just a little
+			_blast_time -= delta
+			# hold the way you're flying to keep your speed, push back to brake hard
+			var brake := CANNON_STEER
+			if not is_zero_approx(dir):
+				brake = 0.0 if signf(dir) == signf(velocity.x) else CANNON_STEER * 4.0
+			velocity.x = move_toward(velocity.x, dir * RUN_SPEED, brake * delta)
+			# (the first moment doesn't count: you were standing at the cannon)
+			if _blast_time < BLAST_TIME - 0.1 and (on_floor or is_on_wall()):
+				_blast_time = 0.0
+		elif _wall_lock > 0.0:
 			_wall_lock -= delta
 		elif _on_ice:
 			# Ice: no steering. Once you're sliding you keep going until you
@@ -256,6 +271,7 @@ func _physics_process(delta: float) -> void:
 		if can_dash and _dash_ready and not _on_ice and Input.is_action_just_pressed("dash"):
 			_dash_ready = false
 			_dash_time = DASH_TIME
+			_blast_time = 0.0
 			_wall_lock = 0.0
 			_dash_dir = signf(dir) if not is_zero_approx(dir) else facing
 			_squash = Vector2(1.4, 0.7)
@@ -422,6 +438,23 @@ func ride_wind() -> void:
 	_launched = true
 
 
+## Called by cannons: fly off at `v` (much faster than you can run), with your
+## double jump and dash ready for the landing.
+func blast(from: Vector2, v: float, angle: float) -> void:
+	global_position = from
+	reset_physics_interpolation()
+	velocity = Vector2.RIGHT.rotated(angle) * v
+	_blast_time = BLAST_TIME
+	_launched = true
+	_slamming = false
+	_air_jumps = 1 if can_double_jump else 0
+	_dash_ready = true
+	_dash_time = 0.0
+	_wall_lock = 0.0
+	_squash = Vector2(1.4, 0.7)
+	_burst(Color("ffd166"), 12)
+
+
 ## Pushes the skull sideways (e.g. off the boss after a stomp).
 func knockback(vx: float) -> void:
 	velocity.x = vx
@@ -470,6 +503,7 @@ func respawn() -> void:
 	reset_physics_interpolation()
 	velocity = Vector2.ZERO
 	dead = false
+	_blast_time = 0.0
 	_squash = Vector2(0.6, 1.4)
 	_was_on_floor = false
 	_wall_lock = 0.0

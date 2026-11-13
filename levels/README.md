@@ -12,7 +12,7 @@ before `level_11`, so rename them all to `level_001` and so on).
 name: Moonlit Graveyard          <- shown on the level menu and HUD
 theme: graveyard                 <- crypt, graveyard, bonecaves, forge, tower,
                                     frost, wells, ossuary, throne, abyss, keep,
-                                    bog or cauldron
+                                    bog, cauldron or circus
 about: Double jump, skeletons     <- short description for the website's level list
 abilities: jump double           <- any of: jump double dash wall slam (leave it out for all of them)
 banner: NEW POWER: DOUBLE JUMP!  <- optional message shown at the start
@@ -59,12 +59,15 @@ that their bottoms line up.
 | `R`  | wraith: wakes up when you come within ~7 tiles and drifts after you, straight through walls. Slower than you, can't be stomped, goes home if you get 12 tiles away or respawn. Keep it 12+ tiles from checkpoints |
 | `J`  | jump pad: launches you about 8 tiles up |
 | `W`  | soul vent: a column of purple wind that lifts you up to 10 tiles (until it hits a ceiling). Riding it refills your double jump and dash. Put one at the very bottom of a pit to catch falling players |
-| `K`  | the Bone King boss (one per level). The exit `E` stays hidden until he's defeated. Give him a flat arena with a wall at each end — he gets dizzy when he charges into a wall |
+| `K`  | the Bone King boss (one per level). The exit `E` stays hidden until he's defeated. Give him a flat arena with a wall at each end — he gets dizzy when he charges into a wall, and that's the only time a stomp hurts him |
 | `L`  | Mortis the Lich boss (one boss per level). Put him on the floor of an arena with a wall at each end (the arena is the space between those walls). He floats around casting spells, then sinks to the floor, drained, for you to stomp. The exit `E` stays hidden until he's defeated |
+| `A`  | Alethea the Happy Clown boss (one boss per level). Put her on the floor of an arena with a wall at each end, at least 30 tiles wide. She juggles, throws pies along the floor, hops with shockwaves and charges on her unicycle; she's dizzy after a charge hits a wall. 5 hits, and at 3 she goes crazy with new moves. The exit `E` stays hidden until she's defeated |
 | `a`–`h` | warp portals. Put exactly two of the same letter in a level: walking (or jumping) into one pops you out of the other, still moving the way you were going. Each letter has its own colour. A portal can float in the air too |
 | `F`  | flame jet: a grate that blasts fire every 3 seconds (it glows just before). On a floor it fires up, under a ceiling it fires down. The fire is 9 tiles tall (too tall to double jump over) or stops at the first solid tile. A row like `FF` is one wide jet. Every jet in a level fires at the same time, so leave a safe spot to wait between jets |
 | `Y`, `Z` | the Reaper's chase: once you pass the `Y` column the Reaper appears behind you and chases you (a bit slower than you run, straight through walls). At the `Z` column he teleports next to you, says his piece about the level's boss, and leaves. Only run-forward obstacles in between, since you can't stop for long |
 | `Q`  | witch: hovers on her broom and throws smiley-face potions that explode where they land (aimed at where you are, so they miss if you keep moving). Stomp her, or slam near her: stomping bounces you up and gives back your double jump, so a witch over a pit makes a trampoline. Stomped witches come back when you respawn. Leave two empty rows between her and the ground so the skull can walk underneath (and jump onto her), and keep her 13+ tiles from checkpoints and away from spots where players must wait |
+| `>` `<` | cannon: touch it and it shoots you out, `>` up-right and `<` up-left. A shot goes about 7–8 tiles up and lands about 17 tiles away at the same height (about 20 if you hold forward, about 9 if you push back), and you land with your double jump and dash ready. Give the landing spot plenty of room |
+| `D`  | skeleton guard: stands still, turns to face you and stabs his spear about 3 tiles out at skull height. Takes two stomps (a slam close by counts as one); after the first he holds his spear up for a moment, so don't stomp again straight away. Put him on the row above the ground |
 | `m`  | hidden magma: looks exactly like `#` until the skull comes within about 6 tiles, then glows (fully at 3 tiles). Touching it kills straight away. It's solid, so skeletons can walk on it. Keep patches 3 wide or less where players have to jump them |
 | `M`  | moving platform (left/right). A row like `MMM` is one 3-wide platform; it moves 4 tiles right and back |
 | `V`  | moving platform (up/down). Moves 4 tiles up from where you draw it, and back |
