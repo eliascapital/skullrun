@@ -38,6 +38,8 @@ func _ready() -> void:
 	_streams["vanish"] = _make([[900, 150, 0.3, "triangle", 0.3]])
 	_streams["laugh"] = _make([[180, 150, 0.12, "saw", 0.3], [170, 140, 0.12, "saw", 0.3], [160, 120, 0.2, "saw", 0.3]])
 	_streams["boom"] = _make([[260, 40, 0.35, "noise", 0.4], [120, 50, 0.2, "square", 0.2]])
+	_streams["cannon"] = _make([[160, 40, 0.3, "noise", 0.45], [90, 50, 0.25, "square", 0.25]])
+	_streams["honk"] = _make([[330, 300, 0.12, "square", 0.25], [440, 420, 0.16, "square", 0.25]])
 	_streams["click"] = _make([[660, 660, 0.04, "square", 0.15]])
 	_streams["hover"] = _make([[440, 440, 0.025, "triangle", 0.12]])
 

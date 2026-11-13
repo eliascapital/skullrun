@@ -33,6 +33,9 @@ const Reaper = preload("res://scripts/objects/reaper.gd")
 const Lich = preload("res://scripts/objects/lich.gd")
 const Witch = preload("res://scripts/objects/witch.gd")
 const MagmaBlock = preload("res://scripts/objects/magma_block.gd")
+const Cannon = preload("res://scripts/objects/cannon.gd")
+const SkeletonGuard = preload("res://scripts/objects/skeleton_guard.gd")
+const Alethea = preload("res://scripts/objects/alethea.gd")
 
 ## Warp portal pairs: map letter -> colour.
 const WARP_COLORS := {
@@ -48,7 +51,7 @@ var height := 0
 
 var player: Player
 var hud: Hud
-var boss: Node2D  # the Bone King or Mortis the Lich
+var boss: Node2D  # the Bone King, Mortis the Lich or Alethea the Happy Clown
 var boss_name := ""
 var reaper: Reaper
 var exit_portal: Area2D
@@ -57,6 +60,7 @@ var spitters: Array = []
 var flame_jets: Array = []
 var witches: Array = []
 var magma: Array = []
+var guards: Array = []
 var cracked := {}  # Vector2i cell -> cracked block
 
 var total_gems := 0
@@ -287,11 +291,15 @@ func _build_objects() -> Vector2:
 					exit_portal.position = center
 					exit_portal.reached.connect(_on_exit_reached)
 					objects.add_child(exit_portal)
-				"K", "L":
+				"K", "L", "A":
 					if c == "K":
 						boss = BoneKing.new()
 						boss.position = center + Vector2(0, -28)
 						boss_name = BoneKing.BOSS_NAME
+					elif c == "A":
+						boss = Alethea.new()
+						boss.position = center + Vector2(0, -28)
+						boss_name = Alethea.BOSS_NAME
 					else:
 						boss = Lich.new()
 						boss.position = center
@@ -354,6 +362,16 @@ func _build_objects() -> Vector2:
 					wi.is_solid = is_solid_at
 					objects.add_child(wi)
 					witches.append(wi)
+				">", "<":
+					var cn := Cannon.new()
+					cn.dir = 1.0 if c == ">" else -1.0
+					cn.position = center
+					objects.add_child(cn)
+				"D":
+					var sg := SkeletonGuard.new()
+					sg.position = center
+					objects.add_child(sg)
+					guards.append(sg)
 				"m":
 					var mb := MagmaBlock.new()
 					mb.width_tiles = run
@@ -462,6 +480,8 @@ func _build_player(start: Vector2) -> void:
 		player.respawned.connect(wi.reset)
 	for mb in magma:
 		mb.player = player
+	for sg in guards:
+		sg.player = player
 	if reaper:
 		reaper.player = player
 		player.respawned.connect(reaper.reset)

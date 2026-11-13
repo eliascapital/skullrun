@@ -152,6 +152,34 @@ func _draw() -> void:
 				draw_rect(Rect2(x - r * 1.1, cy - r * 0.8, r * 2.2, r * 0.3), color)
 				for k in 3:
 					draw_circle(Vector2(x + (k - 1) * r * 0.45, cy - r - 6.0 - k * 10.0), 2.0 + k, Color(brew, 0.1 + depth * 0.08))
+		"tents":
+			# striped circus tents with flags, and strings of bunting
+			for i in 4:
+				var x := rng.randf_range(0, SEGMENT - 200)
+				var tw := rng.randf_range(150, 230) * (0.7 + depth * 0.4)
+				var th := tw * 0.75
+				var base := ground + 10.0
+				var stripe := Color(Config.COLOR_ACCENT, 0.10 + depth * 0.08)
+				draw_rect(Rect2(x, base - th * 0.55, tw, th * 0.55 + 10), color)
+				draw_colored_polygon(PackedVector2Array([Vector2(x - 12, base - th * 0.55),
+					Vector2(x + tw * 0.5, base - th), Vector2(x + tw + 12, base - th * 0.55)]), color)
+				for k in 4:
+					var sx := x + tw * (k + 0.5) / 4.0
+					draw_colored_polygon(PackedVector2Array([Vector2(x + tw * 0.5, base - th),
+						Vector2(sx - tw * 0.06, base - th * 0.55), Vector2(sx + tw * 0.06, base - th * 0.55)]), stripe)
+				var pole := Vector2(x + tw * 0.5, base - th)
+				draw_line(pole, pole + Vector2(0, -26), color, 3.0)
+				draw_colored_polygon(PackedVector2Array([pole + Vector2(0, -26), pole + Vector2(18, -21),
+					pole + Vector2(0, -16)]), Color(Config.COLOR_GOLD, 0.15 + depth * 0.1))
+			for i in 3:
+				var x0 := rng.randf_range(0, SEGMENT - 300)
+				var y0 := h * rng.randf_range(0.25, 0.45)
+				for k in 10:
+					var x := x0 + k * 30.0
+					var y := y0 + sin(k / 9.0 * PI) * 30.0
+					var flag: Color = [Color("ff5fd2"), Color("ffd166"), Color("6bd7ff")][k % 3]
+					draw_colored_polygon(PackedVector2Array([Vector2(x, y), Vector2(x + 14, y), Vector2(x + 7, y + 12)]),
+						Color(flag, 0.10 + depth * 0.08))
 		"spires":
 			for i in 8:
 				var x := rng.randf_range(0, SEGMENT - 60)

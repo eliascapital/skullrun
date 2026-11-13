@@ -112,6 +112,8 @@ func update_stats(gems: int, total_gems: int, time: float, deaths: int) -> void:
 func show_banner(text: String, duration: float = 3.0, size: int = 26) -> void:
 	_banner.text = text
 	_banner.add_theme_font_size_override("font_size", size)
+	# below the boss's health bar while it's showing
+	_banner.offset_top = 112 if _boss_box.visible else 70
 	if _banner_tween:
 		_banner_tween.kill()
 	_banner_tween = create_tween()

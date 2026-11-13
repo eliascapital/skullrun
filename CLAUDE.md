@@ -1,6 +1,6 @@
 # SKULLRUN — notes for Claude
 
-A Godot 4.3 platformer about a cursed skull escaping the Reaper. 25 levels, two bosses,
+A Godot 4.3 platformer about a cursed skull escaping the Reaper. 30 levels, three bosses,
 playable in the browser (also on phones). Levels are text files in `levels/` (format in
 `levels/README.md`). The website (`website/`) is published to GitHub Pages by
 `.github/workflows/website.yml` on every push to `main`.
@@ -15,7 +15,7 @@ The owner wants the website to grow with the game, with no empty placeholder slo
 - **New level:** give the level file an `about:` line. The website's level list and level
   count are generated from the level files at build time (`website/gen_levels.py`),
   so nothing else is needed. A new theme also needs its colour in `THEME_COLORS` there,
-  and a new boss character needs adding to its boss detection (it looks for `K` and `L`).
+  and a new boss character needs adding to its boss detection (it looks for `K`, `L` and `A`).
 - **New power/ability:** add a card to the `#powers` section of `website/index.html`
   (icon, name, one-line description, the level it unlocks in), and add it to the
   controls section and the in-game How to Play panel (`scripts/ui/title_screen.gd`) if it has a key.
@@ -24,8 +24,9 @@ The owner wants the website to grow with the game, with no empty placeholder slo
   game's own drawing code, cropped and saved as `website/img/e_<name>.webp`.
   Give drawing code a `static func draw_<name>(ci: CanvasItem, ...)` so it can be reused
   for that picture (see `reaper.gd`, `lich.gd`). The enemy grid is 4 columns (2 on phones):
-  keep the rows full, or the last row has a hole. Cards with class `wide` (the Reaper and
-  both bosses) fill 2 columns, so count them as 2 (it's 12 now: 6 small + 3 wide).
+  keep the rows full, or the last row has a hole. Cards with class `wide` (the witch, the
+  Reaper and the bosses) fill 2 columns, so count them as 2 (it's 16 now: 6 small + 5 wide;
+  keep the small ones even too, for the 2-column phone layout).
 - **New world/theme:** consider adding a screenshot to the gallery (`website/img/<name>.webp`,
   1280×720 in-game capture with the HUD). The gallery is 3 wide: add shots in threes.
 - Also update the level table in `README.md`, and hint signs that name keys should
@@ -92,6 +93,23 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - `m` hidden magma (`magma_block.gd`): solid like `#` and drawn as a plain block by the tile
   slices; each block fades in a glow when the skull is within 6 tiles (full at 3) and kills on
   touch. Single jumps over patches wider than 3 get tight, so keep jumped patches ≤ 3 wide.
+
+### Map characters added in levels 26–30
+- `>` / `<` cannon (`cannon.gd`): touching it calls `player.blast()`, which moves the skull to
+  the muzzle and fires it at 55° and 1100 px/s, with double jump and dash refilled. While
+  `_blast_time` runs the skull keeps its speed: holding forward keeps it, no input slows it
+  gently, pushing back brakes hard. Landing at the same height: about 17 tiles out (20 holding
+  forward, 9 braking), about 7.7 tiles high at the top. Don't put ceilings over the barrel.
+- `D` skeleton guard (`skeleton_guard.gd`, `draw_guard`): stationary, turns to face you after
+  0.35 s behind him; stabs (0.45 s wind-up) when you're within 3 tiles at his height. 2 HP:
+  after the first stomp (knockback + 0.35 s grace) he holds his spear up for 1.3 s.
+- `A` Alethea the Happy Clown (`alethea.gd`, `draw_alethea`; props in `clown_prop.gd`,
+  springs in `jack_box.gd`): 5 HP, crazy at 3 (`CRAZY_AT`: RAGE banner, faster, adds
+  confetti, jack-in-the-box springs and a double charge). Only hittable while DIZZY after a
+  charge ends at a wall; a charge that starts against a wall just turns her round.
+- All three bosses only take a stomp when they're down (Bone King STUNNED, Mortis DRAINED,
+  Alethea DIZZY); landing on them any other time bounces the skull off without hurting either.
+  The HUD banner moves below the boss bar while the bar is showing.
 
 ### Touch screens and phones
 - `touch_controls.gd`: joystick + jump + dash + pause, pressing the normal input actions

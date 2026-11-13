@@ -5,7 +5,8 @@ extends CharacterBody2D
 ## gets faster and nastier each time you hurt him:
 ##   walk towards you -> throw bones -> (slam) -> charge.
 ## When a charge ends against a wall he is dazed for a moment: that's the
-## best time to jump on his head. Three stomps and he's done.
+## only time jumping on his head hurts him (any other time you just bounce
+## off his crown). Three stomps and he's done.
 ## If you die, he goes back to sleep at full health.
 
 signal defeated
@@ -210,7 +211,15 @@ func _check_player_contact(p: Node2D) -> void:
 		if body != p:
 			continue
 		if p.is_falling_onto(global_position.y - HALF_HEIGHT + 22.0):
-			_take_hit(p)
+			if state == State.STUNNED:
+				_take_hit(p)
+			elif state not in [State.SLAM_JUMP, State.SLAM_FALL]:
+				# not dazed: you just bounce off his crown
+				p.bounce()
+				p.knockback(signf(p.global_position.x - global_position.x + 0.01) * 300.0)
+				Sfx.play("stomp", 1.5)
+			else:
+				p.hurt()
 		else:
 			p.hurt()
 
