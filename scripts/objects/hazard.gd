@@ -5,6 +5,8 @@ extends Area2D
 @export var kind := "spikes"
 @export var width_tiles := 1
 var color := Color.WHITE
+## In the olive world, spikes are toothpicks with an olive on each.
+var olive := false
 
 var _t := 0.0
 
@@ -43,6 +45,14 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var w := width_tiles * 32.0
+	if kind == "spikes" and olive:
+		for i in width_tiles * 2:
+			var x := i * 16.0 + 8.0
+			draw_line(Vector2(x, 32), Vector2(x, 12), Color("d8b880"), 2.0)
+			draw_circle(Vector2(x, 24), 5.0, Color("4e5a18"))
+			draw_circle(Vector2(x, 24), 4.0, Color("8fa032"))
+			draw_circle(Vector2(x, 21), 1.8, Color("c8302a"))
+		return
 	if kind == "spikes":
 		for i in width_tiles * 2:
 			var x := i * 16.0

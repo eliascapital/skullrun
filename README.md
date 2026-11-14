@@ -1,7 +1,7 @@
 # SKULLRUN
 
 A spooky 2D platformer made with **Godot 4.3**. You play a runaway skull that
-escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 30 levels,
+escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 35 levels,
 collect soul gems, defeat three bosses, and fall upward through the Abyss.
 
 ## Play it
@@ -81,6 +81,11 @@ menu (it asks first).
 | 28 | The Funhouse | Mirror portals, cannons that point backwards, cannon ping-pong up a tower |
 | 29 | Tightrope Terror | Crumbling tightropes, fire hoops, trapezes and cannons onto tightropes |
 | 30 | Alethea's Big Top | **Boss**: Alethea the Happy Clown. Stomp her only when she's dizzy, 5 times. At 3 she goes crazy! |
+| 31 | Serpent Hollow | **Evil snakes**: they rear up and hiss, then lunge. **Fake walls**: some walls (and floors) aren't really there |
+| 32 | Snakes Cave | A surprise! (No hint signs on purpose. Hint: it isn't snakes, it's olives) |
+| 33 | The Hidden Paths | Fake ceilings, fake floors, secret tunnels, snakes hiding inside walls, a cannon through a fake ceiling |
+| 34 | Viper Falls | Snakes with fire jets, rising platforms, a guard, a cannon and hidden magma |
+| 35 | The Serpent Temple | Everything together: portals, a witch, cannons, guards, a hidden tunnel over the fire hall, and lots of snakes |
 
 The first time you press PLAY, a short story plays (a man walking to work, the
 Reaper's army taking over the world, and a skull waking up in a sealed tomb).
@@ -121,7 +126,7 @@ scripts/level.gd       builds a level from its text file
 scripts/player.gd      the skull
 scripts/objects/       gems, checkpoints, enemies, platforms, hazards…
 scripts/ui/            menus and the in-game HUD
-levels/                level_01.txt … level_30.txt
+levels/                level_01.txt … level_35.txt
 assets/fonts/          Creepster (title) and Rubik (text), both free OFL fonts
 ```
 

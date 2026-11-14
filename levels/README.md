@@ -12,7 +12,7 @@ before `level_11`, so rename them all to `level_001` and so on).
 name: Moonlit Graveyard          <- shown on the level menu and HUD
 theme: graveyard                 <- crypt, graveyard, bonecaves, forge, tower,
                                     frost, wells, ossuary, throne, abyss, keep,
-                                    bog, cauldron or circus
+                                    bog, cauldron, circus, serpent or olive
 about: Double jump, skeletons     <- short description for the website's level list
 abilities: jump double           <- any of: jump double dash wall slam (leave it out for all of them)
 banner: NEW POWER: DOUBLE JUMP!  <- optional message shown at the start
@@ -68,6 +68,9 @@ that their bottoms line up.
 | `Q`  | witch: hovers on her broom and throws smiley-face potions that explode where they land (aimed at where you are, so they miss if you keep moving). Stomp her, or slam near her: stomping bounces you up and gives back your double jump, so a witch over a pit makes a trampoline. Stomped witches come back when you respawn. Leave two empty rows between her and the ground so the skull can walk underneath (and jump onto her), and keep her 13+ tiles from checkpoints and away from spots where players must wait |
 | `>` `<` | cannon: touch it and it shoots you out, `>` up-right and `<` up-left. A shot goes about 7–8 tiles up and lands about 17 tiles away at the same height (about 20 if you hold forward, about 9 if you push back), and you land with your double jump and dash ready. Give the landing spot plenty of room |
 | `D`  | skeleton guard: stands still, turns to face you and stabs his spear about 3 tiles out at skull height. Takes two stomps (a slam close by counts as one); after the first he holds his spear up for a moment, so don't stomp again straight away. Put him on the row above the ground |
+| `N`  | evil snake: slithers back and forth (turning at walls and ledges). When you're close in front of it, it rears up and hisses, then lunges about 5 tiles. Stomp it while it slithers (not while it's rearing up) |
+| `U`  | olive: waddles slowly back and forth; when you're close in front of it, it hops in surprise, then charges until it bumps into something. One stomp squishes it |
+| `%`  | fake wall: looks exactly like `#`, but you (and snakes) can walk or fall straight through it. The blocks near the skull turn see-through while it's inside. A gem or snake in a row of fake blocks (like `%%o%%`, with `%` at both ends) is hidden too. Build secret rooms, hidden tunnels and fake floors with it, but never hide a snake where the player can't see it coming |
 | `m`  | hidden magma: looks exactly like `#` until the skull comes within about 6 tiles, then glows (fully at 3 tiles). Touching it kills straight away. It's solid, so skeletons can walk on it. Keep patches 3 wide or less where players have to jump them |
 | `M`  | moving platform (left/right). A row like `MMM` is one 3-wide platform; it moves 4 tiles right and back |
 | `V`  | moving platform (up/down). Moves 4 tiles up from where you draw it, and back |
