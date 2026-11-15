@@ -47,6 +47,8 @@ title text), `Game` (level list, save file, scene changes, input map, phone zoom
 - `scripts/objects/` one file per thing (enemies, hazards, platforms, bosses, projectiles).
 - `scripts/ui/` HUD, title screen (and How to Play panel), level select, story intro,
   touch controls, `ui.gd` (button/label/panel helpers in the game's style).
+- Secret code: the title screen's CODE button (or typing it on the title screen) calls
+  `Game.try_code()`; `UNLOCK_CODE` ("olives123") unlocks every level and saves.
 - Save file: `user://skullrun_save.cfg` — `[progress]` (unlocked, best times/gems, seen_intro)
   and `[settings] touch_layout`. `Game.save_progress()` writes both.
 

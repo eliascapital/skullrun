@@ -153,6 +153,21 @@ func complete_level(index: int, time: float, gems: int) -> void:
 	save_progress()
 
 
+## The secret code (title screen → CODE, or just type it there) that unlocks
+## every level. Not case sensitive, spaces don't matter.
+const UNLOCK_CODE := "olives123"
+
+
+## Returns true (and unlocks every level) if `code` is the secret code.
+func try_code(code: String) -> bool:
+	if code.strip_edges().to_lower().replace(" ", "") != UNLOCK_CODE:
+		return false
+	unlocked = maxi(level_count(), 1)
+	seen_intro = true
+	save_progress()
+	return true
+
+
 func save_progress() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("progress", "unlocked", unlocked)
