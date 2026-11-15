@@ -113,6 +113,8 @@ sending shockwaves along the floor (jump them). If you die, he resets to full he
   [`levels/README.md`](levels/README.md) to learn how to make new ones. To add
   level 16, create `levels/level_16.txt` and it shows up in the game automatically.
 * **Controls**: `_setup_input()` in `scripts/game.gd`.
+* **Secret code**: on the title screen, press **CODE** and type `olives123` (or just type it
+  on the title screen) to unlock every level. Change it with `UNLOCK_CODE` in `scripts/game.gd`.
 * **How the skull moves** (speed, jump height, dash): the constants at the top of `scripts/player.gd`.
 
 ## Project layout

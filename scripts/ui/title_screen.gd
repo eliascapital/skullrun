@@ -7,7 +7,11 @@ const MenuBackground = preload("res://scripts/ui/menu_background.gd")
 
 var _title: Label
 var _help_layer: Control
+var _code_layer: Control
+var _code_edit: LineEdit
+var _code_message: Label
 var _play_button: Button
+var _typed := ""  # letters typed on the title screen, to catch the secret code
 var _time := 0.0
 
 
@@ -62,6 +66,9 @@ func _ready() -> void:
 	var story := UI.make_button("STORY", false, 130)
 	story.pressed.connect(Game.play_story)
 	row.add_child(story)
+	var code := UI.make_button("CODE", false, 110)
+	code.pressed.connect(_show_code.bind(true))
+	row.add_child(code)
 	if OS.get_name() != "Web":
 		var quit := UI.make_button("QUIT", false, 150)
 		quit.pressed.connect(get_tree().quit)
@@ -75,6 +82,7 @@ func _ready() -> void:
 	add_child(footer)
 
 	_build_help()
+	_build_code()
 	_play_button.grab_focus()
 
 
@@ -90,6 +98,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _help_layer.visible and (event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel")):
 		_show_help(false)
 		get_viewport().set_input_as_handled()
+	elif _code_layer.visible and (event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel")):
+		_show_code(false)
+		get_viewport().set_input_as_handled()
+	elif not _code_layer.visible and event is InputEventKey and event.pressed and not event.echo \
+			and event.unicode > 0:
+		# typing the secret code straight onto the title screen works too
+		_typed = (_typed + char(event.unicode).to_lower()).right(Game.UNLOCK_CODE.length())
+		if _typed == Game.UNLOCK_CODE:
+			_typed = ""
+			_show_code(true)
+			_submit_code(Game.UNLOCK_CODE)
 
 
 func _build_help() -> void:
@@ -133,6 +152,69 @@ func _build_help() -> void:
 	var back := UI.make_button("GOT IT", true, 180)
 	back.pressed.connect(_show_help.bind(false))
 	box.add_child(_centered(back))
+
+
+func _build_code() -> void:
+	_code_layer = ColorRect.new()
+	(_code_layer as ColorRect).color = Color(0, 0, 0, 0.7)
+	_code_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_code_layer.visible = false
+	add_child(_code_layer)
+	var center := UI.make_center()
+	_code_layer.add_child(center)
+	var panel := UI.make_panel(440)
+	center.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	panel.add_child(box)
+	box.add_child(UI.make_title("SECRET CODE", 46))
+	box.add_child(UI.make_label("Know a secret code? Type it in!", 16, Config.COLOR_MUTED))
+	_code_edit = LineEdit.new()
+	_code_edit.custom_minimum_size = Vector2(300, 48)
+	_code_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_code_edit.max_length = 24
+	_code_edit.placeholder_text = "type the code here"
+	_code_edit.add_theme_font_size_override("font_size", 22)
+	_code_edit.add_theme_stylebox_override("normal", UI.style_box(Config.COLOR_BG_LIGHT, Config.COLOR_MUTED))
+	_code_edit.add_theme_stylebox_override("focus", UI.style_box(Config.COLOR_BG_LIGHT, Config.COLOR_ACCENT))
+	_code_edit.text_submitted.connect(_submit_code)
+	box.add_child(_centered(_code_edit))
+	_code_message = UI.make_label(" ", 18, Config.COLOR_BONE)
+	box.add_child(_code_message)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	box.add_child(row)
+	var ok := UI.make_button("OK", true, 140)
+	ok.pressed.connect(func(): _submit_code(_code_edit.text))
+	row.add_child(ok)
+	var back := UI.make_button("BACK", false, 140)
+	back.pressed.connect(_show_code.bind(false))
+	row.add_child(back)
+
+
+func _show_code(show: bool) -> void:
+	_code_layer.visible = show
+	if show:
+		_code_edit.text = ""
+		_code_message.text = " "
+		_code_edit.grab_focus()
+	else:
+		_play_button.grab_focus()
+
+
+func _submit_code(code: String) -> void:
+	if Game.try_code(code):
+		_code_message.text = "ALL LEVELS UNLOCKED!"
+		_code_message.add_theme_color_override("font_color", Config.COLOR_GOLD)
+		_play_button.text = "CONTINUE  •  LEVEL %d" % (Game.continue_level() + 1)
+		Sfx.play("win")
+	else:
+		_code_message.text = "Hmm, that's not a code."
+		_code_message.add_theme_color_override("font_color", Config.COLOR_ACCENT)
+		Sfx.play("click", 0.6)
+		_code_edit.select_all()
+		_code_edit.grab_focus()
 
 
 func _show_help(show: bool) -> void:
