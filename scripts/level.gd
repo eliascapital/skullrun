@@ -36,6 +36,9 @@ const MagmaBlock = preload("res://scripts/objects/magma_block.gd")
 const Cannon = preload("res://scripts/objects/cannon.gd")
 const SkeletonGuard = preload("res://scripts/objects/skeleton_guard.gd")
 const Alethea = preload("res://scripts/objects/alethea.gd")
+const Snake = preload("res://scripts/objects/snake.gd")
+const Olive = preload("res://scripts/objects/olive.gd")
+const FakeWall = preload("res://scripts/objects/fake_wall.gd")
 
 ## Warp portal pairs: map letter -> colour.
 const WARP_COLORS := {
@@ -46,6 +49,7 @@ const WARP_COLORS := {
 var data := {}
 var colors := {}
 var grid: Array = []
+var _map: Array = []  # the map as written, before hidden gems/snakes get covered by fake walls
 var width := 0
 var height := 0
 
@@ -61,6 +65,8 @@ var flame_jets: Array = []
 var witches: Array = []
 var magma: Array = []
 var guards: Array = []
+var critters: Array = []  # snakes and olives (they need to know where the player is)
+var fake_walls: Node2D
 var cracked := {}  # Vector2i cell -> cracked block
 
 var total_gems := 0
@@ -78,6 +84,8 @@ func _ready() -> void:
 		return
 	data = LevelData.load_level(Game.level_paths[index])
 	grid = data["grid"]
+	_map = grid.duplicate()
+	_cover_hidden_things()
 	width = data["width"]
 	height = data["height"]
 	colors = Config.get_theme_colors(data["theme"])
@@ -250,6 +258,29 @@ func _build_tiles() -> void:
 		body.add_child(shape)
 
 
+## A gem or a snake inside a fake wall (a row like `%%o%o%%`, with `%` at both
+## ends) gets a fake block drawn over it too, so the secret doesn't show as a hole.
+## The thing itself is still built from `_map`.
+func _cover_hidden_things() -> void:
+	for y in grid.size():
+		var row: String = grid[y]
+		var x := 0
+		while x < row.length():
+			if row[x] != "%":
+				x += 1
+				continue
+			var x0 := x
+			while x < row.length() and row[x] in ["%", "o", "N"]:
+				x += 1
+			var x1 := x - 1
+			while x1 > x0 and row[x1] != "%":
+				x1 -= 1
+			for i in range(x0, x1 + 1):
+				if row[i] != "%":
+					row = row.substr(0, i) + "%" + row.substr(i + 1)
+		grid[y] = row
+
+
 ## Places everything that isn't plain ground. Returns the start position.
 func _build_objects() -> Vector2:
 	var start := Vector2(2 * T, (height - 3) * T)
@@ -262,7 +293,7 @@ func _build_objects() -> Vector2:
 	var chase_to := -1.0
 
 	for y in height:
-		var row: String = grid[y]
+		var row: String = _map[y]
 		var x := 0
 		while x < width:
 			var c := row[x]
@@ -278,6 +309,7 @@ func _build_objects() -> Vector2:
 				"o":
 					var g := Gem.new()
 					g.position = center
+					g.olive = colors.get("style", "") == "olive"
 					g.collected.connect(_on_gem_collected)
 					objects.add_child(g)
 					total_gems += 1
@@ -334,6 +366,12 @@ func _build_objects() -> Vector2:
 					gh.travel = 80.0 if c == "B" else 96.0
 					gh.position = center
 					objects.add_child(gh)
+				"N", "U":
+					var cr: CharacterBody2D = Snake.new() if c == "N" else Olive.new()
+					cr.position = center
+					cr.is_solid = is_solid_at
+					objects.add_child(cr)
+					critters.append(cr)
 				"S":
 					var sk := Skeleton.new()
 					sk.position = center
@@ -400,6 +438,7 @@ func _build_objects() -> Vector2:
 					hz.kind = {"^": "spikes", "v": "ceiling_spikes", "~": "liquid"}[c]
 					hz.width_tiles = run
 					hz.color = colors["liquid"] if c == "~" else colors["hazard"]
+					hz.olive = colors.get("style", "") == "olive"
 					hz.position = corner
 					objects.add_child(hz)
 				"M", "V":
@@ -421,6 +460,15 @@ func _build_objects() -> Vector2:
 						objects.add_child(s)
 			x += run
 	_build_gravity_zones(objects)
+	var has_fake := false
+	for row in grid:
+		if (row as String).contains("%"):
+			has_fake = true
+	if has_fake:
+		fake_walls = FakeWall.new()
+		fake_walls.grid = grid
+		fake_walls.colors = colors
+		add_child(fake_walls)
 	for letter in warps:
 		var pair: Array = warps[letter]
 		if pair.size() != 2:
@@ -482,6 +530,10 @@ func _build_player(start: Vector2) -> void:
 		mb.player = player
 	for sg in guards:
 		sg.player = player
+	for cr in critters:
+		cr.player = player
+	if fake_walls:
+		fake_walls.player = player
 	if reaper:
 		reaper.player = player
 		player.respawned.connect(reaper.reset)

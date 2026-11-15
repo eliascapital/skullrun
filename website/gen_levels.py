@@ -15,6 +15,7 @@ THEME_COLORS = {
     "tower": "#e63946", "frost": "#8fd8f0", "wells": "#6bd49a", "ossuary": "#efe4cc",
     "throne": "#ffd166", "abyss": "#4ff0d0", "keep": "#59ff8a", "bog": "#a3d94a",
     "cauldron": "#b07cff", "circus": "#ffd166",
+    "serpent": "#c8a040", "olive": "#8fa032",
 }
 
 

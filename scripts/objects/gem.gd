@@ -3,6 +3,8 @@ extends Area2D
 
 signal collected
 
+## In the olive world, gems are olives too.
+var olive := false
 var _t := 0.0
 var _taken := false
 
@@ -39,6 +41,15 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _draw() -> void:
 	var y := sin(_t * 3.0) * 3.0
+	if olive:
+		draw_circle(Vector2(0, y), 13.0, Color(Color("b8d040"), 0.15))
+		draw_set_transform(Vector2(0, y), 0.4 * sin(_t * 2.0), Vector2(1.0, 0.8))
+		draw_circle(Vector2.ZERO, 9.0, Color("4e5a18"))
+		draw_circle(Vector2(-0.5, -0.5), 7.5, Color("8fa032"))
+		draw_circle(Vector2(5, 0), 3.0, Color("c8302a"))
+		draw_circle(Vector2(-3, -3), 1.8, Color(1, 1, 1, 0.5))
+		draw_set_transform(Vector2.ZERO)
+		return
 	var c := Config.COLOR_GEM
 	draw_circle(Vector2(0, y), 14.0, Color(c, 0.12))
 	draw_circle(Vector2(0, y), 9.0, Color(c, 0.15))

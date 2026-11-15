@@ -1,6 +1,6 @@
 # SKULLRUN — notes for Claude
 
-A Godot 4.3 platformer about a cursed skull escaping the Reaper. 30 levels, three bosses,
+A Godot 4.3 platformer about a cursed skull escaping the Reaper. 35 levels, three bosses,
 playable in the browser (also on phones). Levels are text files in `levels/` (format in
 `levels/README.md`). The website (`website/`) is published to GitHub Pages by
 `.github/workflows/website.yml` on every push to `main`.
@@ -25,7 +25,7 @@ The owner wants the website to grow with the game, with no empty placeholder slo
   Give drawing code a `static func draw_<name>(ci: CanvasItem, ...)` so it can be reused
   for that picture (see `reaper.gd`, `lich.gd`). The enemy grid is 4 columns (2 on phones):
   keep the rows full, or the last row has a hole. Cards with class `wide` (the witch, the
-  Reaper and the bosses) fill 2 columns, so count them as 2 (it's 16 now: 6 small + 5 wide;
+  Reaper and the bosses) fill 2 columns, so count them as 2 (it's 20 now: 6 small + 7 wide;
   keep the small ones even too, for the 2-column phone layout).
 - **New world/theme:** consider adding a screenshot to the gallery (`website/img/<name>.webp`,
   1280×720 in-game capture with the HUD). The gallery is 3 wide: add shots in threes.
@@ -110,6 +110,20 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - All three bosses only take a stomp when they're down (Bone King STUNNED, Mortis DRAINED,
   Alethea DIZZY); landing on them any other time bounces the skull off without hurting either.
   The HUD banner moves below the boss bar while the bar is showing.
+
+### Map characters added in levels 31–35
+- `N` evil snake (`snake.gd`, `draw_snake`): slithers at 60 px/s, turns at walls and ledges;
+  sees you 4.5 tiles ahead at its height, rears up 0.45 s (can't be stomped then), lunges
+  at 470 px/s for 0.32 s, rests 0.7 s. One stomp or a nearby slam.
+- `U` olive (`olive.gd`, `draw_olive`): waddles at 35 px/s; sees you 5 tiles ahead, hops,
+  then charges at 300 px/s until a wall or ledge (then dizzy 0.8 s). One stomp. Level 32
+  ("Snakes Cave") is all olives with no signs or banner on purpose: keep it that way.
+- `%` fake wall (`fake_wall.gd`): no collision, not solid for `level.is_solid_at` (so snakes,
+  skeletons and fire pass through), but drawn like ground (above everything, `z_index` 5) by
+  `TileChunk.draw_block`, fading near the skull. `level._cover_hidden_things()` turns gems/snakes
+  inside a `%` run into `%` in `grid` (objects are still built from `_map`).
+- Themes `serpent` and `olive`. The olive theme sets `"style": "olive"`, which makes
+  `TileChunk.draw_block` draw olives, gems draw as olives and spikes as olive toothpicks.
 
 ### Touch screens and phones
 - `touch_controls.gd`: joystick + jump + dash + pause, pressing the normal input actions

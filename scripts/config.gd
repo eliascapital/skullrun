@@ -154,6 +154,23 @@ const THEMES := {
 		"hazard": Color("fff1d6"), "liquid": Color("ff5fd2"),
 		"moon": true, "scenery": "tents",
 	},
+	"serpent": {
+		"sky_top": Color("04100e"), "sky_bottom": Color("123a30"),
+		"far": Color("0a2420"), "near": Color("0e2e28"),
+		"tile": Color("3a4038"), "tile_dark": Color("282e28"), "tile_light": Color("4c5448"),
+		"tile_top": Color("c8a040"), "platform": Color("6a5034"),
+		"hazard": Color("e8e0c8"), "liquid": Color("7cff6b"),
+		"moon": false, "scenery": "jungle",
+	},
+	# Everything is olives. The tiles are drawn as olives too ("style").
+	"olive": {
+		"sky_top": Color("1c2008"), "sky_bottom": Color("5a6a1c"),
+		"far": Color("2e3610"), "near": Color("3a4414"),
+		"tile": Color("8fa032"), "tile_dark": Color("2a300c"), "tile_light": Color("a8b848"),
+		"tile_top": Color("e8d860"), "platform": Color("7a6a30"),
+		"hazard": Color("d8b880"), "liquid": Color("d8c840"),
+		"moon": false, "scenery": "olives", "style": "olive",
+	},
 }
 
 const DEFAULT_THEME := "crypt"

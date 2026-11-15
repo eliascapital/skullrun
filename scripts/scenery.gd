@@ -180,6 +180,56 @@ func _draw() -> void:
 					var flag: Color = [Color("ff5fd2"), Color("ffd166"), Color("6bd7ff")][k % 3]
 					draw_colored_polygon(PackedVector2Array([Vector2(x, y), Vector2(x + 14, y), Vector2(x + 7, y + 12)]),
 						Color(flag, 0.10 + depth * 0.08))
+		"jungle":
+			# a crumbling temple with a snake carved on it, and hanging vines
+			for i in 3:
+				var x := rng.randf_range(0, SEGMENT - 220)
+				var tw := rng.randf_range(140, 220) * (0.7 + depth * 0.4)
+				var steps := 4
+				for k in steps:
+					var w := tw * (1.0 - k * 0.2)
+					draw_rect(Rect2(x + (tw - w) * 0.5, ground - 40.0 * (k + 1) * (0.7 + depth * 0.4), w, 42), color)
+				var top := Vector2(x + tw * 0.5, ground - 40.0 * steps * (0.7 + depth * 0.4))
+				for k in 6:
+					var a := k * 0.9
+					draw_circle(top + Vector2(sin(a) * 18.0, 30 + k * 12.0) * (0.7 + depth * 0.4), 6.0,
+						Color(Color("c8a040"), 0.08 + depth * 0.06))
+			for i in 12:
+				var x := rng.randf_range(0, SEGMENT)
+				var vl := rng.randf_range(60, 220) * (0.6 + depth * 0.6)
+				var wob := rng.randf_range(0, TAU)
+				var vine := PackedVector2Array()
+				for k in 8:
+					var yy := -10.0 + vl * k / 7.0
+					vine.append(Vector2(x + sin(wob + k * 0.8) * 6.0, yy))
+				draw_polyline(vine, color, 3.0)
+				for k in 3:
+					draw_circle(vine[2 + k * 2] + Vector2(4, 0), 4.0, color)
+		"olives":
+			# giant olives, olive branches and jars of olives
+			for i in 6:
+				var x := rng.randf_range(0, SEGMENT)
+				var r := rng.randf_range(40, 90) * (0.6 + depth * 0.5)
+				var y := ground - r * 0.6
+				draw_set_transform(Vector2(x, y), rng.randf_range(-0.5, 0.5), Vector2(1.3, 1.0))
+				draw_circle(Vector2.ZERO, r, color)
+				draw_circle(Vector2(r * 0.65, 0), r * 0.28, Color(Color("c8302a"), 0.10 + depth * 0.08))
+				draw_set_transform(Vector2.ZERO)
+			for i in 3:
+				var x := rng.randf_range(0, SEGMENT - 120)
+				var jh := rng.randf_range(110, 180) * (0.7 + depth * 0.4)
+				draw_rect(Rect2(x, ground - jh, 90, jh + 20), color)
+				draw_rect(Rect2(x + 10, ground - jh - 18, 70, 20), color)
+			for i in 3:
+				var bx := rng.randf_range(0, SEGMENT - 200)
+				var by := h * rng.randf_range(0.15, 0.4)
+				draw_line(Vector2(bx, by), Vector2(bx + 200, by + 30), color, 4.0)
+				for k in 6:
+					var lx := bx + 20 + k * 30
+					var ly := by + 3 + k * 4.5
+					var s: float = 1.0 if k % 2 == 0 else -1.0
+					draw_colored_polygon(PackedVector2Array([Vector2(lx, ly), Vector2(lx + 8, ly + s * 16),
+						Vector2(lx + 16, ly)]), color)
 		"spires":
 			for i in 8:
 				var x := rng.randf_range(0, SEGMENT - 60)
