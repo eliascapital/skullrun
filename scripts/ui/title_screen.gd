@@ -103,12 +103,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif not _code_layer.visible and event is InputEventKey and event.pressed and not event.echo \
 			and event.unicode > 0:
-		# typing the secret code straight onto the title screen works too
-		_typed = (_typed + char(event.unicode).to_lower()).right(Game.UNLOCK_CODE.length())
-		if _typed == Game.UNLOCK_CODE:
-			_typed = ""
-			_show_code(true)
-			_submit_code(Game.UNLOCK_CODE)
+		# typing a secret code straight onto the title screen works too
+		_typed = (_typed + char(event.unicode).to_lower()).right(Game.MAX_CODE_LENGTH)
+		for n in range(4, _typed.length() + 1):
+			var code := _typed.right(n)
+			if Game.code_time(code) >= 0.0:
+				_typed = ""
+				_show_code(true)
+				_submit_code(code)
+				break
 
 
 func _build_help() -> void:
@@ -205,7 +208,7 @@ func _show_code(show: bool) -> void:
 
 func _submit_code(code: String) -> void:
 	if Game.try_code(code):
-		_code_message.text = "ALL LEVELS UNLOCKED!"
+		_code_message.text = "ALL LEVELS UNLOCKED!\nYour time on every level: %s" % Game.format_time(Game.code_time(code))
 		_code_message.add_theme_color_override("font_color", Config.COLOR_GOLD)
 		_play_button.text = "CONTINUE  •  LEVEL %d" % (Game.continue_level() + 1)
 		Sfx.play("win")

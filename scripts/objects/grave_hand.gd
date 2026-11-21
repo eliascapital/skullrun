@@ -3,6 +3,8 @@ extends Area2D
 ## glows first (that's your warning), then the hand grabs upward, about
 ## 2.5 tiles high. Don't be standing there!
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const WARN := 0.8
 const UP := 0.65
 const HEIGHT := 2.5 * 32.0
@@ -54,15 +56,15 @@ func _draw() -> void:
 		k = 1.0 - (_age - WARN - UP) / 0.2
 	var top := -HEIGHT * k
 	var bone := Config.COLOR_BONE
-	draw_circle(Vector2(0, -2), 14.0, Color(Config.COLOR_PURPLE, 0.25))
+	Shapes.disc(self, Vector2(0, -2), 14.0, Color(Config.COLOR_PURPLE, 0.25))
 	# the arm
 	draw_line(Vector2(-3, 0), Vector2(-3, top + 16), bone, 4.0)
 	draw_line(Vector2(3, 0), Vector2(3, top + 16), bone.darkened(0.15), 4.0)
 	# the palm and grabbing fingers
-	draw_circle(Vector2(0, top + 14), 7.0, bone)
+	Shapes.disc(self, Vector2(0, top + 14), 7.0, bone)
 	for i in 4:
 		var x := -7.0 + i * 4.7
 		var curl := sin(_age * 18.0 + i) * 2.0
 		draw_line(Vector2(x, top + 10), Vector2(x + curl, top - 2), bone, 3.0)
-		draw_circle(Vector2(x + curl, top - 2), 1.6, bone)
+		Shapes.disc(self, Vector2(x + curl, top - 2), 1.6, bone)
 	draw_line(Vector2(7, top + 14), Vector2(12, top + 6), bone, 3.0)

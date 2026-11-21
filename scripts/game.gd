@@ -153,16 +153,33 @@ func complete_level(index: int, time: float, gems: int) -> void:
 	save_progress()
 
 
-## The secret code (title screen → CODE, or just type it there) that unlocks
-## every level. Not case sensitive, spaces don't matter.
-const UNLOCK_CODE := "olives123"
+## Secret codes (title screen → CODE, or just type one there). They're kept
+## only as SHA-256 hashes because this code is public: never write a code
+## itself in the code, the docs or a commit. Each one unlocks every level and
+## sets your best time on every level to the time next to it. Not case
+## sensitive, spaces don't matter.
+const CODES := {
+	"1996e73821c8c4bd2d08cb5d52904b6b8a8c22def3863a6f90827c87cf6ddaa1": 0.1,
+	"01949ff4f7c87a98695f74f58737c1776f3101cf4a4da3970105b3a4c67f5b0e": 0.0,
+}
+const MAX_CODE_LENGTH := 16
 
 
-## Returns true (and unlocks every level) if `code` is the secret code.
+## The best time a code gives (seconds), or -1 if `code` isn't a code.
+func code_time(code: String) -> float:
+	var h := code.strip_edges().to_lower().replace(" ", "").sha256_text()
+	return CODES.get(h, -1.0)
+
+
+## Returns true (unlocking every level and setting every best time) if `code`
+## is one of the secret codes.
 func try_code(code: String) -> bool:
-	if code.strip_edges().to_lower().replace(" ", "") != UNLOCK_CODE:
+	var t := code_time(code)
+	if t < 0.0:
 		return false
 	unlocked = maxi(level_count(), 1)
+	for i in level_count():
+		best_times[str(i)] = t
 	seen_intro = true
 	save_progress()
 	return true

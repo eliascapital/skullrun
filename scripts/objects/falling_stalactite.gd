@@ -9,6 +9,8 @@ extends Area2D
 ## Jett the Scarecrow makes them fall too (`once`: they drop straight away
 ## and don't grow back).
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const SHAKE_TIME := 0.5
 const GRAVITY := 1800.0
 const MAX_FALL := 1000.0
@@ -157,7 +159,7 @@ func _draw() -> void:
 				var p: Vector2 = s[0]
 				draw_colored_polygon(PackedVector2Array([p + Vector2(-3, -2), p + Vector2(3, -3),
 					p + Vector2(2, 3)]), Color(color, fade))
-			draw_circle(Vector2(16, LENGTH * 0.6), 18.0 * (1.0 - fade) + 4.0, Color(color.lightened(0.4), 0.3 * fade))
+			Shapes.disc(self, Vector2(16, LENGTH * 0.6), 18.0 * (1.0 - fade) + 4.0, Color(color.lightened(0.4), 0.3 * fade))
 			return
 	var off := Vector2.ZERO
 	if state == State.SHAKE:
@@ -172,7 +174,7 @@ func _draw() -> void:
 	if state == State.SHAKE:
 		for i in 3:
 			var k := fmod(_state_time * 3.0 + i / 3.0, 1.0)
-			draw_circle(Vector2(10 + i * 6, 4 + k * 40.0), 1.5, Color(color.lightened(0.3), 1.0 - k))
+			Shapes.disc(self, Vector2(10 + i * 6, 4 + k * 40.0), 1.5, Color(color.lightened(0.3), 1.0 - k))
 
 
 ## A pointy rock icicle, hanging down from (0, 0). Also used for the website.
@@ -185,7 +187,7 @@ static func draw_stalactite(ci: CanvasItem, col: Color, warning: bool) -> void:
 		Vector2(1, 22), Vector2(-3, 14), Vector2(-7, 6)]), col)
 	ci.draw_line(Vector2(-6, 2), Vector2(-2, 14), light, 2.0)
 	# a drip at the tip
-	ci.draw_circle(Vector2(0, LENGTH + 2), 1.8, Color(Color("8fd8f0"), 0.7))
+	Shapes.disc(ci, Vector2(0, LENGTH + 2), 1.8, Color(Color("8fd8f0"), 0.7))
 	if warning:
 		ci.draw_line(Vector2(-3, 5), Vector2(2, 11), Color(0, 0, 0, 0.6), 1.5)
 		ci.draw_line(Vector2(2, 11), Vector2(-1, 16), Color(0, 0, 0, 0.6), 1.5)

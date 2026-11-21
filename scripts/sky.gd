@@ -25,9 +25,13 @@ func _draw() -> void:
 	var bottom: Color = colors["sky_bottom"]
 	draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)]),
 		PackedColorArray([top, top, bottom, bottom]))
+	# stars are tiny squares: the sky redraws every frame (they twinkle), and a
+	# circle is a lot of points for a dot
 	for s in _stars:
 		var tw := 0.35 + 0.35 * sin(_t * (1.0 + s.z * 2.0) + s.z * 20.0)
-		draw_circle(Vector2(s.x * size.x, s.y * size.y), 0.8 + s.z, Color(1, 1, 1, tw * 0.6))
+		var r: float = 0.8 + s.z
+		draw_rect(Rect2(Vector2(s.x * size.x, s.y * size.y) - Vector2(r, r) * 0.8, Vector2(r, r) * 1.6),
+			Color(1, 1, 1, tw * 0.6))
 	if colors.get("moon", false):
 		var m := Vector2(size.x * 0.78, size.y * 0.2)
 		for i in 5:

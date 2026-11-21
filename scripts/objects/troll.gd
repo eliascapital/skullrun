@@ -8,6 +8,8 @@ extends CharacterBody2D
 ## stalactites right over him. So get him to pound under one!
 ## Like witches, he comes back (walking again) when the skull respawns.
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const BossShockwave = preload("res://scripts/objects/boss_shockwave.gd")
 
 const SPEED := 45.0
@@ -223,22 +225,22 @@ static func draw_troll(ci: CanvasItem, facing: float, t: float, raise: float, ko
 		var hip := o + Vector2(s * 9.0, 12)
 		var foot := Vector2(s * 10.0 + step * s * 3.0, 26)
 		ci.draw_line(hip, foot, skin_dark, 10.0)
-		ci.draw_circle(foot + Vector2(f * 3.0, 0), 6.0, skin_dark)
+		Shapes.disc(ci, foot + Vector2(f * 3.0, 0), 6.0, skin_dark)
 		ci.draw_rect(Rect2(foot.x - 5 + f * 2.0, foot.y, 12, 4), skin_dark)
 	# back arm
 	ci.draw_line(o + Vector2(-f * 14.0, -10), o + Vector2(-f * 18.0, 8 - step * 2.0), skin_dark, 8.0)
 	# a big round body with a hairy belly and a rag
-	ci.draw_circle(o + Vector2(0, -4), 20.0, skin)
-	ci.draw_circle(o + Vector2(f * 3.0, 0), 13.0, belly)
+	Shapes.disc(ci, o + Vector2(0, -4), 20.0, skin)
+	Shapes.disc(ci, o + Vector2(f * 3.0, 0), 13.0, belly)
 	ci.draw_colored_polygon(PackedVector2Array([o + Vector2(-18, 6), o + Vector2(18, 6), o + Vector2(15, 16),
 		o + Vector2(4, 13), o + Vector2(-6, 18), o + Vector2(-16, 14)]), cloth)
 	ci.draw_line(o + Vector2(-17, 7), o + Vector2(17, 7), cloth.darkened(0.3), 2.0)
 	# the head: low and lumpy, with a big nose, tusks and moss for hair
 	var head := o + Vector2(f * 8.0, -22)
-	ci.draw_circle(head, 12.0, skin)
+	Shapes.disc(ci, head, 12.0, skin)
 	for k in 4:
-		ci.draw_circle(head + Vector2(-8.0 + k * 5.0 - f * 2.0, -10.0 + absf(k - 1.5) * 1.5), 4.5, hair)
-	ci.draw_circle(head + Vector2(f * 9.0, 1), 5.5, skin_dark)  # the nose
+		Shapes.disc(ci, head + Vector2(-8.0 + k * 5.0 - f * 2.0, -10.0 + absf(k - 1.5) * 1.5), 4.5, hair)
+	Shapes.disc(ci, head + Vector2(f * 9.0, 1), 5.5, skin_dark)  # the nose
 	if ko:
 		for s in [-1.0, 1.0]:
 			var e := head + Vector2(s * 4.0 + f * 3.0, -4)
@@ -247,12 +249,12 @@ static func draw_troll(ci: CanvasItem, facing: float, t: float, raise: float, ko
 		for k in 3:
 			var a := t * 4.0 + k * TAU / 3.0 + Time.get_ticks_msec() * 0.004
 			var sp := head + Vector2(cos(a) * 14.0, -16.0 + sin(a) * 4.0)
-			ci.draw_circle(sp, 2.5, Color("ffd166"))
+			Shapes.disc(ci, sp, 2.5, Color("ffd166"))
 	else:
 		for s in [-1.0, 1.0]:
 			var e := head + Vector2(s * 4.0 + f * 3.0, -4)
-			ci.draw_circle(e, 2.6, Color("fff2a0"))
-			ci.draw_circle(e + Vector2(f * 0.8, 0), 1.3, dark)
+			Shapes.disc(ci, e, 2.6, Color("fff2a0"))
+			Shapes.disc(ci, e + Vector2(f * 0.8, 0), 1.3, dark)
 		# a grumpy brow
 		ci.draw_line(head + Vector2(-7 + f * 3.0, -9), head + Vector2(7 + f * 3.0, -8), skin_dark, 3.0)
 	ci.draw_line(head + Vector2(-5 + f * 3.0, 6), head + Vector2(5 + f * 3.0, 6), dark, 2.0)
@@ -272,6 +274,6 @@ static func draw_troll(ci: CanvasItem, facing: float, t: float, raise: float, ko
 	ci.draw_line(shoulder, hand, skin, 8.0)
 	var club_end := hand + club_dir * 26.0
 	ci.draw_line(hand - club_dir * 4.0, club_end, Color("7a5236"), 6.0)
-	ci.draw_circle(club_end, 8.0, Color("8a8478"))
-	ci.draw_circle(club_end + Vector2(-2, -2), 3.0, Color("a8a294"))
-	ci.draw_circle(hand, 5.0, skin)
+	Shapes.disc(ci, club_end, 8.0, Color("8a8478"))
+	Shapes.disc(ci, club_end + Vector2(-2, -2), 3.0, Color("a8a294"))
+	Shapes.disc(ci, hand, 5.0, skin)

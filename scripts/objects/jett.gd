@@ -13,6 +13,8 @@ extends CharacterBody2D
 ## that stalactites fall from the ceiling.
 ## If you die, he goes back to standing still at full health.
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 signal defeated
 
 const Sickle = preload("res://scripts/objects/sickle.gd")
@@ -24,6 +26,12 @@ const BOSS_NAME := "JETT THE SCARECROW"
 const MAX_HP := 5
 const CRAZY_AT := 3  # hit points left when he goes crazy
 const GRAVITY := 1800.0
+# hops and leaps: [seconds in the air, height in pixels]. Crazy Jett floats
+# longer (not much higher), so there's time to run underneath him.
+const HOP := [0.75, 126.0]
+const HOP_CRAZY := [1.15, 150.0]
+const LEAP := [0.9, 182.0]
+const LEAP_CRAZY := [1.3, 200.0]
 const HALF_HEIGHT := 44.0
 const WITCH_HEIGHT := 3.5 * 32.0  # summoned witches float this high above the floor
 
@@ -47,6 +55,7 @@ var _arena_right := 0.0
 var _sickles: Array = []
 var _witches: Array = []
 var _hitbox: Area2D
+var _air_gravity := GRAVITY  # lighter while crazy Jett floats through a hop or leap
 var _rng := RandomNumberGenerator.new()
 
 
@@ -119,7 +128,9 @@ func _physics_process(delta: float) -> void:
 	if p == null:
 		return
 
-	velocity.y = minf(velocity.y + GRAVITY * delta, 1200.0)
+	if is_on_floor() and state not in [State.HOP, State.LEAP]:
+		_air_gravity = GRAVITY
+	velocity.y = minf(velocity.y + _air_gravity * delta, 1200.0)
 	var m := _speed_mult()
 
 	match state:
@@ -162,9 +173,9 @@ func _physics_process(delta: float) -> void:
 			velocity.x = 0.0
 			if _state_time > 0.25 / m:
 				_face_player()
-				var flight := 0.75
+				var arc: Array = HOP_CRAZY if is_crazy() else HOP
 				var dx := clampf(p.global_position.x - global_position.x, -200.0, 200.0)
-				velocity = Vector2(dx / flight, -0.5 * GRAVITY * flight)
+				velocity = Vector2(dx / arc[0], _launch(arc))
 				var done := _count
 				_set_state(State.HOP)
 				_count = done
@@ -187,9 +198,9 @@ func _physics_process(delta: float) -> void:
 				Sfx.play("roar", 1.5)
 			if _state_time > (0.7 if _count == 0 else 0.3) / m:
 				# aim for where the skull is now (so keep moving!)
-				var flight := 0.9
+				var arc: Array = LEAP_CRAZY if is_crazy() else LEAP
 				var tx := clampf(p.global_position.x, _arena_left + 48.0, _arena_right - 48.0)
-				velocity = Vector2((tx - global_position.x) / flight, -0.5 * GRAVITY * flight)
+				velocity = Vector2((tx - global_position.x) / arc[0], _launch(arc))
 				var done := _count
 				_set_state(State.LEAP)
 				_count = done
@@ -243,6 +254,15 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_check_player_contact(p)
+
+
+## Sets the gravity for a jump that stays `arc[0]` seconds in the air and goes
+## `arc[1]` pixels high, and returns the upward speed to start it with.
+func _launch(arc: Array) -> float:
+	var t: float = arc[0]
+	var h: float = arc[1]
+	_air_gravity = 8.0 * h / (t * t)
+	return -4.0 * h / t
 
 
 func _set_state(s: State) -> void:
@@ -552,8 +572,8 @@ static func draw_jett(ci: CanvasItem, facing: float, t: float, crazy: float, stu
 				head + Vector2(fx + sin(t * 15.0 + k) * 2.0, -12 - fh - 8.0)]),
 				Color("ff7a1f").lerp(Color("ffd166"), 0.5 + 0.5 * sin(t * 18.0 + k)))
 	ci.draw_set_transform(head, 0.0, Vector2(1.15, 1.0))
-	ci.draw_circle(Vector2.ZERO, 14.0, pumpkin_dark)
-	ci.draw_circle(Vector2(0, -1), 12.5, pumpkin)
+	Shapes.disc(ci, Vector2.ZERO, 14.0, pumpkin_dark)
+	Shapes.disc(ci, Vector2(0, -1), 12.5, pumpkin)
 	for k in [-6.0, 0.0, 6.0]:
 		ci.draw_line(Vector2(k, -12), Vector2(k * 1.2, 11), pumpkin_dark, 1.5)
 	ci.draw_set_transform(Vector2.ZERO)
@@ -564,7 +584,7 @@ static func draw_jett(ci: CanvasItem, facing: float, t: float, crazy: float, stu
 			var e := head + Vector2(s * 5.5 + f * 2.0, -3)
 			for k in 5:
 				var a := t * 9.0 + k * 1.2
-				ci.draw_circle(e + Vector2(cos(a), sin(a)) * (0.6 * k), 1.3, face_col)
+				Shapes.disc(ci, e + Vector2(cos(a), sin(a)) * (0.6 * k), 1.3, face_col)
 	else:
 		for s in [-1.0, 1.0]:
 			var e := head + Vector2(s * 5.5 + f * 2.0, -3)
@@ -580,7 +600,7 @@ static func draw_jett(ci: CanvasItem, facing: float, t: float, crazy: float, stu
 		mouth + Vector2(6, 4), mouth + Vector2(0, 5), mouth + Vector2(-6, 4)])
 	ci.draw_colored_polygon(pts, face_col)
 	if lit:
-		ci.draw_circle(head, 22.0, Color(glow, 0.08))
+		Shapes.disc(ci, head, 22.0, Color(glow, 0.08))
 	# a floppy straw hat (it burns away a bit when he's crazy)
 	var brim := head + Vector2(-f * 1.0, -11)
 	ci.draw_colored_polygon(PackedVector2Array([brim + Vector2(-22, 3), brim + Vector2(22, 3),
@@ -595,4 +615,4 @@ static func draw_jett(ci: CanvasItem, facing: float, t: float, crazy: float, stu
 		# sweat drops: he's trying to pull his pole out
 		for k in 2:
 			var d := fmod(t * 1.6 + k * 0.5, 1.0)
-			ci.draw_circle(head + Vector2(-f * (16.0 + k * 4.0), -6.0 + d * 12.0), 2.0, Color(Color("8fd8f0"), 1.0 - d))
+			Shapes.disc(ci, head + Vector2(-f * (16.0 + k * 4.0), -6.0 + d * 12.0), 2.0, Color(Color("8fd8f0"), 1.0 - d))

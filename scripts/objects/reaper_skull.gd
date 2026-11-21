@@ -2,6 +2,8 @@ extends Area2D
 ## A little flaming skull the Reaper sends after you. It follows you for a few
 ## seconds, but it turns slowly, so keep running and it can't catch you.
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const SPEED := 165.0
 const TURN := 2.0  # radians per second
 const LIFE := 3.4
@@ -48,9 +50,9 @@ func _draw() -> void:
 	for i in 4:
 		var k := float(i) / 4.0
 		var flick := sin(_age * 30.0 + i * 2.0) * 2.0
-		draw_circle(back * (6.0 + i * 5.0) + back.orthogonal() * flick, 7.0 - i * 1.5,
+		Shapes.disc(self, back * (6.0 + i * 5.0) + back.orthogonal() * flick, 7.0 - i * 1.5,
 			Color(Config.COLOR_ACCENT.lerp(Color("ffd166"), k), 0.7 * fade * (1.0 - k * 0.6)))
-	draw_circle(Vector2.ZERO, 8.0, Color(Config.COLOR_BONE, fade))
+	Shapes.disc(self, Vector2.ZERO, 8.0, Color(Config.COLOR_BONE, fade))
 	draw_rect(Rect2(-4, 4, 8, 4), Color(Config.COLOR_BONE, fade))
 	for s in [-1.0, 1.0]:
-		draw_circle(Vector2(s * 3.0, -1), 2.2, Color(Config.COLOR_ACCENT, fade))
+		Shapes.disc(self, Vector2(s * 3.0, -1), 2.2, Color(Config.COLOR_ACCENT, fade))
