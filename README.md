@@ -83,12 +83,12 @@ menu (it asks first).
 | 30 | Alethea's Big Top | **Boss**: Alethea the Happy Clown. Stomp her only when she's dizzy, 5 times. At 3 she goes crazy! |
 | 31 | Serpent Hollow | **Evil snakes**: they rear up and hiss, then lunge. **Fake walls**: some walls (and floors) aren't really there |
 | 32 | Snakes Cave | A surprise! (No hint signs on purpose. Hint: it isn't snakes, it's olives) |
-| 33 | The Hidden Paths | Fake ceilings, fake floors, secret tunnels, snakes hiding inside walls, a cannon through a fake ceiling. At the end you catch **Griselda**, the scruffy witch who's been putting up all the signs. She's too scared to go deeper into the Reaper's lands, so from here on there are **no more signs** |
+| 33 | The Hidden Paths | Fake ceilings, fake floors, secret tunnels, snakes hiding inside walls, a cannon through a fake ceiling. |
 | 34 | Viper Falls | Snakes with fire jets, rising platforms, a guard, a cannon and hidden magma |
 | 35 | The Serpent Temple | Everything together: portals, a witch, cannons, guards, a hidden tunnel over the fire hall, and lots of snakes |
 | 36 | Dripping Caverns | **Falling stalactites**: rocks shake, then drop when you pass under. Don't stop! |
 | 37 | Troll Tunnels | **Cave trolls**: too big to squish. Bounce on their heads to fly high, or get them to thump under a stalactite |
-| 38 | Crystal Mines | Trolls and rocks with slams, a wall-jump shaft, a portal and bats over a crumbling bridge |
+| 38 | Crystal Mines | Trolls and rocks with slams, a wall-jump shaft, a portal and bats over a crumbling bridge. At the end you catch **Griselda**, the scruffy witch who's been putting up all the signs. She's too scared to go deeper into the Reaper's lands, so from here on there are **no more signs** |
 | 39 | The Rumbling Deep | Everything together: snakes, rising platforms over magma, a cannon, fire jets, a guard, and a witch to bounce off |
 | 40 | Jett's Hollow | **Boss**: first **the Reaper himself** (you can't hurt him: survive 30 seconds!), then he throws you far away to **Jett the Scarecrow**. Stomp Jett when his pole gets stuck, 5 times. At 3 he goes crazy! |
 
@@ -97,7 +97,7 @@ Reaper's army taking over the world, and a skull waking up in a sealed tomb).
 Skip it with Space or Esc, or watch it again with the **STORY** button.
 
 Each level should take about 2–4 minutes the first time through, and each has
-checkpoints and optional soul gems. Levels 1–33 also have hint signs (until you catch
+checkpoints and optional soul gems. Levels 1–38 also have hint signs (until you catch
 Griselda putting them up); after that, each level's opening banner gives the hint. Your progress and best times are saved.
 The level timer starts when you first move, and right after a respawn you blink
 for a moment while enemies can't hurt you.

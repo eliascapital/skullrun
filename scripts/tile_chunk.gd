@@ -136,6 +136,8 @@ static func _draw_olive_block(ci: CanvasItem, x: int, y: int, p: Vector2, colors
 
 ## Caves: rough natural rock instead of bricks. Lumpy stone with cracks and
 ## pebbles, moss (or crystals) along the top and little drips underneath.
+## Only cheap shapes (rectangles and small polygons, no circles): caves are
+## mostly rock, so this runs for a lot of cells.
 static func _draw_stone_block(ci: CanvasItem, g: Array, x: int, y: int, p: Vector2, colors: Dictionary,
 		exposed_top: bool, alpha: float) -> void:
 	var tile: Color = colors["tile"]
@@ -147,22 +149,25 @@ static func _draw_stone_block(ci: CanvasItem, g: Array, x: int, y: int, p: Vecto
 	var open_l := not is_solid_cell(g, x - 1, y)
 	var open_r := not is_solid_cell(g, x + 1, y)
 	var open_b := not is_solid_cell(g, x, y + 1)
-	# how far this cell is from open air (deep rock is darker)
 	var near := exposed_top or open_l or open_r or open_b or not is_solid_cell(g, x, y - 2) \
 		or not is_solid_cell(g, x, y + 2) or not is_solid_cell(g, x - 2, y) or not is_solid_cell(g, x + 2, y)
-	var base := tile.lerp(dark, 0.2 + (h % 3) * 0.015) if near else dark.lerp(tile, (h % 3) * 0.015)
+	if not near:
+		# deep rock: plain, with the odd speck
+		ci.draw_rect(Rect2(p, Vector2(T, T)), Color(dark.lerp(tile, (h % 3) * 0.015), alpha))
+		if h % 4 == 0:
+			ci.draw_rect(Rect2(p + Vector2(4 + h2 % 22, 4 + (h2 / 5) % 22), Vector2(3, 2)), Color(tile, alpha))
+		return
+	var base := tile.lerp(dark, 0.2 + (h % 3) * 0.015)
 	ci.draw_rect(Rect2(p, Vector2(T, T)), Color(base, alpha))
-	# soft lumps of lighter and darker rock (kept inside the cell)
-	var c1 := p + Vector2(8 + h % 16, 8 + (h / 16) % 16)
-	ci.draw_circle(c1, 5.0 + h % 3, Color(base.lightened(0.06), alpha))
-	var c2 := p + Vector2(8 + h2 % 16, 8 + (h2 / 16) % 16)
-	ci.draw_circle(c2, 4.0 + h2 % 4, Color(base.darkened(0.12), alpha))
-	# pebbles and specks
+	# a lump of lighter rock and a darker hollow (small 6-sided shapes)
+	var c1 := p + Vector2(9 + h % 14, 9 + (h / 16) % 14)
+	ci.draw_colored_polygon(_lump(c1, 5.0 + h % 3), Color(base.lightened(0.06), alpha))
+	if h2 % 2 == 0:
+		var c2 := p + Vector2(9 + h2 % 14, 9 + (h2 / 16) % 14)
+		ci.draw_colored_polygon(_lump(c2, 4.0 + h2 % 3), Color(base.darkened(0.12), alpha))
+	# pebbles, specks and the odd crack
 	if h % 3 == 0:
-		ci.draw_circle(p + Vector2(5 + (h / 3) % 22, 6 + (h / 7) % 20), 2.0, Color(light, 0.8 * alpha))
-	if h2 % 4 == 0:
-		ci.draw_rect(Rect2(p + Vector2(4 + h2 % 22, 4 + (h2 / 5) % 22), Vector2(2, 2)), Color(light.lightened(0.2), alpha))
-	# a crack here and there
+		ci.draw_rect(Rect2(p + Vector2(5 + (h / 3) % 20, 6 + (h / 7) % 18), Vector2(4, 3)), Color(light, 0.8 * alpha))
 	if h % 6 == 1:
 		var a := p + Vector2(4 + h2 % 10, 3 + h % 8)
 		var b := a + Vector2(6 + h % 6, 8 + h2 % 6)
@@ -181,26 +186,31 @@ static func _draw_stone_block(ci: CanvasItem, g: Array, x: int, y: int, p: Vecto
 		var dx := 3 + h % 12
 		ci.draw_colored_polygon(PackedVector2Array([p + Vector2(dx, T), p + Vector2(dx + 7, T),
 			p + Vector2(dx + 3, T + 4 + h2 % 5)]), Color(dark.darkened(0.2), alpha))
-		if h2 % 2 == 0:
-			var dx2 := 18 + h2 % 10
-			ci.draw_colored_polygon(PackedVector2Array([p + Vector2(dx2, T), p + Vector2(dx2 + 5, T),
-				p + Vector2(dx2 + 2, T + 3 + h % 4)]), Color(dark.darkened(0.2), alpha))
 	# a bumpy top with moss (or glowing crystals) growing on it
 	if exposed_top:
-		ci.draw_rect(Rect2(p, Vector2(T, 4)), Color(light, alpha))
+		var bumps := PackedVector2Array([p + Vector2(0, 6)])
 		for k in 4:
-			var bx := 2.0 + k * 8.0 + (cell_hash(x + k, y) % 3)
-			ci.draw_circle(p + Vector2(bx + 2.0, 3), 3.0, Color(light, alpha))
-		ci.draw_rect(Rect2(p + Vector2(0, -1), Vector2(T, 3)), Color(top.darkened(0.25), alpha))
+			var bx := k * 8.0
+			bumps.append(p + Vector2(bx, 2.0 + (cell_hash(x + k, y) % 3)))
+			bumps.append(p + Vector2(bx + 4.0, 0.0))
+		bumps.append(p + Vector2(T, 2))
+		bumps.append(p + Vector2(T, 6))
+		ci.draw_colored_polygon(bumps, Color(light, alpha))
 		var d := cell_hash(x + 11, y)
-		for k in 3:
-			var mx := 3.0 + k * 10.0 + d % 4
-			ci.draw_circle(p + Vector2(mx, 0), 2.0 + (d + k) % 2, Color(top, alpha))
+		ci.draw_rect(Rect2(p + Vector2(0, -1), Vector2(T, 3)), Color(top.darkened(0.25), alpha))
+		ci.draw_rect(Rect2(p + Vector2(3 + d % 6, -2), Vector2(6, 3)), Color(top, alpha))
+		ci.draw_rect(Rect2(p + Vector2(17 + d % 8, -2), Vector2(5, 3)), Color(top, alpha))
 		if d % 5 == 0:
 			# a little crystal
 			var cx := 8.0 + d % 16
 			ci.draw_colored_polygon(PackedVector2Array([p + Vector2(cx - 3, 0), p + Vector2(cx + 3, 0),
 				p + Vector2(cx + 1, -8), p + Vector2(cx - 1, -9)]), Color(top.lightened(0.3), alpha))
+
+
+## A small rounded lump (a hexagon), much cheaper to draw than a circle.
+static func _lump(c: Vector2, r: float) -> PackedVector2Array:
+	return PackedVector2Array([c + Vector2(r, 0), c + Vector2(r * 0.5, r * 0.85), c + Vector2(-r * 0.5, r * 0.85),
+		c + Vector2(-r, 0), c + Vector2(-r * 0.5, -r * 0.85), c + Vector2(r * 0.5, -r * 0.85)])
 
 
 func _draw_ice(x: int, y: int, p: Vector2) -> void:

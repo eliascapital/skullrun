@@ -31,9 +31,10 @@ The owner wants the website to grow with the game, with no empty placeholder slo
   1280×720 in-game capture with the HUD). The gallery is 3 wide: add shots in threes.
 - Also update the level table in `README.md`, and hint signs that name keys should
   mention the touch controls too ("SPACE (or the jump button)").
-- **No hint signs after level 33.** The story: Griselda (`&`, the witch who puts up the signs) is
-  caught in level 33 and is too scared to go deeper into the Reaper's lands. Later levels teach
-  new things with their `banner:` line instead. Don't add signs to levels 34+.
+- **No hint signs after level 38.** The story: Griselda (`&`, the witch who puts up the signs) is
+  caught hammering in her last sign at the end of level 38 and is too scared to go deeper into
+  the Reaper's lands. Later levels teach new things with their `banner:` line instead. Don't add
+  signs to levels 39+.
 - The Reaper's line "I will let <boss> deal with you" belongs to the chase (`Y`/`Z`). Don't reuse
   it elsewhere (level 40's Reaper fight has its own lines).
 
@@ -136,6 +137,10 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - Themes `cave` and `hollow` set `"style": "stone"`: `TileChunk.draw_block` draws rough rock
   (`_draw_stone_block`: lumps, cracks, pebbles, moss/crystal tops, drips under ceilings) instead
   of bricks. Cave rooms are about 15 tiles tall; only the puzzle tunnels are low.
+- **Tile drawing must stay cheap**: caves are mostly rock and every visible cell is drawn every
+  frame. No `draw_circle` in tile code (one circle is a big polygon; circles per cell made the
+  cave levels 3-7x slower). Use rects and small polygons (`_lump`), and keep deep rock plain.
+  Objects that sit still (hanging stalactites) shouldn't `queue_redraw()` every frame.
 - `!` falling stalactite (`falling_stalactite.gd`, `draw_stalactite`): in the cell under a ceiling.
   Triggers when the skull is under it (±40 px, up to 16 tiles down, nothing solid between),
   shakes 0.5 s, falls (deadly only while falling), shatters, regrows after 3 s. Running under
@@ -144,8 +149,12 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - `t` cave troll (`troll.gd`, `draw_troll`): 40×58, walks 45 px/s, turns at walls/ledges. Sees
   6 tiles ahead → 0.7 s wind-up → thump: two shockwaves (`BossShockwave`, `life` 1 s) and every
   stalactite within 52 px (sideways) above him is triggered (`trigger()`). Landing on his head calls
-  `player.launch(-760)` (≈5 tiles, refills double jump). Only a falling stalactite KOs him
-  (`level.trolls`, `covers()`, `crush()`); he doesn't come back.
+  `player.launch(-760)` (≈5 tiles, refills double jump); landing anywhere on his top half counts,
+  and touching him doesn't hurt for 0.3 s after a bounce (the skull is still inside his hitbox for
+  a frame or two on the way up). Only a falling stalactite KOs him (`level.trolls`, `covers()`,
+  `crush()`). Like witches, every troll comes back (`reset()`) when the skull respawns, so a
+  route that needs a troll bounce never breaks. Don't hang rocks over a troll that's needed as
+  a trampoline (his own thump would drop them on him).
 - `O` Jett the Scarecrow (`jett.gd`, `draw_jett`; `sickle.gd`): 5 HP, crazy at 3. Sickle goes out
   low (20 px up) and back high (100 px up). Summons witches (`witch.summoned`: pop in, in group
   `boss_projectile`, freed when stomped; max 2, crazy 3). Hops (shockwaves), then a leap aimed at

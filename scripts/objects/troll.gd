@@ -6,6 +6,7 @@ extends CharacterBody2D
 ## like a trampoline. The only thing that knocks him out is a falling
 ## stalactite landing on his head... and his pounding shakes loose the
 ## stalactites right over him. So get him to pound under one!
+## Like witches, he comes back (walking again) when the skull respawns.
 
 const BossShockwave = preload("res://scripts/objects/boss_shockwave.gd")
 
@@ -16,6 +17,7 @@ const WINDUP := 0.7
 const REST := 0.9
 const COOLDOWN := 1.6
 const HEAD_BOUNCE := -760.0  # higher than a stomp bounce: about 5 tiles
+const BOUNCE_GRACE := 0.3  # after a bounce, touching him doesn't hurt for a moment
 const SIZE := Vector2(40, 58)
 const ROCK_REACH := 52.0  # his thump shakes loose stalactites this close (sideways) to him
 
@@ -32,6 +34,9 @@ var _t := 0.0
 var _state_time := 0.0
 var _cooldown := 0.0
 var _squish := 0.0  # a wobble when the skull bounces off his head
+var _grace := 0.0
+var _home := Vector2.ZERO
+var _tween: Tween
 var _hitbox: Area2D
 
 
@@ -55,6 +60,7 @@ func _ready() -> void:
 	_hitbox.add_child(hs)
 	add_child(_hitbox)
 	_t = fmod(position.x * 0.021, TAU)
+	_home = position
 
 
 func _set_state(s: State) -> void:
@@ -66,6 +72,7 @@ func _physics_process(delta: float) -> void:
 	_t += delta
 	_state_time += delta
 	_cooldown -= delta
+	_grace -= delta
 	_squish = maxf(0.0, _squish - delta * 3.0)
 	queue_redraw()
 	velocity.y = minf(velocity.y + GRAVITY * delta, 900.0)
@@ -88,8 +95,8 @@ func _physics_process(delta: float) -> void:
 		State.KO:
 			velocity.x = 0.0
 			move_and_slide()
-			if _state_time > 1.4:
-				queue_free()
+			if _state_time > 1.4 and visible:
+				hide()
 			return
 	move_and_slide()
 	if is_on_floor() and state == State.WALK:
@@ -100,15 +107,19 @@ func _physics_process(delta: float) -> void:
 
 
 func _check_player() -> void:
+	if not _hitbox.monitoring:
+		return  # just got back up (monitoring turns back on next frame)
 	for body in _hitbox.get_overlapping_bodies():
 		if not body.is_in_group("player") or body.dead:
 			continue
-		if body.is_falling_onto(global_position.y - SIZE.y * 0.5 + 10.0):
+		# landing anywhere on his top half counts (he's big, so be generous)
+		if body.is_falling_onto(global_position.y - 6.0):
 			# boing! his big head is like a trampoline
 			body.launch(HEAD_BOUNCE)
 			_squish = 1.0
+			_grace = BOUNCE_GRACE
 			Sfx.play("bounce", 0.7)
-		else:
+		elif _grace <= 0.0:
 			body.hurt()
 
 
@@ -156,9 +167,26 @@ func crush() -> void:
 	_set_state(State.KO)
 	Sfx.play("boss_hit", 0.8)
 	_hitbox.set_deferred("monitoring", false)
-	var tw := create_tween()
-	tw.tween_interval(0.8)
-	tw.tween_property(self, "modulate:a", 0.0, 0.5)
+	_tween = create_tween()
+	_tween.tween_interval(0.8)
+	_tween.tween_property(self, "modulate:a", 0.0, 0.5)
+
+
+## Called when the skull respawns: a knocked-out troll gets back up, and
+## every troll walks again from where he started.
+func reset() -> void:
+	if _tween:
+		_tween.kill()
+	position = _home
+	reset_physics_interpolation()
+	velocity = Vector2.ZERO
+	_dir = -1.0
+	_cooldown = 0.0
+	_grace = 0.0
+	modulate.a = 1.0
+	show()
+	_hitbox.set_deferred("monitoring", true)
+	_set_state(State.WALK)
 
 
 func _draw() -> void:

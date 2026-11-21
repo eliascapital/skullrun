@@ -62,7 +62,8 @@ func _set_state(s: State) -> void:
 func _physics_process(delta: float) -> void:
 	_t += delta
 	_state_time += delta
-	queue_redraw()
+	if state != State.HANG or _state_time < 0.1:
+		queue_redraw()  # a hanging stalactite keeps its last drawing
 	match state:
 		State.HANG:
 			if _skull_below():
