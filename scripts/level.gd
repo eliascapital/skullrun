@@ -39,6 +39,11 @@ const Alethea = preload("res://scripts/objects/alethea.gd")
 const Snake = preload("res://scripts/objects/snake.gd")
 const Olive = preload("res://scripts/objects/olive.gd")
 const FakeWall = preload("res://scripts/objects/fake_wall.gd")
+const Troll = preload("res://scripts/objects/troll.gd")
+const FallingStalactite = preload("res://scripts/objects/falling_stalactite.gd")
+const Jett = preload("res://scripts/objects/jett.gd")
+const ReaperBoss = preload("res://scripts/objects/reaper_boss.gd")
+const Griselda = preload("res://scripts/objects/griselda.gd")
 
 ## Warp portal pairs: map letter -> colour.
 const WARP_COLORS := {
@@ -55,9 +60,11 @@ var height := 0
 
 var player: Player
 var hud: Hud
-var boss: Node2D  # the Bone King, Mortis the Lich or Alethea the Happy Clown
+var boss: Node2D  # the Bone King, Mortis the Lich, Alethea the Happy Clown or Jett the Scarecrow
 var boss_name := ""
 var reaper: Reaper
+var reaper_boss: ReaperBoss  # the Reaper fighting you himself, before Jett
+var griselda: Griselda
 var exit_portal: Area2D
 var wraiths: Array = []
 var spitters: Array = []
@@ -66,6 +73,8 @@ var witches: Array = []
 var magma: Array = []
 var guards: Array = []
 var critters: Array = []  # snakes and olives (they need to know where the player is)
+var trolls: Array = []
+var stalactites: Array = []
 var fake_walls: Node2D
 var cracked := {}  # Vector2i cell -> cracked block
 
@@ -74,6 +83,7 @@ var gems := 0
 var deaths := 0
 var time := 0.0
 var running := true
+var cutscene := false  # the clock stops while someone's talking
 
 
 func _ready() -> void:
@@ -118,7 +128,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	# the clock only starts once you first move
-	if running and player.has_moved:
+	if running and player.has_moved and not cutscene:
 		time += delta
 	hud.update_stats(gems, total_gems, time, deaths)
 
@@ -323,7 +333,7 @@ func _build_objects() -> Vector2:
 					exit_portal.position = center
 					exit_portal.reached.connect(_on_exit_reached)
 					objects.add_child(exit_portal)
-				"K", "L", "A":
+				"K", "L", "A", "O":
 					if c == "K":
 						boss = BoneKing.new()
 						boss.position = center + Vector2(0, -28)
@@ -332,6 +342,10 @@ func _build_objects() -> Vector2:
 						boss = Alethea.new()
 						boss.position = center + Vector2(0, -28)
 						boss_name = Alethea.BOSS_NAME
+					elif c == "O":
+						boss = Jett.new()
+						boss.position = center + Vector2(0, -28)
+						boss_name = Jett.BOSS_NAME
 					else:
 						boss = Lich.new()
 						boss.position = center
@@ -372,6 +386,30 @@ func _build_objects() -> Vector2:
 					cr.is_solid = is_solid_at
 					objects.add_child(cr)
 					critters.append(cr)
+				"t":
+					var tr := Troll.new()
+					tr.position = center + Vector2(0, -14)
+					tr.is_solid = is_solid_at
+					tr.level = self
+					objects.add_child(tr)
+					trolls.append(tr)
+				"!":
+					var st := FallingStalactite.new()
+					st.level = self
+					st.color = colors["tile_light"]
+					st.position = corner
+					objects.add_child(st)
+					stalactites.append(st)
+				"r":
+					reaper_boss = ReaperBoss.new()
+					reaper_boss.level = self
+					reaper_boss.position = center
+					objects.add_child(reaper_boss)
+				"&":
+					griselda = Griselda.new()
+					griselda.level = self
+					griselda.position = center
+					objects.add_child(griselda)
 				"S":
 					var sk := Skeleton.new()
 					sk.position = center
@@ -532,6 +570,15 @@ func _build_player(start: Vector2) -> void:
 		sg.player = player
 	for cr in critters:
 		cr.player = player
+	for tr in trolls:
+		tr.player = player
+	for st in stalactites:
+		st.player = player
+	if reaper_boss:
+		reaper_boss.player = player
+		player.respawned.connect(reaper_boss.reset)
+	if griselda:
+		griselda.player = player
 	if fake_walls:
 		fake_walls.player = player
 	if reaper:

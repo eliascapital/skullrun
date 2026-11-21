@@ -135,6 +135,10 @@ func show_boss_bar(boss_name: String, max_hp: int) -> void:
 	create_tween().tween_property(_boss_box, "modulate:a", 1.0, 0.5)
 
 
+func set_boss_name(boss_name: String) -> void:
+	_boss_label.text = boss_name
+
+
 func set_boss_hp(hp: int) -> void:
 	_boss_hp = hp
 	_boss_bar.queue_redraw()

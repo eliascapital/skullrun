@@ -58,6 +58,11 @@ var respawn_point := Vector2.ZERO
 var kill_y := 100000.0
 var dead := false
 var frozen := false  # true when the level is finished
+## True while the Reaper is carrying the skull (he moves it himself).
+var held := false
+## Extra spin and size for drawing (the Reaper's big throw).
+var tumble := 0.0
+var draw_scale := 1.0
 
 var facing := 1.0
 var _air_jumps := 0
@@ -155,6 +160,9 @@ func _physics_process(delta: float) -> void:
 			modulate.a = 1.0
 
 	if dead:
+		return
+	if held:
+		velocity = Vector2.ZERO
 		return
 	if _warp_t >= 0.0:
 		_update_warp(delta)
@@ -512,6 +520,9 @@ func respawn() -> void:
 	_flip_time = 0.0
 	_warp_t = -1.0
 	_warp_scale = 1.0
+	held = false
+	tumble = 0.0
+	draw_scale = 1.0
 	_safe_time = RESPAWN_SAFE_TIME
 	camera.reset_smoothing()
 	respawned.emit()
@@ -605,12 +616,12 @@ func _draw() -> void:
 		for i in 4:
 			var x := -9.0 + i * 6.0
 			draw_line(Vector2(x, -18.0 * g), Vector2(x, -40.0 * g), Color(Config.COLOR_BONE, 0.35), 2.0)
-	var lean := clampf(velocity.x / RUN_SPEED, -1.0, 1.0) * 0.12 * g + (1.0 - _warp_scale) * TAU
+	var lean := clampf(velocity.x / RUN_SPEED, -1.0, 1.0) * 0.12 * g + (1.0 - _warp_scale) * TAU + tumble
 	var bob := 0.0
 	if is_on_floor() and absf(velocity.x) > 20.0:
 		bob = absf(sin(_time * 16.0)) * -2.5
 	var body_offset := Vector2(0, (13.0 * (1.0 - _squash.y) + bob) * g)
-	var body_scale := Vector2(_squash.x, _squash.y * g) * _warp_scale
+	var body_scale := Vector2(_squash.x, _squash.y * g) * _warp_scale * draw_scale
 	draw_set_transform(body_offset, lean, body_scale)
 	var eye := Config.COLOR_ACCENT.lerp(Color.WHITE, 0.25 + 0.15 * sin(_time * 6.0))
 	if not _dash_ready and can_dash:

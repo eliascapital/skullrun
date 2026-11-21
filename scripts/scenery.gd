@@ -230,6 +230,54 @@ func _draw() -> void:
 					var s: float = 1.0 if k % 2 == 0 else -1.0
 					draw_colored_polygon(PackedVector2Array([Vector2(lx, ly), Vector2(lx + 8, ly + s * 16),
 						Vector2(lx + 16, ly)]), color)
+		"crystals":
+			# a rocky cave roof with stalactites, and glowing crystals and mushrooms below
+			_cave_roof(rng)
+			for i in 7:
+				var x := rng.randf_range(0, SEGMENT - 60)
+				var ch := rng.randf_range(30, 80) * (0.6 + depth * 0.6)
+				var glow := Color(Color("6ad8e8"), 0.10 + depth * 0.10)
+				for k in 3:
+					var cx := x + k * 14.0 - 14.0
+					var hh := ch * (1.0 - absf(k - 1) * 0.35)
+					var tilt := (k - 1) * 10.0
+					draw_colored_polygon(PackedVector2Array([Vector2(cx - 7, ground + 10), Vector2(cx + tilt, ground - hh),
+						Vector2(cx + 7, ground + 10)]), color)
+					draw_line(Vector2(cx, ground + 4), Vector2(cx + tilt * 0.8, ground - hh * 0.8), glow, 3.0)
+				draw_circle(Vector2(x, ground - ch * 0.4), ch * 0.6, Color(Color("6ad8e8"), 0.03 + depth * 0.03))
+			for i in 8:
+				var x := rng.randf_range(0, SEGMENT)
+				var mh := rng.randf_range(10, 22) * (0.7 + depth * 0.5)
+				draw_line(Vector2(x, ground + 6), Vector2(x, ground - mh), color, 3.0)
+				draw_circle(Vector2(x, ground - mh), mh * 0.45, color)
+				draw_circle(Vector2(x, ground - mh - 1), mh * 0.3, Color(Color("9cff8a"), 0.10 + depth * 0.10))
+		"pumpkins":
+			# a cave roof over a pumpkin patch, with scarecrows and hay bales
+			_cave_roof(rng)
+			for i in 3:
+				var x := rng.randf_range(40, SEGMENT - 40)
+				var sh := rng.randf_range(90, 140) * (0.7 + depth * 0.4)
+				draw_line(Vector2(x, ground + 10), Vector2(x, ground - sh), color, 5.0)
+				draw_line(Vector2(x - 34, ground - sh * 0.75), Vector2(x + 34, ground - sh * 0.75), color, 5.0)
+				draw_colored_polygon(PackedVector2Array([Vector2(x - 14, ground - sh * 0.78), Vector2(x + 14, ground - sh * 0.78),
+					Vector2(x + 12, ground - sh * 0.45), Vector2(x - 12, ground - sh * 0.45)]), color)
+				draw_circle(Vector2(x, ground - sh - 2), 13.0, color)
+				draw_colored_polygon(PackedVector2Array([Vector2(x - 22, ground - sh - 10), Vector2(x + 22, ground - sh - 10),
+					Vector2(x + 8, ground - sh - 30), Vector2(x - 8, ground - sh - 30)]), color)
+			for i in 9:
+				var x := rng.randf_range(0, SEGMENT)
+				var r := rng.randf_range(12, 24) * (0.7 + depth * 0.5)
+				draw_set_transform(Vector2(x, ground - r * 0.7), 0.0, Vector2(1.3, 1.0))
+				draw_circle(Vector2.ZERO, r, color)
+				draw_set_transform(Vector2.ZERO)
+				var face := Color(Color("ffb23e"), 0.10 + depth * 0.12)
+				for s2 in [-1.0, 1.0]:
+					draw_colored_polygon(PackedVector2Array([Vector2(x + s2 * r * 0.4, ground - r * 0.95),
+						Vector2(x + s2 * r * 0.4 - 3, ground - r * 0.75), Vector2(x + s2 * r * 0.4 + 3, ground - r * 0.75)]), face)
+				draw_rect(Rect2(x - r * 0.5, ground - r * 0.55, r, 3), face)
+			for i in 3:
+				var x := rng.randf_range(0, SEGMENT - 80)
+				draw_rect(Rect2(x, ground - 34, 70, 44), color)
 		"spires":
 			for i in 8:
 				var x := rng.randf_range(0, SEGMENT - 60)
@@ -238,6 +286,17 @@ func _draw() -> void:
 				draw_rect(Rect2(x, ground - sh, sw, sh + 20), color)
 				draw_colored_polygon(PackedVector2Array([Vector2(x - 6, ground - sh), Vector2(x + sw * 0.5, ground - sh - sw * 1.6), Vector2(x + sw + 6, ground - sh)]), color)
 				draw_rect(Rect2(x + sw * 0.5 - 4, ground - sh + 30, 8, 14), Color(Config.COLOR_ACCENT, 0.25))
+
+
+## A rocky cave roof along the top with stalactites hanging from it.
+func _cave_roof(rng: RandomNumberGenerator) -> void:
+	draw_rect(Rect2(0, -400, SEGMENT, 430 - depth * 10.0), color)
+	for i in 16:
+		var x := rng.randf_range(0, SEGMENT)
+		var w := rng.randf_range(10, 26)
+		var slen := rng.randf_range(30, 120) * (0.6 + depth * 0.6)
+		draw_colored_polygon(PackedVector2Array([Vector2(x - w, 20), Vector2(x + w, 20), Vector2(x + w * 0.3, 20 + slen * 0.4),
+			Vector2(x, 20 + slen)]), color)
 
 
 func _tree(x: float, base: float, rng: RandomNumberGenerator) -> void:

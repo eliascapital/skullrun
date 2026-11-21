@@ -15,6 +15,9 @@ const POTION_COLORS := [Color("ff5fd2"), Color("8cff5a"), Color("ffb23e"), Color
 
 var player: Node2D
 var is_solid: Callable
+## Summoned by Jett the Scarecrow: she pops in, and once stomped she's gone
+## for good (Jett clears his witches away when he's hit or you respawn).
+var summoned := false
 
 var facing := -1.0
 var _cooldown := 1.0
@@ -23,6 +26,7 @@ var _t := 0.0
 var _dead := false
 var _thrown := 0
 var _tween: Tween
+var _pop_in := 0.0  # a summoned witch can't throw or hurt while she appears
 
 
 func _ready() -> void:
@@ -37,6 +41,13 @@ func _ready() -> void:
 	add_child(shape)
 	_cooldown = 0.9 + fmod(position.x * 0.013, 1.0)
 	_t = fmod(position.x * 0.01, TAU)
+	if summoned:
+		add_to_group("boss_projectile")
+		_pop_in = 0.8
+		_cooldown = 1.6 + fmod(position.x * 0.013, 1.0)
+		scale = Vector2.ZERO
+		create_tween().tween_property(self, "scale", Vector2.ONE, 0.4).set_trans(Tween.TRANS_BACK) \
+			.set_ease(Tween.EASE_OUT)
 
 
 func _physics_process(delta: float) -> void:
@@ -45,6 +56,9 @@ func _physics_process(delta: float) -> void:
 	_t += delta
 	queue_redraw()
 	if player == null:
+		return
+	if _pop_in > 0.0:
+		_pop_in -= delta
 		return
 	var d := player.global_position - global_position
 	var near: bool = absf(d.x) < RANGE.x and absf(d.y) < RANGE.y and not player.dead
@@ -109,7 +123,11 @@ func defeat() -> void:
 	_tween.tween_property(self, "scale", Vector2(1.3, 0.3), 0.12)
 	_tween.tween_property(self, "scale", Vector2(0.2, 1.6), 0.15)
 	_tween.parallel().tween_property(self, "modulate:a", 0.0, 0.25)
-	_tween.tween_callback(hide)
+	_tween.tween_callback(queue_free if summoned else hide)
+
+
+func is_defeated() -> bool:
+	return _dead
 
 
 ## Called when the skull respawns: a stomped witch flies back.
@@ -132,6 +150,12 @@ func slam_hit() -> void:
 
 
 func _draw() -> void:
+	if _pop_in > 0.0:
+		# a puff of straw as she appears
+		for i in 8:
+			var a := i * TAU / 8.0 + _t * 3.0
+			draw_line(Vector2(cos(a), sin(a)) * (10.0 + (0.8 - _pop_in) * 30.0),
+				Vector2(cos(a), sin(a)) * (16.0 + (0.8 - _pop_in) * 40.0), Color("e0be62"), 2.0)
 	var raise := 0.0
 	if _windup > 0.0:
 		raise = 1.0 - _windup / WINDUP

@@ -16,6 +16,7 @@ THEME_COLORS = {
     "throne": "#ffd166", "abyss": "#4ff0d0", "keep": "#59ff8a", "bog": "#a3d94a",
     "cauldron": "#b07cff", "circus": "#ffd166",
     "serpent": "#c8a040", "olive": "#8fa032",
+    "cave": "#6ad8e8", "hollow": "#ffb23e",
 }
 
 
@@ -29,7 +30,7 @@ def read_level(path):
             in_map = True
             continue
         if in_map:
-            if not line.startswith(";") and any(b in line for b in "KLA"):  # the bosses
+            if not line.startswith(";") and any(b in line for b in "KLAO"):  # the bosses
                 is_boss = True
         elif ":" in line and not line.startswith(";"):
             key, value = line.split(":", 1)

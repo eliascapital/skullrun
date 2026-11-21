@@ -171,6 +171,24 @@ const THEMES := {
 		"hazard": Color("d8b880"), "liquid": Color("d8c840"),
 		"moon": false, "scenery": "olives", "style": "olive",
 	},
+	# Deep caves: falling stalactites and cave trolls (levels 36-39)
+	"cave": {
+		"sky_top": Color("05090e"), "sky_bottom": Color("182632"),
+		"far": Color("0c1620"), "near": Color("121e2a"),
+		"tile": Color("3c444e"), "tile_dark": Color("292f37"), "tile_light": Color("58626e"),
+		"tile_top": Color("6ad8e8"), "platform": Color("6a5a48"),
+		"hazard": Color("d8eef4"), "liquid": Color("5ec8ff"),
+		"moon": false, "scenery": "crystals", "style": "stone",
+	},
+	# Jett the Scarecrow's pumpkin cave (level 40)
+	"hollow": {
+		"sky_top": Color("0c0705"), "sky_bottom": Color("3a1c0c"),
+		"far": Color("201008"), "near": Color("2c160a"),
+		"tile": Color("4a3e36"), "tile_dark": Color("322a24"), "tile_light": Color("62544a"),
+		"tile_top": Color("ffb23e"), "platform": Color("7a5a34"),
+		"hazard": Color("f4e4c8"), "liquid": Color("ff7a1f"),
+		"moon": false, "scenery": "pumpkins", "style": "stone",
+	},
 }
 
 const DEFAULT_THEME := "crypt"

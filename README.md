@@ -1,8 +1,8 @@
 # SKULLRUN
 
 A spooky 2D platformer made with **Godot 4.3**. You play a runaway skull that
-escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 35 levels,
-collect soul gems, defeat three bosses, and fall upward through the Abyss.
+escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 40 levels,
+collect soul gems, defeat four bosses, and fall upward through the Abyss.
 
 ## Play it
 
@@ -83,16 +83,22 @@ menu (it asks first).
 | 30 | Alethea's Big Top | **Boss**: Alethea the Happy Clown. Stomp her only when she's dizzy, 5 times. At 3 she goes crazy! |
 | 31 | Serpent Hollow | **Evil snakes**: they rear up and hiss, then lunge. **Fake walls**: some walls (and floors) aren't really there |
 | 32 | Snakes Cave | A surprise! (No hint signs on purpose. Hint: it isn't snakes, it's olives) |
-| 33 | The Hidden Paths | Fake ceilings, fake floors, secret tunnels, snakes hiding inside walls, a cannon through a fake ceiling |
+| 33 | The Hidden Paths | Fake ceilings, fake floors, secret tunnels, snakes hiding inside walls, a cannon through a fake ceiling. At the end you catch **Griselda**, the scruffy witch who's been putting up all the signs. She's too scared to go deeper into the Reaper's lands, so from here on there are **no more signs** |
 | 34 | Viper Falls | Snakes with fire jets, rising platforms, a guard, a cannon and hidden magma |
 | 35 | The Serpent Temple | Everything together: portals, a witch, cannons, guards, a hidden tunnel over the fire hall, and lots of snakes |
+| 36 | Dripping Caverns | **Falling stalactites**: rocks shake, then drop when you pass under. Don't stop! |
+| 37 | Troll Tunnels | **Cave trolls**: too big to squish. Bounce on their heads to fly high, or get them to thump under a stalactite |
+| 38 | Crystal Mines | Trolls and rocks with slams, a wall-jump shaft, a portal and bats over a crumbling bridge |
+| 39 | The Rumbling Deep | Everything together: snakes, rising platforms over magma, a cannon, fire jets, a guard, and a witch to bounce off |
+| 40 | Jett's Hollow | **Boss**: first **the Reaper himself** (you can't hurt him: survive 30 seconds!), then he throws you far away to **Jett the Scarecrow**. Stomp Jett when his pole gets stuck, 5 times. At 3 he goes crazy! |
 
 The first time you press PLAY, a short story plays (a man walking to work, the
 Reaper's army taking over the world, and a skull waking up in a sealed tomb).
 Skip it with Space or Esc, or watch it again with the **STORY** button.
 
 Each level should take about 2–4 minutes the first time through, and each has
-checkpoints, hint signs and optional soul gems. Your progress and best times are saved.
+checkpoints and optional soul gems. Levels 1–33 also have hint signs (until you catch
+Griselda putting them up); after that, each level's opening banner gives the hint. Your progress and best times are saved.
 The level timer starts when you first move, and right after a respawn you blink
 for a moment while enemies can't hurt you.
 
@@ -103,6 +109,19 @@ walking at you, throwing arcs of bones, and charging. When a charge ends against
 wall he's dizzy for a couple of seconds, which is the only time jumping on his head hurts him. Each hit
 makes him faster, and from the second phase he also leaps and slams the ground,
 sending shockwaves along the floor (jump them). If you die, he resets to full health.
+
+### The Reaper and Jett the Scarecrow (level 40)
+
+The Reaper finally fights you himself. He can't be hurt (landing on him just makes him laugh),
+so all you can do is survive for 30 seconds: dodge his flaming skulls, jump his scythe sweep and
+get off the glowing cracks before bony hands grab up out of the floor. Then he decides you're not
+worth his time and flings the skull far, far away... into Jett's hollow.
+
+Jett the Scarecrow stands still like a normal scarecrow until you come close. Then he throws his
+sickle (it flies out low, so jump it, and comes back high, so stay down), calls up witches around
+him, hops at you on his pole, and finally leaps high and plunges his pole into the ground, where
+it gets stuck. That's the only time a stomp hurts him. At 3 hit points his head catches fire: he
+throws two sickles, calls more witches, leaps twice and stamps so hard that rocks fall from the ceiling.
 
 ## Editing the game
 
@@ -128,7 +147,7 @@ scripts/level.gd       builds a level from its text file
 scripts/player.gd      the skull
 scripts/objects/       gems, checkpoints, enemies, platforms, hazards…
 scripts/ui/            menus and the in-game HUD
-levels/                level_01.txt … level_35.txt
+levels/                level_01.txt … level_40.txt
 assets/fonts/          Creepster (title) and Rubik (text), both free OFL fonts
 ```
 
