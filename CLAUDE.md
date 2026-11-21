@@ -136,6 +136,10 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - Themes `cave` and `hollow` set `"style": "stone"`: `TileChunk.draw_block` draws rough rock
   (`_draw_stone_block`: lumps, cracks, pebbles, moss/crystal tops, drips under ceilings) instead
   of bricks. Cave rooms are about 15 tiles tall; only the puzzle tunnels are low.
+- **Tile drawing must stay cheap**: caves are mostly rock and every visible cell is drawn every
+  frame. No `draw_circle` in tile code (one circle is a big polygon; circles per cell made the
+  cave levels 3-7x slower). Use rects and small polygons (`_lump`), and keep deep rock plain.
+  Objects that sit still (hanging stalactites) shouldn't `queue_redraw()` every frame.
 - `!` falling stalactite (`falling_stalactite.gd`, `draw_stalactite`): in the cell under a ceiling.
   Triggers when the skull is under it (±40 px, up to 16 tiles down, nothing solid between),
   shakes 0.5 s, falls (deadly only while falling), shatters, regrows after 3 s. Running under
