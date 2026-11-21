@@ -572,6 +572,7 @@ func _build_player(start: Vector2) -> void:
 		cr.player = player
 	for tr in trolls:
 		tr.player = player
+		player.respawned.connect(tr.reset)
 	for st in stalactites:
 		st.player = player
 	if reaper_boss:

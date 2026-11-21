@@ -149,8 +149,12 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
 - `t` cave troll (`troll.gd`, `draw_troll`): 40×58, walks 45 px/s, turns at walls/ledges. Sees
   6 tiles ahead → 0.7 s wind-up → thump: two shockwaves (`BossShockwave`, `life` 1 s) and every
   stalactite within 52 px (sideways) above him is triggered (`trigger()`). Landing on his head calls
-  `player.launch(-760)` (≈5 tiles, refills double jump). Only a falling stalactite KOs him
-  (`level.trolls`, `covers()`, `crush()`); he doesn't come back.
+  `player.launch(-760)` (≈5 tiles, refills double jump); landing anywhere on his top half counts,
+  and touching him doesn't hurt for 0.3 s after a bounce (the skull is still inside his hitbox for
+  a frame or two on the way up). Only a falling stalactite KOs him (`level.trolls`, `covers()`,
+  `crush()`). Like witches, every troll comes back (`reset()`) when the skull respawns, so a
+  route that needs a troll bounce never breaks. Don't hang rocks over a troll that's needed as
+  a trampoline (his own thump would drop them on him).
 - `O` Jett the Scarecrow (`jett.gd`, `draw_jett`; `sickle.gd`): 5 HP, crazy at 3. Sickle goes out
   low (20 px up) and back high (100 px up). Summons witches (`witch.summoned`: pop in, in group
   `boss_projectile`, freed when stomped; max 2, crazy 3). Hops (shockwaves), then a leap aimed at

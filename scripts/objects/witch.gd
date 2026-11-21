@@ -80,6 +80,8 @@ func _physics_process(delta: float) -> void:
 			_windup = WINDUP
 			if _thrown % 3 == 0:
 				Sfx.play("laugh", 1.7)
+	if not monitoring:
+		return  # just flew back (monitoring turns back on next frame)
 	for body in get_overlapping_bodies():
 		if body.is_in_group("player") and not body.dead:
 			if body.is_slamming() or body.is_falling_onto(global_position.y - 10.0):
