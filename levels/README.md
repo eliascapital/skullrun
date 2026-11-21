@@ -12,7 +12,8 @@ before `level_11`, so rename them all to `level_001` and so on).
 name: Moonlit Graveyard          <- shown on the level menu and HUD
 theme: graveyard                 <- crypt, graveyard, bonecaves, forge, tower,
                                     frost, wells, ossuary, throne, abyss, keep,
-                                    bog, cauldron, circus, serpent or olive
+                                    bog, cauldron, circus, serpent, olive,
+                                    cave or hollow
 about: Double jump, skeletons     <- short description for the website's level list
 abilities: jump double           <- any of: jump double dash wall slam (leave it out for all of them)
 banner: NEW POWER: DOUBLE JUMP!  <- optional message shown at the start
@@ -74,7 +75,12 @@ that their bottoms line up.
 | `m`  | hidden magma: looks exactly like `#` until the skull comes within about 6 tiles, then glows (fully at 3 tiles). Touching it kills straight away. It's solid, so skeletons can walk on it. Keep patches 3 wide or less where players have to jump them |
 | `M`  | moving platform (left/right). A row like `MMM` is one 3-wide platform; it moves 4 tiles right and back |
 | `V`  | moving platform (up/down). Moves 4 tiles up from where you draw it, and back |
-| `1`–`9` | hint sign that shows the matching `signN:` text |
+| `t`  | cave troll: a big troll that stomps back and forth (turning at walls and ledges) and thumps the ground with his club when you're in front of him, sending a rumble along the floor both ways (jump it). He's too big to squish: landing on his head bounces you about 5 tiles up and gives back your double jump, so he makes a trampoline. A falling stalactite on his head knocks him out, and his thump shakes loose any stalactite right over him (so put rocks no more than 3 tiles apart over his path). Fence him in with 1-tile posts like skeletons |
+| `!`  | falling stalactite: put it in the cell right under a ceiling. When the skull passes under it, it shakes for half a second and drops (deadly while falling), smashes on the ground, and grows back 3 seconds later. Running under is safe, stopping isn't, so keep them away from spots where players must wait (flame jets, moving platforms, guards) and from checkpoints |
+| `r`  | the Reaper's own fight (level 40). Put him on the floor of an arena with a wall at each end and plenty of room above (he flings the skull up and away). He can't be hurt: survive 30 seconds and he throws the skull to the boss of the level, landing high over the left side of the boss's arena. So use him together with `O`, and make his arena's walls too tall to climb back out |
+| `O`  | Jett the Scarecrow boss (one boss per level). Put him on the floor of an arena with a wall at each end, at least 30 tiles wide, with the ceiling about 11 tiles up (he leaps high, and when he's crazy rocks fall from that ceiling). He throws a sickle that comes back high, summons witches, hops at you and leaps to plunge his pole into the ground; it gets stuck, and that's the only time a stomp hurts him. 5 hits, and at 3 he goes crazy. The exit `E` stays hidden until he's defeated |
+| `&`  | Griselda, the witch who puts up the hint signs (level 33). Put her just right of a sign. When the skull comes close she tells her story (the skull waits, JUMP skips a line) and flies off |
+| `1`–`9` | hint sign that shows the matching `signN:` text. (Since Griselda left in level 33 there are no more signs after it, so later levels teach with their `banner:` instead) |
 
 Put things that stand on the ground (`P`, `E`, `C`, `S`, `J`, signs) in the row
 directly above a `#`. Lava `~` usually goes in the top ground row, with `#` underneath it.

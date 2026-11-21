@@ -1,6 +1,6 @@
 # SKULLRUN — notes for Claude
 
-A Godot 4.3 platformer about a cursed skull escaping the Reaper. 35 levels, three bosses,
+A Godot 4.3 platformer about a cursed skull escaping the Reaper. 40 levels, four bosses,
 playable in the browser (also on phones). Levels are text files in `levels/` (format in
 `levels/README.md`). The website (`website/`) is published to GitHub Pages by
 `.github/workflows/website.yml` on every push to `main`.
@@ -15,7 +15,7 @@ The owner wants the website to grow with the game, with no empty placeholder slo
 - **New level:** give the level file an `about:` line. The website's level list and level
   count are generated from the level files at build time (`website/gen_levels.py`),
   so nothing else is needed. A new theme also needs its colour in `THEME_COLORS` there,
-  and a new boss character needs adding to its boss detection (it looks for `K`, `L` and `A`).
+  and a new boss character needs adding to its boss detection (it looks for `K`, `L`, `A` and `O`).
 - **New power/ability:** add a card to the `#powers` section of `website/index.html`
   (icon, name, one-line description, the level it unlocks in), and add it to the
   controls section and the in-game How to Play panel (`scripts/ui/title_screen.gd`) if it has a key.
@@ -25,12 +25,17 @@ The owner wants the website to grow with the game, with no empty placeholder slo
   Give drawing code a `static func draw_<name>(ci: CanvasItem, ...)` so it can be reused
   for that picture (see `reaper.gd`, `lich.gd`). The enemy grid is 4 columns (2 on phones):
   keep the rows full, or the last row has a hole. Cards with class `wide` (the witch, the
-  Reaper and the bosses) fill 2 columns, so count them as 2 (it's 20 now: 6 small + 7 wide;
+  Reaper, the troll and the bosses) fill 2 columns, so count them as 2 (it's 24 now: 6 small + 9 wide;
   keep the small ones even too, for the 2-column phone layout).
 - **New world/theme:** consider adding a screenshot to the gallery (`website/img/<name>.webp`,
   1280×720 in-game capture with the HUD). The gallery is 3 wide: add shots in threes.
 - Also update the level table in `README.md`, and hint signs that name keys should
   mention the touch controls too ("SPACE (or the jump button)").
+- **No hint signs after level 33.** The story: Griselda (`&`, the witch who puts up the signs) is
+  caught in level 33 and is too scared to go deeper into the Reaper's lands. Later levels teach
+  new things with their `banner:` line instead. Don't add signs to levels 34+.
+- The Reaper's line "I will let <boss> deal with you" belongs to the chase (`Y`/`Z`). Don't reuse
+  it elsewhere (level 40's Reaper fight has its own lines).
 
 ## How the game is put together
 
@@ -126,6 +131,36 @@ Walls 10+ tiles tall are used in levels as "can't climb this".
   inside a `%` run into `%` in `grid` (objects are still built from `_map`).
 - Themes `serpent` and `olive`. The olive theme sets `"style": "olive"`, which makes
   `TileChunk.draw_block` draw olives, gems draw as olives and spikes as olive toothpicks.
+
+### Map characters added in levels 36–40 (themes `cave` and `hollow`)
+- Themes `cave` and `hollow` set `"style": "stone"`: `TileChunk.draw_block` draws rough rock
+  (`_draw_stone_block`: lumps, cracks, pebbles, moss/crystal tops, drips under ceilings) instead
+  of bricks. Cave rooms are about 15 tiles tall; only the puzzle tunnels are low.
+- `!` falling stalactite (`falling_stalactite.gd`, `draw_stalactite`): in the cell under a ceiling.
+  Triggers when the skull is under it (±40 px, up to 16 tiles down, nothing solid between),
+  shakes 0.5 s, falls (deadly only while falling), shatters, regrows after 3 s. Running under
+  is safe; keep them away from wait spots and checkpoints. `once` mode (Jett's cave-in) drops
+  straight away and doesn't regrow. Listed in `level.stalactites`.
+- `t` cave troll (`troll.gd`, `draw_troll`): 40×58, walks 45 px/s, turns at walls/ledges. Sees
+  6 tiles ahead → 0.7 s wind-up → thump: two shockwaves (`BossShockwave`, `life` 1 s) and every
+  stalactite within 52 px (sideways) above him is triggered (`trigger()`). Landing on his head calls
+  `player.launch(-760)` (≈5 tiles, refills double jump). Only a falling stalactite KOs him
+  (`level.trolls`, `covers()`, `crush()`); he doesn't come back.
+- `O` Jett the Scarecrow (`jett.gd`, `draw_jett`; `sickle.gd`): 5 HP, crazy at 3. Sickle goes out
+  low (20 px up) and back high (100 px up). Summons witches (`witch.summoned`: pop in, in group
+  `boss_projectile`, freed when stomped; max 2, crazy 3). Hops (shockwaves), then a leap aimed at
+  the skull → STUCK (2.4 s, 1.9 crazy): the only stompable state. Crazy adds CAVE_IN (6 `once`
+  stalactites from the ceiling, one over the skull) and a double leap. Needs ~11 tiles of headroom.
+- `r` the Reaper's fight (`reaper_boss.gd`, `grave_hand.gd`, `reaper_skull.gd`): can't be hurt
+  (stomping bounces you off, he laughs). Survive 30 s (the boss bar counts down, the label shows
+  the seconds) of homing skulls, grave hands and a low scythe sweep. Then he talks, grabs the skull
+  (`player.held` = the Reaper moves it; `player.tumble`/`draw_scale` spin and shrink it), flings
+  it into the distance (twinkle), fades to black ("Far, far away..."), and drops it at
+  `level.boss.drop_point()` (left side of Jett's arena), which becomes the respawn point.
+  Dying during the fight restarts the 30 s.
+- `&` Griselda (`griselda.gd`, `draw_griselda`): hammers a sign; when the skull comes within
+  6 tiles she freezes it (`player.frozen`, `level.cutscene` stops the clock), talks (JUMP skips a
+  line) and flies off.
 
 ### Touch screens and phones
 - `touch_controls.gd`: joystick + jump + dash + pause, pressing the normal input actions

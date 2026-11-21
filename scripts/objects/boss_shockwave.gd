@@ -1,10 +1,13 @@
 extends Area2D
-## A ground shockwave from the Bone King's slam. Jump over it!
+## A ground shockwave from the Bone King's slam (also Alethea's hops, Jett's
+## landings and a cave troll's club). Jump over it!
 
 const SPEED := 270.0
 
 var dir := 1.0
 var is_solid: Callable
+var life := 4.0  # seconds before it fades out
+var tint := Config.COLOR_ACCENT
 var _age := 0.0
 
 
@@ -30,12 +33,12 @@ func _physics_process(delta: float) -> void:
 			body.hurt()
 	var blocked: bool = is_solid.is_valid() and (is_solid.call(global_position + Vector2(dir * 12, -10))
 		or not is_solid.call(global_position + Vector2(0, 6)))
-	if _age > 4.0 or blocked:
+	if _age > life or blocked:
 		queue_free()
 
 
 func _draw() -> void:
-	var c := Config.COLOR_ACCENT
+	var c := tint
 	var flick := 0.8 + 0.2 * sin(_age * 40.0)
 	draw_colored_polygon(PackedVector2Array([Vector2(-14, 0), Vector2(-4, -26 * flick), Vector2(2, -12),
 		Vector2(8, -22 * flick), Vector2(14, 0)]), Color(c, 0.85))
