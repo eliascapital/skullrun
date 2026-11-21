@@ -1,6 +1,6 @@
 name: The Hidden Paths
 theme: serpent
-about: Secret passages, fake floors, hidden snakes... and who's been putting up the signs?
+about: Secret passages, fake floors and hidden snakes
 abilities: jump double dash wall slam
 sign1: A dead end? Look up. Not every ceiling is real...
 sign2: Snakes hide inside fake walls!
@@ -8,7 +8,7 @@ sign3: Real posts stop snakes. Fake posts don't!
 sign4: Up there, past the ceiling, there's something shiny...
 sign5: Careful. Not every floor is real!
 sign6: A cannon under a ceiling? Trust the cannon!
-sign7: Good luck, little skull!\n- Griselda
+sign7: You found every hidden path!
 
 ; Map key:  . air   # ground   - wooden ledge (jump up through)   X crumbling block   I ice
 ;           ^ spikes   ~ lava/acid   o soul gem   P start   E exit portal   C checkpoint   K L bosses
@@ -20,7 +20,6 @@ sign7: Good luck, little skull!\n- Griselda
 ;           Q witch (throws potions)   m hidden magma (looks like ground until you're close)
 ;           > < cannon (fires up-right / up-left)   D skeleton guard (spear!)   A Alethea the Happy Clown
 ;           N snake (rears up, then lunges)   U olive (waddles, then charges)   % fake wall (walk right through)
-;           & Griselda (the witch who puts up the signs)
 ; Blocks separated by a blank line are placed left-to-right. See levels/README.md.
 ---
 ; Part 1: a dead end... but the ceiling over the jump pad is fake. Up and over the top!
@@ -107,7 +106,7 @@ sign7: Good luck, little skull!\n- Griselda
 ########################################
 ########################################
 
-; Part 7: out of the hidden paths... and who's that, hammering in a sign?
+; Part 7: out of the hidden paths
 ........................................
 ........................................
 ........................................
@@ -117,6 +116,6 @@ sign7: Good luck, little skull!\n- Griselda
 .........o..o..o........................
 ........................................
 ........................................
-........7&...............E..............
+...7.....................E..............
 ########################################
 ########################################

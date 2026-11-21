@@ -31,9 +31,10 @@ The owner wants the website to grow with the game, with no empty placeholder slo
   1280×720 in-game capture with the HUD). The gallery is 3 wide: add shots in threes.
 - Also update the level table in `README.md`, and hint signs that name keys should
   mention the touch controls too ("SPACE (or the jump button)").
-- **No hint signs after level 33.** The story: Griselda (`&`, the witch who puts up the signs) is
-  caught in level 33 and is too scared to go deeper into the Reaper's lands. Later levels teach
-  new things with their `banner:` line instead. Don't add signs to levels 34+.
+- **No hint signs after level 38.** The story: Griselda (`&`, the witch who puts up the signs) is
+  caught hammering in her last sign at the end of level 38 and is too scared to go deeper into
+  the Reaper's lands. Later levels teach new things with their `banner:` line instead. Don't add
+  signs to levels 39+.
 - The Reaper's line "I will let <boss> deal with you" belongs to the chase (`Y`/`Z`). Don't reuse
   it elsewhere (level 40's Reaper fight has its own lines).
 
