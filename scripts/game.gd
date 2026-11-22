@@ -20,7 +20,9 @@ var current_level := 0
 
 # Progress (saved to disk)
 var unlocked := 1  # number of levels you can play
-var best_times := {}  # level index (String) -> seconds
+var best_times := {}  # level index (String) -> seconds (real runs only)
+var code_best := -1.0  # the time a secret code gives on every level (-1 = no code entered)
+var show_code_scores := false  # the level menu shows the code score instead of the real one
 var best_gems := {}  # level index (String) -> gems
 var seen_intro := false
 ## Where the player has moved the touch buttons (see scripts/ui/touch_controls.gd).
@@ -178,8 +180,9 @@ func try_code(code: String) -> bool:
 	if t < 0.0:
 		return false
 	unlocked = maxi(level_count(), 1)
-	for i in level_count():
-		best_times[str(i)] = t
+	# real best times are kept: the code score is separate (the level menu switches)
+	code_best = t if code_best < 0.0 else minf(code_best, t)
+	show_code_scores = true
 	seen_intro = true
 	save_progress()
 	return true
@@ -189,6 +192,8 @@ func save_progress() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("progress", "unlocked", unlocked)
 	cfg.set_value("progress", "best_times", best_times)
+	cfg.set_value("progress", "code_best", code_best)
+	cfg.set_value("settings", "show_code_scores", show_code_scores)
 	cfg.set_value("progress", "best_gems", best_gems)
 	cfg.set_value("progress", "seen_intro", seen_intro)
 	cfg.set_value("settings", "touch_layout", touch_layout)
@@ -201,6 +206,14 @@ func load_progress() -> void:
 		return
 	unlocked = clampi(int(cfg.get_value("progress", "unlocked", 1)), 1, maxi(level_count(), 1))
 	best_times = cfg.get_value("progress", "best_times", {})
+	code_best = cfg.get_value("progress", "code_best", -1.0)
+	show_code_scores = cfg.get_value("settings", "show_code_scores", false)
+	# older saves wrote code times straight into the best times: no real run
+	# is that fast, so move them over to the code score
+	for key in best_times.keys():
+		if best_times[key] <= 0.1001:
+			code_best = best_times[key] if code_best < 0.0 else minf(code_best, best_times[key])
+			best_times.erase(key)
 	best_gems = cfg.get_value("progress", "best_gems", {})
 	seen_intro = cfg.get_value("progress", "seen_intro", unlocked > 1)
 	touch_layout = cfg.get_value("settings", "touch_layout", {})
@@ -210,7 +223,17 @@ func reset_progress() -> void:
 	unlocked = 1
 	best_times = {}
 	best_gems = {}
+	code_best = -1.0
+	show_code_scores = false
 	save_progress()
+
+
+## The best time the level menu shows for a level: the real one, or the code
+## score when the menu is switched to code scores. -1 if there isn't one.
+func shown_best(index: int) -> float:
+	if show_code_scores and code_best >= 0.0:
+		return code_best
+	return best_times.get(str(index), -1.0)
 
 
 static func format_time(seconds: float) -> String:

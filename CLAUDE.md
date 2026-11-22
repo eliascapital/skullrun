@@ -54,11 +54,12 @@ title text), `Game` (level list, save file, scene changes, input map, phone zoom
 - `scripts/ui/` HUD, title screen (and How to Play panel), level select, story intro,
   touch controls, `ui.gd` (button/label/panel helpers in the game's style).
 - Secret codes: the title screen's CODE button (or typing one on the title screen) calls
-  `Game.try_code()`, which unlocks every level, sets every best time to that code's time, and
-  saves. `Game.CODES` holds only SHA-256 hashes of the codes. **Never write a code itself
+  `Game.try_code()`, which unlocks every level, sets `Game.code_best` (the code score shown on
+  every level; real `best_times` are kept) and saves. The level menu's SCORES: REAL / CODE button
+  (only there once a code was used) flips `Game.show_code_scores`; `Game.shown_best(i)` picks. `Game.CODES` holds only SHA-256 hashes of the codes. **Never write a code itself
   anywhere on GitHub** (code, comments, docs, commit messages, PRs): the owner keeps them secret.
-- Save file: `user://skullrun_save.cfg` — `[progress]` (unlocked, best times/gems, seen_intro)
-  and `[settings] touch_layout`. `Game.save_progress()` writes both.
+- Save file: `user://skullrun_save.cfg` — `[progress]` (unlocked, best times/gems, code_best,
+  seen_intro) and `[settings]` (touch_layout, show_code_scores). `Game.save_progress()` writes both.
 
 ### Player numbers (1 tile = 32 px)
 Jump ≈ 4 tiles (plan for 3), + double jump ≈ 7 (plan for 6), dash+double clears 9–10 tiles.

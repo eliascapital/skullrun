@@ -133,8 +133,10 @@ throws two sickles, calls more witches, leaps twice and stamps so hard that rock
   level 16, create `levels/level_16.txt` and it shows up in the game automatically.
 * **Controls**: `_setup_input()` in `scripts/game.gd`.
 * **Secret codes**: on the title screen, press **CODE** and type a secret code (or just type it
-  on the title screen) to unlock every level and set your time on every level. The codes are
-  kept secret: `scripts/game.gd` only stores their SHA-256 hashes (`CODES`).
+  on the title screen) to unlock every level and get a "code score" on every level. Your real
+  best times are kept too: the **SCORES: REAL / CODE** button on the level menu switches
+  between them. The codes are kept secret: `scripts/game.gd` only stores their SHA-256
+  hashes (`CODES`).
 * **How the skull moves** (speed, jump height, dash): the constants at the top of `scripts/player.gd`.
 
 ## Project layout

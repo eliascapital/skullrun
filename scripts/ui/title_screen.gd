@@ -208,7 +208,8 @@ func _show_code(show: bool) -> void:
 
 func _submit_code(code: String) -> void:
 	if Game.try_code(code):
-		_code_message.text = "ALL LEVELS UNLOCKED!\nYour time on every level: %s" % Game.format_time(Game.code_time(code))
+		_code_message.text = "ALL LEVELS UNLOCKED!\nCode score on every level: %s\n(Switch REAL / CODE scores on the level menu.)" \
+			% Game.format_time(Game.code_time(code))
 		_code_message.add_theme_color_override("font_color", Config.COLOR_GOLD)
 		_play_button.text = "CONTINUE  •  LEVEL %d" % (Game.continue_level() + 1)
 		Sfx.play("win")
