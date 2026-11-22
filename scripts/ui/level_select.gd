@@ -6,6 +6,9 @@ const MenuBackground = preload("res://scripts/ui/menu_background.gd")
 
 const COLUMNS := 5
 
+var _buttons: Array = []
+var _score_button: Button
+
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -40,6 +43,7 @@ func _ready() -> void:
 	for i in Game.level_count():
 		var b := _level_button(i)
 		grid.add_child(b)
+		_buttons.append(b)
 		if first == null or i == Game.continue_level():
 			first = b
 
@@ -53,6 +57,12 @@ func _ready() -> void:
 	var back := UI.make_button("BACK", false, 180)
 	back.pressed.connect(Game.goto_title)
 	bottom.add_child(back)
+	# once a secret code has been used, switch between real and code scores
+	if Game.code_best >= 0.0:
+		_score_button = UI.make_button("", false, 250)
+		_score_button.pressed.connect(_toggle_scores)
+		bottom.add_child(_score_button)
+		_update_score_button()
 
 	if first:
 		first.grab_focus()
@@ -66,13 +76,7 @@ func _level_button(i: int) -> Button:
 	b.custom_minimum_size = Vector2(168, 104)
 	b.disabled = locked
 	b.clip_text = true
-	var key := str(i)
-	var text := "%d\n%s" % [i + 1, Game.level_name(i)]
-	if locked:
-		text = "%d\nLOCKED" % (i + 1)
-	elif Game.best_times.has(key):
-		text += "\nBest %s" % Game.format_time(Game.best_times[key])
-	b.text = text
+	b.text = _button_text(i)
 	b.add_theme_font_size_override("font_size", 15)
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
 		var sb: StyleBoxFlat = b.get_theme_stylebox(state).duplicate()
@@ -81,6 +85,29 @@ func _level_button(i: int) -> Button:
 		b.add_theme_stylebox_override(state, sb)
 	b.pressed.connect(Game.start_level.bind(i))
 	return b
+
+
+func _button_text(i: int) -> String:
+	if i >= Game.unlocked:
+		return "%d\nLOCKED" % (i + 1)
+	var text := "%d\n%s" % [i + 1, Game.level_name(i)]
+	var best := Game.shown_best(i)
+	if best >= 0.0:
+		text += "\n%s %s" % ["Code" if Game.show_code_scores else "Best", Game.format_time(best)]
+	return text
+
+
+func _toggle_scores() -> void:
+	Game.show_code_scores = not Game.show_code_scores
+	Game.save_progress()
+	Sfx.play("click")
+	for i in _buttons.size():
+		(_buttons[i] as Button).text = _button_text(i)
+	_update_score_button()
+
+
+func _update_score_button() -> void:
+	_score_button.text = "SCORES: CODE" if Game.show_code_scores else "SCORES: REAL"
 
 
 func _unhandled_input(event: InputEvent) -> void:
