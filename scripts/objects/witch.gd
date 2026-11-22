@@ -5,6 +5,8 @@ extends Area2D
 ## She flies back when the skull respawns, so a witch over a pit can be used
 ## as a trampoline (stomp her to bounce up and get your double jump back).
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const Potion = preload("res://scripts/objects/potion.gd")
 
 const RANGE := Vector2(12.0 * 32.0, 8.0 * 32.0)
@@ -193,7 +195,7 @@ static func draw_witch(ci: CanvasItem, facing: float, t: float, raise: float, po
 	# a little green glow under the broom
 	for i in 3:
 		var k := fmod(t * 1.2 + i / 3.0, 1.0)
-		ci.draw_circle(tail + Vector2(-f * (18.0 + k * 14.0), 4.0 + k * 6.0), 3.0 * (1.0 - k), Color(Color("8cff5a"), 0.5 * (1.0 - k)))
+		Shapes.disc(ci, tail + Vector2(-f * (18.0 + k * 14.0), 4.0 + k * 6.0), 3.0 * (1.0 - k), Color(Color("8cff5a"), 0.5 * (1.0 - k)))
 
 	# dress: sitting side-saddle on the broom
 	var body := PackedVector2Array([o + Vector2(-9, -16), o + Vector2(9, -16), o + Vector2(13, 6),
@@ -212,19 +214,19 @@ static func draw_witch(ci: CanvasItem, facing: float, t: float, raise: float, po
 
 	# back arm holds the broom
 	ci.draw_line(o + Vector2(-f * 6.0, -10.0), o + Vector2(f * 10.0, 6.0), dress, 4.0)
-	ci.draw_circle(o + Vector2(f * 11.0, 7.0), 3.0, skin)
+	Shapes.disc(ci, o + Vector2(f * 11.0, 7.0), 3.0, skin)
 
 	# head: green face, big nose, a happy grin
 	var head := o + Vector2(f * 1.0, -24.0)
-	ci.draw_circle(head + Vector2(-f * 7.0, 2.0), 7.0, hair)
-	ci.draw_circle(head + Vector2(-f * 9.0, 9.0), 5.0, hair)
-	ci.draw_circle(head, 9.0, skin)
+	Shapes.disc(ci, head + Vector2(-f * 7.0, 2.0), 7.0, hair)
+	Shapes.disc(ci, head + Vector2(-f * 9.0, 9.0), 5.0, hair)
+	Shapes.disc(ci, head, 9.0, skin)
 	ci.draw_colored_polygon(PackedVector2Array([head + Vector2(f * 6.0, -2.0), head + Vector2(f * 15.0, 4.0),
 		head + Vector2(f * 6.0, 4.0)]), skin_dark)
-	ci.draw_circle(head + Vector2(f * 3.5, -2.0), 1.8, Color("1a1020"))
-	ci.draw_circle(head + Vector2(f * 3.9, -2.4), 0.6, Color.WHITE)
+	Shapes.disc(ci, head + Vector2(f * 3.5, -2.0), 1.8, Color("1a1020"))
+	Shapes.disc(ci, head + Vector2(f * 3.9, -2.4), 0.6, Color.WHITE)
 	ci.draw_arc(head + Vector2(f * 2.0, 3.0), 4.0, 0.4, PI - 0.4, 6, Color("2a1030"), 1.5)
-	ci.draw_circle(head + Vector2(-f * 2.0, 3.0), 1.0, skin_dark)  # a wart!
+	Shapes.disc(ci, head + Vector2(-f * 2.0, 3.0), 1.0, skin_dark)  # a wart!
 
 	# the pointy hat, a little bent at the tip
 	var brim := head + Vector2(0, -6.0)
@@ -241,8 +243,8 @@ static func draw_witch(ci: CanvasItem, facing: float, t: float, raise: float, po
 	var up := o + Vector2(f * 8.0, -34.0)
 	var hand := rest.lerp(up, raise)
 	ci.draw_line(shoulder, hand, dress, 4.0)
-	ci.draw_circle(hand, 3.0, skin)
+	Shapes.disc(ci, hand, 3.0, skin)
 	if raise > 0.0:
 		var sc := 0.8
-		ci.draw_circle(hand + Vector2(0, -8), 14.0 * raise, Color(potion, 0.18))
+		Shapes.disc(ci, hand + Vector2(0, -8), 14.0 * raise, Color(potion, 0.18))
 		Potion.draw_potion(ci, hand + Vector2(0, -8), sc, potion)

@@ -2,6 +2,8 @@ extends Area2D
 ## Jett the Scarecrow's spinning sickle. It flies out LOW along the floor
 ## (jump over it!), turns at the wall, and comes back HIGH (so stay down!).
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const LOW := 20.0   # height above the floor on the way out
 const HIGH := 100.0  # and on the way back
 const RISE_TIME := 0.3
@@ -63,7 +65,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _draw() -> void:
-	draw_circle(Vector2.ZERO, 16.0, Color(Color("ffb23e"), 0.12))
+	Shapes.disc(self, Vector2.ZERO, 16.0, Color(Color("ffb23e"), 0.12))
 	draw_set_transform(Vector2.ZERO, _age * 16.0 * dir)
 	draw_sickle(self)
 	draw_set_transform(Vector2.ZERO)

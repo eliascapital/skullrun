@@ -2,6 +2,8 @@ extends Node2D
 ## One parallax layer of background silhouettes. The picture is
 ## SEGMENT pixels wide and repeats forever.
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const SEGMENT := 1024.0
 
 var kind := "graves"
@@ -244,13 +246,13 @@ func _draw() -> void:
 					draw_colored_polygon(PackedVector2Array([Vector2(cx - 7, ground + 10), Vector2(cx + tilt, ground - hh),
 						Vector2(cx + 7, ground + 10)]), color)
 					draw_line(Vector2(cx, ground + 4), Vector2(cx + tilt * 0.8, ground - hh * 0.8), glow, 3.0)
-				draw_circle(Vector2(x, ground - ch * 0.4), ch * 0.6, Color(Color("6ad8e8"), 0.03 + depth * 0.03))
+				Shapes.disc(self, Vector2(x, ground - ch * 0.4), ch * 0.6, Color(Color("6ad8e8"), 0.03 + depth * 0.03))
 			for i in 8:
 				var x := rng.randf_range(0, SEGMENT)
 				var mh := rng.randf_range(10, 22) * (0.7 + depth * 0.5)
 				draw_line(Vector2(x, ground + 6), Vector2(x, ground - mh), color, 3.0)
-				draw_circle(Vector2(x, ground - mh), mh * 0.45, color)
-				draw_circle(Vector2(x, ground - mh - 1), mh * 0.3, Color(Color("9cff8a"), 0.10 + depth * 0.10))
+				Shapes.disc(self, Vector2(x, ground - mh), mh * 0.45, color)
+				Shapes.disc(self, Vector2(x, ground - mh - 1), mh * 0.3, Color(Color("9cff8a"), 0.10 + depth * 0.10))
 		"pumpkins":
 			# a cave roof over a pumpkin patch, with scarecrows and hay bales
 			_cave_roof(rng)
@@ -261,14 +263,14 @@ func _draw() -> void:
 				draw_line(Vector2(x - 34, ground - sh * 0.75), Vector2(x + 34, ground - sh * 0.75), color, 5.0)
 				draw_colored_polygon(PackedVector2Array([Vector2(x - 14, ground - sh * 0.78), Vector2(x + 14, ground - sh * 0.78),
 					Vector2(x + 12, ground - sh * 0.45), Vector2(x - 12, ground - sh * 0.45)]), color)
-				draw_circle(Vector2(x, ground - sh - 2), 13.0, color)
+				Shapes.disc(self, Vector2(x, ground - sh - 2), 13.0, color)
 				draw_colored_polygon(PackedVector2Array([Vector2(x - 22, ground - sh - 10), Vector2(x + 22, ground - sh - 10),
 					Vector2(x + 8, ground - sh - 30), Vector2(x - 8, ground - sh - 30)]), color)
 			for i in 9:
 				var x := rng.randf_range(0, SEGMENT)
 				var r := rng.randf_range(12, 24) * (0.7 + depth * 0.5)
 				draw_set_transform(Vector2(x, ground - r * 0.7), 0.0, Vector2(1.3, 1.0))
-				draw_circle(Vector2.ZERO, r, color)
+				Shapes.disc(self, Vector2.ZERO, r, color)
 				draw_set_transform(Vector2.ZERO)
 				var face := Color(Color("ffb23e"), 0.10 + depth * 0.12)
 				for s2 in [-1.0, 1.0]:

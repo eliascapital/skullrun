@@ -6,6 +6,8 @@ extends Node2D
 ## there are no more signs.
 ## The skull stands still while she talks; JUMP skips to her next line.
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const TRIGGER := 6.0 * 32.0
 const SCALE := 1.3
 const LINE_TIME := 3.6
@@ -181,8 +183,8 @@ static func draw_griselda(ci: CanvasItem, facing: float, t: float, hammer: float
 	ci.draw_colored_polygon(body, dress)
 	ci.draw_rect(Rect2(-4, -12 + dy, 5, 5), patch)
 	ci.draw_line(Vector2(-4, -12 + dy), Vector2(1, -7 + dy), patch.darkened(0.4), 1.0)
-	ci.draw_circle(Vector2(3, -2 + dy), 2.5, mud)
-	ci.draw_circle(Vector2(-4, 1 + dy), 2.0, mud)
+	Shapes.disc(ci, Vector2(3, -2 + dy), 2.5, mud)
+	Shapes.disc(ci, Vector2(-4, 1 + dy), 2.0, mud)
 
 	# a sack of signs on her back
 	ci.draw_rect(Rect2(-f * 12 - 4, -24 + dy, 8, 16), Color("8a7a5a"))
@@ -206,15 +208,15 @@ static func draw_griselda(ci: CanvasItem, facing: float, t: float, hammer: float
 	for k in 5:
 		var hx := -f * (3.0 + k * 1.5)
 		ci.draw_line(head + Vector2(hx, -4), head + Vector2(hx - f * 2.0, 8.0 + k * 1.5), hair, 2.0)
-	ci.draw_circle(head, 6.5, skin)
+	Shapes.disc(ci, head, 6.5, skin)
 	ci.draw_colored_polygon(PackedVector2Array([head + Vector2(f * 4.0, -2), head + Vector2(f * 13.0, 3),
 		head + Vector2(f * 9.0, 4), head + Vector2(f * 4.0, 3)]), skin_dark)
-	ci.draw_circle(head + Vector2(-f * 2.5, 2.5), 1.8, Color(mud, 0.8))
+	Shapes.disc(ci, head + Vector2(-f * 2.5, 2.5), 1.8, Color(mud, 0.8))
 	var eye := head + Vector2(f * 2.5, -1.5)
-	ci.draw_circle(eye, 1.8 if talking else 1.3, Color.WHITE)
-	ci.draw_circle(eye + Vector2(f * 0.5, 0), 0.9, dark)
+	Shapes.disc(ci, eye, 1.8 if talking else 1.3, Color.WHITE)
+	Shapes.disc(ci, eye + Vector2(f * 0.5, 0), 0.9, dark)
 	if talking:
-		ci.draw_circle(head + Vector2(f * 3.0, 4.0), 1.5 + absf(sin(t * 12.0)), dark)
+		Shapes.disc(ci, head + Vector2(f * 3.0, 4.0), 1.5 + absf(sin(t * 12.0)), dark)
 	else:
 		ci.draw_line(head + Vector2(f * 1.0, 4.0), head + Vector2(f * 4.0, 4.0), dark, 1.2)
 
@@ -227,11 +229,11 @@ static func draw_griselda(ci: CanvasItem, facing: float, t: float, hammer: float
 	ci.draw_colored_polygon(PackedVector2Array([brim + Vector2(-f * 1.0 - 2.5, -12), brim + Vector2(-f * 1.0 + 2.5, -12),
 		brim + Vector2(-f * 9.0, -19)]), hat)
 	ci.draw_rect(Rect2(brim + Vector2(-2, -9), Vector2(4, 4)), patch)
-	ci.draw_circle(brim + Vector2(f * 3.0, -5), 1.0, Color("8cff5a"))  # a hole the light peeks through
+	Shapes.disc(ci, brim + Vector2(f * 3.0, -5), 1.0, Color("8cff5a"))  # a hole the light peeks through
 
 	# flies buzzing round her (she really needs a bath)
 	for k in 3:
 		var a := t * (5.0 + k) + k * 2.1
 		var fp := head + Vector2(cos(a) * (14.0 + k * 3.0), -6.0 + sin(a * 1.3) * 8.0)
-		ci.draw_circle(fp, 1.2, dark)
+		Shapes.disc(ci, fp, 1.2, dark)
 		ci.draw_line(fp + Vector2(-2, -1.5), fp + Vector2(2, -1.5), Color(1, 1, 1, 0.5), 1.0)

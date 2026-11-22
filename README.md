@@ -132,8 +132,9 @@ throws two sickles, calls more witches, leaps twice and stamps so hard that rock
   [`levels/README.md`](levels/README.md) to learn how to make new ones. To add
   level 16, create `levels/level_16.txt` and it shows up in the game automatically.
 * **Controls**: `_setup_input()` in `scripts/game.gd`.
-* **Secret code**: on the title screen, press **CODE** and type `olives123` (or just type it
-  on the title screen) to unlock every level. Change it with `UNLOCK_CODE` in `scripts/game.gd`.
+* **Secret codes**: on the title screen, press **CODE** and type a secret code (or just type it
+  on the title screen) to unlock every level and set your time on every level. The codes are
+  kept secret: `scripts/game.gd` only stores their SHA-256 hashes (`CODES`).
 * **How the skull moves** (speed, jump height, dash): the constants at the top of `scripts/player.gd`.
 
 ## Project layout

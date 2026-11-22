@@ -8,6 +8,8 @@ extends Area2D
 ## worth his time, grabs the skull and flings it far, far away... right into
 ## Jett's arena. If you die, the 30 seconds start again.
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const Reaper = preload("res://scripts/objects/reaper.gd")
 const GraveHand = preload("res://scripts/objects/grave_hand.gd")
 const ReaperSkull = preload("res://scripts/objects/reaper_skull.gd")
@@ -52,6 +54,7 @@ var _drop_at := Vector2.ZERO
 var _rng := RandomNumberGenerator.new()
 var _bubble: PanelContainer
 var _fade: ColorRect
+var _fade_layer: CanvasLayer  # only shown during the big throw (a see-through overlay still costs a lot)
 var _far_label: Label
 
 
@@ -207,6 +210,7 @@ func _physics_process(delta: float) -> void:
 		State.TWINKLE:
 			if _state_time > 0.7:
 				_set_state(State.FADE_OUT)
+				_fade_layer.visible = true
 		State.FADE_OUT:
 			_fade.color.a = clampf(_state_time / 0.5, 0.0, 1.0)
 			if _state_time > 0.5:
@@ -235,6 +239,11 @@ func _physics_process(delta: float) -> void:
 				level.shake(10.0, 0.4)
 				Sfx.play("slam")
 				_set_state(State.GONE)
+				# all done: switch everything off for the rest of the level
+				_fade_layer.queue_free()
+				hide()
+				set_physics_process(false)
+				return
 		State.GONE:
 			pass
 
@@ -413,6 +422,8 @@ func _build_bubble() -> void:
 func _build_fade() -> void:
 	var layer := CanvasLayer.new()
 	layer.layer = 60
+	layer.visible = false
+	_fade_layer = layer
 	level.add_child.call_deferred(layer)
 	_fade = ColorRect.new()
 	_fade.color = Color(0, 0, 0, 0)
@@ -442,7 +453,7 @@ func _draw() -> void:
 	if state in [State.SWEEP_WARN, State.SWEEP]:
 		swing = 0.9
 		var glow := 0.3 + 0.25 * sin(_t * 25.0)
-		draw_circle(Vector2(facing * 20.0, 10.0), 40.0, Color(Config.COLOR_ACCENT, glow * 0.4))
+		Shapes.disc(self, Vector2(facing * 20.0, 10.0), 40.0, Color(Config.COLOR_ACCENT, glow * 0.4))
 	elif state in [State.SKULLS, State.HANDS, State.TALK]:
 		swing = 0.6
 	var spin := 0.0

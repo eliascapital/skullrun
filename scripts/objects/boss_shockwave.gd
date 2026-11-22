@@ -2,6 +2,8 @@ extends Area2D
 ## A ground shockwave from the Bone King's slam (also Alethea's hops, Jett's
 ## landings and a cave troll's club). Jump over it!
 
+const Shapes = preload("res://scripts/shapes.gd")
+
 const SPEED := 270.0
 
 var dir := 1.0
@@ -44,4 +46,4 @@ func _draw() -> void:
 		Vector2(8, -22 * flick), Vector2(14, 0)]), Color(c, 0.85))
 	draw_colored_polygon(PackedVector2Array([Vector2(-8, 0), Vector2(-2, -14 * flick), Vector2(6, -10), Vector2(9, 0)]),
 		Config.COLOR_GOLD)
-	draw_circle(Vector2(0, -6), 18.0, Color(c, 0.12))
+	Shapes.disc(self, Vector2(0, -6), 18.0, Color(c, 0.12))
