@@ -1,7 +1,8 @@
 extends Control
 ## The skin shop (title screen → SHOP). Spend soul gems from the gem bag on
 ## skull skins, or save up for MAKE YOUR OWN, which opens the skull maker.
-## The skins themselves are listed in scripts/skins.gd.
+## The skins themselves are listed in scripts/skins.gd. Skins with a "season"
+## go on the SEASONAL tab, grouped under each season's heading.
 
 const UI = preload("res://scripts/ui/ui.gd")
 const MenuBackground = preload("res://scripts/ui/menu_background.gd")
@@ -10,9 +11,12 @@ const Skins = preload("res://scripts/skins.gd")
 const COLUMNS := 6
 const CARD := Vector2(136, 132)
 
-var _ids: Array = []  # one skin id per card, the custom one last
+var _ids: Array = []  # one skin id per card (both tabs)
 var _cards: Array = []
 var _bag_label: Label
+var _main_page: Control
+var _season_page: Control
+var _tab_buttons: Array = []  # SKINS, SEASONAL
 var _back: Button
 var _time := 0.0
 var _pics: Array = []  # skull pictures, redrawn every frame
@@ -48,6 +52,15 @@ func _ready() -> void:
 	bag_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	bag_row.add_theme_constant_override("separation", 8)
 	box.add_child(bag_row)
+	for t in ["SKINS", "SEASONAL"]:
+		var tab := UI.make_button(t, false, 150)
+		tab.custom_minimum_size.y = 42
+		tab.pressed.connect(_set_tab.bind(t == "SEASONAL", true))
+		bag_row.add_child(tab)
+		_tab_buttons.append(tab)
+	var gap := Control.new()
+	gap.custom_minimum_size.x = 36
+	bag_row.add_child(gap)
 	bag_row.add_child(_gem_icon())
 	_bag_label = UI.make_label("", 24, Config.COLOR_GEM)
 	bag_row.add_child(_bag_label)
@@ -61,19 +74,37 @@ func _ready() -> void:
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.add_child(center)
+	var pages := VBoxContainer.new()
+	center.add_child(pages)
+
+	# the SKINS tab: every skin without a season, then MAKE YOUR OWN
 	var grid := GridContainer.new()
 	grid.columns = COLUMNS
 	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 12)
-	center.add_child(grid)
-
+	pages.add_child(grid)
+	_main_page = grid
 	for s in Skins.SKINS:
-		_ids.append(s["id"])
-	_ids.append(Skins.CUSTOM_ID)
-	for i in _ids.size():
-		var b := _card(i)
-		grid.add_child(b)
-		_cards.append(b)
+		if not s.has("season"):
+			grid.add_child(_add_card(s["id"]))
+	grid.add_child(_add_card(Skins.CUSTOM_ID))
+
+	# the SEASONAL tab: a heading and a row of cards for each season
+	var seasons := HBoxContainer.new()
+	seasons.add_theme_constant_override("separation", 30)
+	pages.add_child(seasons)
+	_season_page = seasons
+	for season in Skins.SEASONS:
+		var group := VBoxContainer.new()
+		group.add_theme_constant_override("separation", 8)
+		seasons.add_child(group)
+		group.add_child(UI.make_label(season[1], 22, season[2]))
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		group.add_child(row)
+		for s in Skins.SKINS:
+			if s.get("season", "") == season[0]:
+				row.add_child(_add_card(s["id"]))
 
 	var bottom := HBoxContainer.new()
 	bottom.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -85,6 +116,7 @@ func _ready() -> void:
 	_build_confirm()
 	_build_maker()
 	_update_cards()
+	_set_tab(Skins.find(Game.skin_id).has("season"), false)
 	(_cards[_ids.find(Game.skin_id)] as Button).grab_focus()
 
 
@@ -108,8 +140,27 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 # ---------------------------------------------------------------------
-#  Skin cards
+#  Tabs and skin cards
 # ---------------------------------------------------------------------
+func _set_tab(seasonal: bool, focus: bool) -> void:
+	_main_page.visible = not seasonal
+	_season_page.visible = seasonal
+	for t in _tab_buttons.size():
+		var on := (t == 1) == seasonal
+		var b: Button = _tab_buttons[t]
+		b.add_theme_stylebox_override("normal", UI.style_box(Color(Config.COLOR_ACCENT, 0.9) if on else Color(0, 0, 0, 0.25),
+			Config.COLOR_ACCENT if on else Color(Config.COLOR_BONE, 0.35)))
+	if focus:
+		(_tab_buttons[1 if seasonal else 0] as Button).grab_focus()
+
+
+func _add_card(id: String) -> Button:
+	_ids.append(id)
+	var b := _card(_ids.size() - 1)
+	_cards.append(b)
+	return b
+
+
 func _card(i: int) -> Button:
 	var b := UI.make_button("", false, CARD.x)
 	b.custom_minimum_size = CARD

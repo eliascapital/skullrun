@@ -37,6 +37,7 @@ var gem_bag := 0
 var owned_skins: Array = ["classic"]
 var skin_id := "classic"
 var custom_skin := Skins.DEFAULT_CUSTOM.duplicate()
+var used_gem_codes: Array = []  # hashes of the gem codes this save has used
 var gems_added := 0  # gems the last finished level put in the bag (for the HUD)
 
 
@@ -218,11 +219,39 @@ const CODES := {
 }
 const MAX_CODE_LENGTH := 16
 
+## Gem codes (also typed on the title screen, also kept only as SHA-256
+## hashes): each one puts gems in the gem bag, once per save file.
+const GEM_CODES := {
+	"c315d9cc30342e6ecb562cb6ea183e35e0fe508f0d58b07319d69df873d3c8d9": 500000,
+}
+
+
+static func _code_hash(code: String) -> String:
+	return code.strip_edges().to_lower().replace(" ", "").sha256_text()
+
+
+## True if `code` is any secret code (a level code or a gem code).
+func is_code(code: String) -> bool:
+	return code_time(code) >= 0.0 or GEM_CODES.has(_code_hash(code))
+
+
+## Puts a gem code's gems in the bag. Returns the gems added, 0 if this save
+## already used the code, or -1 if `code` isn't a gem code.
+func try_gem_code(code: String) -> int:
+	var h := _code_hash(code)
+	if not GEM_CODES.has(h):
+		return -1
+	if h in used_gem_codes:
+		return 0
+	used_gem_codes.append(h)
+	gem_bag += int(GEM_CODES[h])
+	save_progress()
+	return int(GEM_CODES[h])
+
 
 ## The best time a code gives (seconds), or -1 if `code` isn't a code.
 func code_time(code: String) -> float:
-	var h := code.strip_edges().to_lower().replace(" ", "").sha256_text()
-	return CODES.get(h, -1.0)
+	return CODES.get(_code_hash(code), -1.0)
 
 
 ## Returns true (unlocking every level and setting every best time) if `code`
@@ -250,6 +279,7 @@ func save_progress() -> void:
 	cfg.set_value("progress", "seen_intro", seen_intro)
 	cfg.set_value("progress", "gem_bag", gem_bag)
 	cfg.set_value("progress", "owned_skins", owned_skins)
+	cfg.set_value("progress", "used_gem_codes", used_gem_codes)
 	cfg.set_value("settings", "skin", skin_id)
 	cfg.set_value("settings", "custom_skin", custom_skin)
 	cfg.set_value("settings", "touch_layout", touch_layout)
@@ -280,6 +310,8 @@ func load_progress() -> void:
 		for id in owned:
 			if Skins.exists(str(id)) and not str(id) in owned_skins:
 				owned_skins.append(str(id))
+	var used = cfg.get_value("progress", "used_gem_codes", [])
+	used_gem_codes = used if typeof(used) == TYPE_ARRAY else []
 	custom_skin = Skins.clean_custom(cfg.get_value("settings", "custom_skin", {}))
 	skin_id = str(cfg.get_value("settings", "skin", "classic"))
 	if not owns_skin(skin_id) or not Skins.exists(skin_id):

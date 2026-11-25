@@ -140,8 +140,10 @@ throws two sickles, calls more witches, leaps twice and stamps so hard that rock
   hashes (`CODES`).
 * **Skins**: every gem you carry into an exit portal goes in your gem bag, and the **SHOP**
   on the title screen spends them on skull skins. **Make your own** (500,000 gems) opens the
-  skull maker: pick the skull colour, eyes, hat and magic. The skins, their prices and the
-  maker's choices are in [`scripts/skins.gd`](scripts/skins.gd).
+  skull maker: pick the skull colour, eyes, hat and magic. The **SEASONAL** tab has Thanksgiving
+  and Christmas skins. The skins, their prices, seasons and the maker's choices are in
+  [`scripts/skins.gd`](scripts/skins.gd). Some secret codes fill the gem bag instead
+  (once per save; `GEM_CODES` in `scripts/game.gd`, also kept only as hashes).
 * **How the skull moves** (speed, jump height, dash): the constants at the top of `scripts/player.gd`.
 
 ## Project layout

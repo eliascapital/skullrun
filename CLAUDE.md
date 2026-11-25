@@ -29,7 +29,8 @@ The owner wants the website to grow with the game, with no empty placeholder slo
   keep the small ones even too, for the 2-column phone layout).
 - **New skin:** add it to `SKINS` in `scripts/skins.gd` and re-render `website/img/skins.webp`
   (the shop grid is 6 wide and the picture shows 6 per row, so add skins in sixes; the custom
-  card counts as one).
+  card counts as one). Skins with a `"season"` go on the SEASONAL tab under that season's
+  heading (`SEASONS`: Thanksgiving and Christmas, 3 each, side by side; keep the tab 6 wide).
 - **New world/theme:** consider adding a screenshot to the gallery (`website/img/<name>.webp`,
   1280×720 in-game capture with the HUD). The gallery is 3 wide: add shots in threes.
 - Also update the level table in `README.md`, and hint signs that name keys should
@@ -58,16 +59,18 @@ title text), `Game` (level list, save file, scene changes, input map, phone zoom
   touch controls, `ui.gd` (button/label/panel helpers in the game's style).
 - Secret codes: the title screen's CODE button (or typing one on the title screen) calls
   `Game.try_code()`, which unlocks every level, sets `Game.code_best` (the code score shown on
-  every level; real `best_times` are kept) and saves. The level menu's SCORES: REAL / CODE button
+  every level; real `best_times` are kept) and saves. `Game.GEM_CODES` (hash → gems) are codes that
+  put gems in the gem bag instead, once per save (`used_gem_codes`); `Game.is_code()` checks both kinds. The level menu's SCORES: REAL / CODE button
   (only there once a code was used) flips `Game.show_code_scores`; `Game.shown_best(i)` picks. `Game.CODES` holds only SHA-256 hashes of the codes. **Never write a code itself
   anywhere on GitHub** (code, comments, docs, commit messages, PRs): the owner keeps them secret.
 - Skins (`scripts/skins.gd`, shop in `scripts/ui/shop.gd`, title screen → SHOP): gems carried
   into the exit portal go in `Game.gem_bag` (`complete_level`). `Skins.draw_skin(ci, c, r, skin, time, look)`
-  draws a skull wearing a skin (bone, eye, hat, fx `rainbow`/`ghost`); the player draws itself
+  draws a skull wearing a skin (bone, eye, hat, fx `rainbow`/`ghost`; `draw_hat_back` for hat parts
+  behind the head, like the turkey's feathers); the player draws itself
   with `Game.current_skin()`. MAKE YOUR OWN costs `CUSTOM_PRICE` (500,000, the owner's choice; a
   full run of the game is about 1,300 gems) and opens the skull maker (`Game.custom_skin`).
 - Save file: `user://skullrun_save.cfg` — `[progress]` (unlocked, best times/gems, code_best,
-  seen_intro, gem_bag, owned_skins) and `[settings]` (touch_layout, show_code_scores, skin, custom_skin). `Game.save_progress()` writes both.
+  seen_intro, gem_bag, owned_skins, used_gem_codes) and `[settings]` (touch_layout, show_code_scores, skin, custom_skin). `Game.save_progress()` writes both.
 
 ### Player numbers (1 tile = 32 px)
 Jump ≈ 4 tiles (plan for 3), + double jump ≈ 7 (plan for 6), dash+double clears 9–10 tiles.
