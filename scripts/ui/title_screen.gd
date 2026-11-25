@@ -4,6 +4,7 @@ extends Control
 
 const UI = preload("res://scripts/ui/ui.gd")
 const MenuBackground = preload("res://scripts/ui/menu_background.gd")
+const Skins = preload("res://scripts/skins.gd")
 
 var _title: Label
 var _help_layer: Control
@@ -110,7 +111,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_typed = (_typed + char(event.unicode).to_lower()).right(Game.MAX_CODE_LENGTH)
 		for n in range(4, _typed.length() + 1):
 			var code := _typed.right(n)
-			if Game.code_time(code) >= 0.0:
+			if Game.is_code(code):
 				_typed = ""
 				_show_code(true)
 				_submit_code(code)
@@ -210,7 +211,16 @@ func _show_code(show: bool) -> void:
 
 
 func _submit_code(code: String) -> void:
-	if Game.try_code(code):
+	var gems := Game.try_gem_code(code)
+	if gems > 0:
+		_code_message.text = "+%s GEMS!\nSpend them in the SHOP." % Skins.format_gems(gems)
+		_code_message.add_theme_color_override("font_color", Config.COLOR_GEM)
+		Sfx.play("win")
+	elif gems == 0:
+		_code_message.text = "You already got the gems from that code."
+		_code_message.add_theme_color_override("font_color", Config.COLOR_MUTED)
+		Sfx.play("click", 0.6)
+	elif Game.try_code(code):
 		_code_message.text = "ALL LEVELS UNLOCKED!\nCode score on every level: %s\n(Switch REAL / CODE scores on the level menu.)" \
 			% Game.format_time(Game.code_time(code))
 		_code_message.add_theme_color_override("font_color", Config.COLOR_GOLD)
