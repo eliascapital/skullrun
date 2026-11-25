@@ -211,6 +211,7 @@ kbd {
   font: 600 14px/1 "Rubik", sans-serif; padding: 6px 9px; border-radius: 6px;
   background: #241d31; border: 1px solid #3a3050; border-bottom-width: 3px;
 }
+.skins { display: block; width: 100%; max-width: 900px; height: auto; margin: 0 auto; }
 .note { text-align: center; color: var(--muted); font-size: 15px; margin-top: 18px; }
 
 /* make your own */

@@ -2,12 +2,14 @@ extends Node
 ## Global game state: which level you're on, saved progress and scene changes.
 
 const LevelData = preload("res://scripts/level_data.gd")
+const Skins = preload("res://scripts/skins.gd")
 const SAVE_PATH := "user://skullrun_save.cfg"
 
 const TITLE_SCENE := "res://scenes/title.tscn"
 const LEVEL_SELECT_SCENE := "res://scenes/level_select.tscn"
 const LEVEL_SCENE := "res://scenes/level.tscn"
 const INTRO_SCENE := "res://scenes/intro.tscn"
+const SHOP_SCENE := "res://scenes/shop.tscn"
 
 ## Phones held sideways are wide but short, so the whole level looks tiny.
 ## On touch screens shorter than this (in CSS pixels) the level camera zooms in.
@@ -28,6 +30,14 @@ var seen_intro := false
 ## Where the player has moved the touch buttons (see scripts/ui/touch_controls.gd).
 ## Empty = the standard layout.
 var touch_layout := {}
+
+# Skins (scripts/skins.gd). Gems you carry through a level's exit portal go in
+# the gem bag; the shop spends them.
+var gem_bag := 0
+var owned_skins: Array = ["classic"]
+var skin_id := "classic"
+var custom_skin := Skins.DEFAULT_CUSTOM.duplicate()
+var gems_added := 0  # gems the last finished level put in the bag (for the HUD)
 
 
 func _ready() -> void:
@@ -101,6 +111,11 @@ func goto_title() -> void:
 	get_tree().change_scene_to_file(TITLE_SCENE)
 
 
+func goto_shop() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file(SHOP_SCENE)
+
+
 func goto_level_select() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
@@ -152,7 +167,44 @@ func complete_level(index: int, time: float, gems: int) -> void:
 	if not best_gems.has(key) or gems > best_gems[key]:
 		best_gems[key] = gems
 	unlocked = maxi(unlocked, mini(index + 2, level_count()))
+	gems_added = gems
+	gem_bag += gems
 	save_progress()
+
+
+# ---------------------------------------------------------------------
+#  Skins
+# ---------------------------------------------------------------------
+## The skin the skull is wearing (a Dictionary, see scripts/skins.gd).
+func current_skin() -> Dictionary:
+	if skin_id == Skins.CUSTOM_ID:
+		return custom_skin
+	var s := Skins.find(skin_id)
+	return s if not s.is_empty() else Skins.SKINS[0]
+
+
+func owns_skin(id: String) -> bool:
+	return id == "classic" or id in owned_skins
+
+
+## Spends gems from the bag on a skin and puts it on. False if there aren't enough gems.
+func buy_skin(id: String) -> bool:
+	if owns_skin(id):
+		wear_skin(id)
+		return true
+	var cost := Skins.price(id)
+	if cost < 0 or gem_bag < cost:
+		return false
+	gem_bag -= cost
+	owned_skins.append(id)
+	wear_skin(id)
+	return true
+
+
+func wear_skin(id: String) -> void:
+	if owns_skin(id) and Skins.exists(id):
+		skin_id = id
+		save_progress()
 
 
 ## Secret codes (title screen → CODE, or just type one there). They're kept
@@ -196,6 +248,10 @@ func save_progress() -> void:
 	cfg.set_value("settings", "show_code_scores", show_code_scores)
 	cfg.set_value("progress", "best_gems", best_gems)
 	cfg.set_value("progress", "seen_intro", seen_intro)
+	cfg.set_value("progress", "gem_bag", gem_bag)
+	cfg.set_value("progress", "owned_skins", owned_skins)
+	cfg.set_value("settings", "skin", skin_id)
+	cfg.set_value("settings", "custom_skin", custom_skin)
 	cfg.set_value("settings", "touch_layout", touch_layout)
 	cfg.save(SAVE_PATH)
 
@@ -217,6 +273,17 @@ func load_progress() -> void:
 	best_gems = cfg.get_value("progress", "best_gems", {})
 	seen_intro = cfg.get_value("progress", "seen_intro", unlocked > 1)
 	touch_layout = cfg.get_value("settings", "touch_layout", {})
+	gem_bag = maxi(int(cfg.get_value("progress", "gem_bag", 0)), 0)
+	owned_skins = ["classic"]
+	var owned = cfg.get_value("progress", "owned_skins", [])
+	if typeof(owned) == TYPE_ARRAY:
+		for id in owned:
+			if Skins.exists(str(id)) and not str(id) in owned_skins:
+				owned_skins.append(str(id))
+	custom_skin = Skins.clean_custom(cfg.get_value("settings", "custom_skin", {}))
+	skin_id = str(cfg.get_value("settings", "skin", "classic"))
+	if not owns_skin(skin_id) or not Skins.exists(skin_id):
+		skin_id = "classic"
 
 
 func reset_progress() -> void:

@@ -7,7 +7,7 @@ signal died
 signal respawned
 signal first_move  # the first time the player presses a movement key
 
-const SkullArt = preload("res://scripts/skull_art.gd")
+const Skins = preload("res://scripts/skins.gd")
 
 # --- movement tuning (1 tile = 32 pixels) -----------------------------
 const RUN_SPEED := 250.0
@@ -76,6 +76,7 @@ var _was_on_floor := true
 var _squash := Vector2.ONE
 var _trail: Array = []
 var _time := 0.0
+var _skin: Dictionary = Game.current_skin()  # what the skull is wearing (scripts/skins.gd)
 var _on_ice := false
 var _wall_side := 0.0  # -1 = touching a wall on the left, 1 = on the right
 var _wall_coyote := 0.0
@@ -326,7 +327,7 @@ func _land_slam(g: float) -> void:
 	_slamming = false
 	velocity = Vector2.ZERO
 	_squash = Vector2(1.45, 0.6)
-	_burst(Config.COLOR_BONE, 14)
+	_burst(_bone(), 14)
 	Sfx.play("slam", 1.3)
 
 
@@ -402,7 +403,7 @@ func _wall_jump() -> void:
 	facing = -_wall_side
 	_squash = Vector2(0.75, 1.3)
 	Sfx.play("wall_jump")
-	_burst(Config.COLOR_BONE, 6)
+	_burst(_bone(), 6)
 
 
 func _jump(v: float) -> void:
@@ -501,7 +502,7 @@ func die() -> void:
 	_slamming = false
 	_trail.clear()
 	Sfx.play("death")
-	_burst(Config.COLOR_BONE, 22)
+	_burst(_bone(), 22)
 	died.emit()
 	_respawn_timer.start()
 
@@ -584,6 +585,11 @@ func _update_warp(delta: float) -> void:
 	_squash = Vector2(0.7, 1.3)
 
 
+## The skin's bone colour (bits of bone, slam lines and wall dust use it).
+func _bone() -> Color:
+	return Skins.bone_color(_skin, _time)
+
+
 func _burst(color: Color, amount: int) -> void:
 	_particles.color = color
 	_particles.amount = amount
@@ -615,7 +621,7 @@ func _draw() -> void:
 	if _slamming:
 		for i in 4:
 			var x := -9.0 + i * 6.0
-			draw_line(Vector2(x, -18.0 * g), Vector2(x, -40.0 * g), Color(Config.COLOR_BONE, 0.35), 2.0)
+			draw_line(Vector2(x, -18.0 * g), Vector2(x, -40.0 * g), Color(_bone(), 0.35), 2.0)
 	var lean := clampf(velocity.x / RUN_SPEED, -1.0, 1.0) * 0.12 * g + (1.0 - _warp_scale) * TAU + tumble
 	var bob := 0.0
 	if is_on_floor() and absf(velocity.x) > 20.0:
@@ -623,14 +629,17 @@ func _draw() -> void:
 	var body_offset := Vector2(0, (13.0 * (1.0 - _squash.y) + bob) * g)
 	var body_scale := Vector2(_squash.x, _squash.y * g) * _warp_scale * draw_scale
 	draw_set_transform(body_offset, lean, body_scale)
-	var eye := Config.COLOR_ACCENT.lerp(Color.WHITE, 0.25 + 0.15 * sin(_time * 6.0))
+	var eye := Skins.eye_color(_skin, _time)
 	if not _dash_ready and can_dash:
-		eye = Config.COLOR_PURPLE
+		# purple eyes = dash used up (grey if the skin's eyes are purple already)
+		var own: Color = _skin.get("eye", Config.COLOR_ACCENT)
+		var purple_eyes := absf(own.h - Config.COLOR_PURPLE.h) < 0.08 and own.s > 0.3
+		eye = Color("5c566e") if purple_eyes or _skin.get("fx", "") == "rainbow" else Config.COLOR_PURPLE
 	if _wall_sliding:
 		draw_set_transform(Vector2(0, 0))
 		for i in 3:
 			var y := fmod(_time * 90.0 + i * 9.0, 26.0) - 13.0
-			draw_circle(Vector2(_wall_side * 11.0, y), 1.5, Color(Config.COLOR_BONE, 0.5))
+			draw_circle(Vector2(_wall_side * 11.0, y), 1.5, Color(_bone(), 0.5))
 		draw_set_transform(body_offset, lean, body_scale)
-	SkullArt.draw_skull(self, Vector2(0, 0.5), 12.5, Config.COLOR_BONE, eye, facing)
+	Skins.draw_skin(self, Vector2(0, 0.5), 12.5, _skin, _time, facing, eye)
 	draw_set_transform(Vector2.ZERO)

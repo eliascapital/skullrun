@@ -3,6 +3,7 @@
 A spooky 2D platformer made with **Godot 4.3**. You play a runaway skull that
 escapes a haunted crypt. You run, jump, double jump, dash, wall jump and ground slam through 40 levels,
 collect soul gems, defeat four bosses, and fall upward through the Abyss.
+Spend your gems in the skin shop, or save up 500,000 of them to make your own skull.
 
 ## Play it
 
@@ -137,17 +138,22 @@ throws two sickles, calls more witches, leaps twice and stamps so hard that rock
   best times are kept too: the **SCORES: REAL / CODE** button on the level menu switches
   between them. The codes are kept secret: `scripts/game.gd` only stores their SHA-256
   hashes (`CODES`).
+* **Skins**: every gem you carry into an exit portal goes in your gem bag, and the **SHOP**
+  on the title screen spends them on skull skins. **Make your own** (500,000 gems) opens the
+  skull maker: pick the skull colour, eyes, hat and magic. The skins, their prices and the
+  maker's choices are in [`scripts/skins.gd`](scripts/skins.gd).
 * **How the skull moves** (speed, jump height, dash): the constants at the top of `scripts/player.gd`.
 
 ## Project layout
 
 ```
 project.godot          Godot project settings
-scenes/                title screen, level select, level
+scenes/                title screen, level select, skin shop, level
 scripts/config.gd      ← text and colours you'll want to edit
 scripts/game.gd        progress, saving, scene changes, controls
 scripts/level.gd       builds a level from its text file
 scripts/player.gd      the skull
+scripts/skins.gd       skull skins: the shop list, hats, and their drawing code
 scripts/objects/       gems, checkpoints, enemies, platforms, hazards…
 scripts/ui/            menus and the in-game HUD
 levels/                level_01.txt … level_40.txt
@@ -169,7 +175,6 @@ otherwise the levels are left out of the exported game.
 * **Keys and bone doors**: grab a key to open a gate somewhere else in the level.
 * **Collapsing floors** that crumble one after another behind you as you run.
 * **More bosses** every 10 levels (the Bone King's code in `scripts/objects/bone_king.gd` is a good starting point).
-* **Skins**: unlock new skull colours (gold, crystal, flaming) by collecting every gem.
 * **Swamps** that slow you down, and **switches** that flip platforms on and off.
 * **Time-trial medals** (bronze, silver, gold) for each level's best time.
 * **Music**: a spooky chiptune loop per theme.
