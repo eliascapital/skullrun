@@ -289,7 +289,7 @@ func show_complete(time: float, gems: int, total_gems: int, deaths: int, new_bes
 	stats.add_theme_constant_override("v_separation", 4)
 	var time_text := Game.format_time(time) + ("   NEW BEST!" if new_best else "")
 	var gem_text := "%d / %d" % [gems, total_gems] + ("   ALL FOUND!" if gems == total_gems and total_gems > 0 else "")
-	var bag_text := "+%d   (%s in the bag)" % [Game.gems_added, Skins.format_gems(Game.gem_bag)]
+	var bag_text := "+%d   (%s in the bag)" % [Game.gems_added, Game.gem_text().to_lower()]
 	for pair in [["Time", time_text], ["Soul gems", gem_text], ["Gem bag", bag_text], ["Deaths", str(deaths)]]:
 		stats.add_child(UI.make_label(pair[0], 18, Config.COLOR_MUTED, HORIZONTAL_ALIGNMENT_RIGHT))
 		stats.add_child(UI.make_label(pair[1], 18, Config.COLOR_BONE, HORIZONTAL_ALIGNMENT_LEFT))
