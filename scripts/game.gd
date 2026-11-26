@@ -38,6 +38,10 @@ var owned_skins: Array = ["classic"]
 var skin_id := "classic"
 var custom_skin := Skins.DEFAULT_CUSTOM.duplicate()
 var used_gem_codes: Array = []  # hashes of the gem codes this save has used
+## Infinite gems: after a gem code, the CODE box lets the player pick their own
+## number. Typing that number as a code turns infinite gems on. Only its hash is saved.
+var infinite_code := ""
+var infinite_gems := false
 var gems_added := 0  # gems the last finished level put in the bag (for the HUD)
 
 
@@ -194,12 +198,22 @@ func buy_skin(id: String) -> bool:
 		wear_skin(id)
 		return true
 	var cost := Skins.price(id)
-	if cost < 0 or gem_bag < cost:
+	if cost < 0 or not can_afford(cost):
 		return false
-	gem_bag -= cost
+	if not infinite_gems:
+		gem_bag -= cost
 	owned_skins.append(id)
 	wear_skin(id)
 	return true
+
+
+func can_afford(cost: int) -> bool:
+	return infinite_gems or gem_bag >= cost
+
+
+## The gem bag as text: "1,250" or "INFINITE".
+func gem_text() -> String:
+	return "INFINITE" if infinite_gems else Skins.format_gems(gem_bag)
 
 
 func wear_skin(id: String) -> void:
@@ -230,9 +244,39 @@ static func _code_hash(code: String) -> String:
 	return code.strip_edges().to_lower().replace(" ", "").sha256_text()
 
 
-## True if `code` is any secret code (a level code or a gem code).
+## True if `code` is any secret code (a level code, a gem code or the
+## player's own infinite-gems number).
 func is_code(code: String) -> bool:
-	return code_time(code) >= 0.0 or GEM_CODES.has(_code_hash(code))
+	return code_time(code) >= 0.0 or GEM_CODES.has(_code_hash(code)) or is_infinite_code(code)
+
+
+func is_infinite_code(code: String) -> bool:
+	return infinite_code != "" and _code_hash(code) == infinite_code
+
+
+## Sets the player's own infinite-gems number. Returns "" if it worked, or
+## what's wrong with it.
+func set_infinite_code(number: String) -> String:
+	number = number.strip_edges()
+	if number.length() < 3 or not number.is_valid_int() or "-" in number or "+" in number:
+		return "Use at least 3 numbers."
+	if code_time(number) >= 0.0 or GEM_CODES.has(_code_hash(number)):
+		return "That's already a code. Pick another number!"
+	infinite_code = _code_hash(number)
+	save_progress()
+	return ""
+
+
+## Turns infinite gems on if `code` is the player's number. Returns 1 if it
+## did, 0 if they're already on, or -1 if `code` isn't the number.
+func try_infinite_code(code: String) -> int:
+	if not is_infinite_code(code):
+		return -1
+	if infinite_gems:
+		return 0
+	infinite_gems = true
+	save_progress()
+	return 1
 
 
 ## Puts a gem code's gems in the bag. Returns the gems added, 0 if this save
@@ -280,6 +324,8 @@ func save_progress() -> void:
 	cfg.set_value("progress", "gem_bag", gem_bag)
 	cfg.set_value("progress", "owned_skins", owned_skins)
 	cfg.set_value("progress", "used_gem_codes", used_gem_codes)
+	cfg.set_value("progress", "infinite_code", infinite_code)
+	cfg.set_value("progress", "infinite_gems", infinite_gems)
 	cfg.set_value("settings", "skin", skin_id)
 	cfg.set_value("settings", "custom_skin", custom_skin)
 	cfg.set_value("settings", "touch_layout", touch_layout)
@@ -312,6 +358,8 @@ func load_progress() -> void:
 				owned_skins.append(str(id))
 	var used = cfg.get_value("progress", "used_gem_codes", [])
 	used_gem_codes = used if typeof(used) == TYPE_ARRAY else []
+	infinite_code = str(cfg.get_value("progress", "infinite_code", ""))
+	infinite_gems = bool(cfg.get_value("progress", "infinite_gems", false))
 	custom_skin = Skins.clean_custom(cfg.get_value("settings", "custom_skin", {}))
 	skin_id = str(cfg.get_value("settings", "skin", "classic"))
 	if not owns_skin(skin_id) or not Skins.exists(skin_id):

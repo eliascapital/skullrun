@@ -206,7 +206,7 @@ func _draw_card_skull(pic: Control, i: int) -> void:
 
 
 func _update_cards() -> void:
-	_bag_label.text = "%s gems" % Skins.format_gems(Game.gem_bag)
+	_bag_label.text = "%s gems" % Game.gem_text()
 	for i in _ids.size():
 		var id: String = _ids[i]
 		var b: Button = _cards[i]
@@ -224,11 +224,11 @@ func _update_cards() -> void:
 		var wearing := id == Game.skin_id
 		var bg := Color(Config.COLOR_ACCENT, 0.9) if wearing else Color(0, 0, 0, 0.25)
 		var border := Config.COLOR_ACCENT if wearing else Color(Config.COLOR_BONE, 0.35)
-		if not Game.owns_skin(id) and Game.gem_bag >= Skins.price(id):
+		if not Game.owns_skin(id) and Game.can_afford(Skins.price(id)):
 			border = Config.COLOR_GEM  # you can buy this one now
 		b.add_theme_stylebox_override("normal", _card_style(UI.style_box(bg, border)))
 		b.add_theme_color_override("font_color", Config.COLOR_BONE if Game.owns_skin(id) or wearing
-			else (Config.COLOR_GEM if Game.gem_bag >= Skins.price(id) else Config.COLOR_MUTED))
+			else (Config.COLOR_GEM if Game.can_afford(Skins.price(id)) else Config.COLOR_MUTED))
 
 
 func _on_card(i: int) -> void:
@@ -273,7 +273,7 @@ func _open_confirm(id: String) -> void:
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 12)
 	var first: Button
-	if Game.gem_bag >= cost:
+	if Game.can_afford(cost):
 		first = UI.make_button("BUY IT!", true, 160)
 		first.pressed.connect(_buy)
 		row.add_child(first)

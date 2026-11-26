@@ -11,6 +11,8 @@ var _help_layer: Control
 var _code_layer: Control
 var _code_edit: LineEdit
 var _code_message: Label
+var _number_box: Control  # the secret tab: pick your own infinite-gems number
+var _number_edit: LineEdit
 var _play_button: Button
 var _typed := ""  # letters typed on the title screen, to catch the secret code
 var _time := 0.0
@@ -109,7 +111,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			and event.unicode > 0:
 		# typing a secret code straight onto the title screen works too
 		_typed = (_typed + char(event.unicode).to_lower()).right(Game.MAX_CODE_LENGTH)
-		for n in range(4, _typed.length() + 1):
+		for n in range(3, _typed.length() + 1):
 			var code := _typed.right(n)
 			if Game.is_code(code):
 				_typed = ""
@@ -188,6 +190,7 @@ func _build_code() -> void:
 	box.add_child(_centered(_code_edit))
 	_code_message = UI.make_label(" ", 18, Config.COLOR_BONE)
 	box.add_child(_code_message)
+	_build_number_box(box)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 12)
@@ -200,8 +203,68 @@ func _build_code() -> void:
 	row.add_child(back)
 
 
+## The secret tab that pops up after a gem code: type a number, and from then
+## on typing that number as a code gives infinite gems.
+func _build_number_box(box: VBoxContainer) -> void:
+	var nb := VBoxContainer.new()
+	nb.add_theme_constant_override("separation", 8)
+	nb.visible = false
+	box.add_child(nb)
+	_number_box = nb
+	nb.add_child(UI.make_label("SECRET TAB! Pick a number. Type it as a\ncode any time to get INFINITE gems!", 16, Config.COLOR_GOLD))
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 10)
+	nb.add_child(row)
+	_number_edit = LineEdit.new()
+	_number_edit.custom_minimum_size = Vector2(180, 44)
+	_number_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_number_edit.max_length = 12
+	_number_edit.placeholder_text = "your number"
+	_number_edit.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_NUMBER
+	_number_edit.add_theme_font_size_override("font_size", 20)
+	_number_edit.add_theme_stylebox_override("normal", UI.style_box(Config.COLOR_BG_LIGHT, Config.COLOR_GOLD))
+	_number_edit.add_theme_stylebox_override("focus", UI.style_box(Config.COLOR_BG_LIGHT, Config.COLOR_GOLD.lightened(0.4)))
+	_number_edit.text_changed.connect(_only_numbers)
+	_number_edit.text_submitted.connect(_save_number)
+	row.add_child(_number_edit)
+	var save := UI.make_button("SAVE", false, 110)
+	save.custom_minimum_size.y = 44
+	save.pressed.connect(func(): _save_number(_number_edit.text))
+	row.add_child(save)
+
+
+func _only_numbers(text: String) -> void:
+	var digits := ""
+	for ch in text:
+		if ch >= "0" and ch <= "9":
+			digits += ch
+	if digits != text:
+		var caret := _number_edit.caret_column
+		_number_edit.text = digits
+		_number_edit.caret_column = mini(caret, digits.length())
+
+
+func _save_number(number: String) -> void:
+	var problem := Game.set_infinite_code(number)
+	if problem != "":
+		_code_message.text = problem
+		_code_message.add_theme_color_override("font_color", Config.COLOR_ACCENT)
+		Sfx.play("click", 0.6)
+		_number_edit.grab_focus()
+		return
+	_number_box.visible = false
+	_number_edit.text = ""
+	_code_message.text = "Saved! Now type your number\nin the code box for INFINITE gems."
+	_code_message.add_theme_color_override("font_color", Config.COLOR_GOLD)
+	Sfx.play("checkpoint")
+	_code_edit.text = ""
+	_code_edit.grab_focus()
+
+
 func _show_code(show: bool) -> void:
 	_code_layer.visible = show
+	_number_box.visible = false
 	if show:
 		_code_edit.text = ""
 		_code_message.text = " "
@@ -211,7 +274,19 @@ func _show_code(show: bool) -> void:
 
 
 func _submit_code(code: String) -> void:
+	var infinite := Game.try_infinite_code(code)
+	if infinite >= 0:
+		_code_message.text = "INFINITE GEMS!\nBuy anything in the SHOP." if infinite > 0 \
+			else "You already have infinite gems!"
+		_code_message.add_theme_color_override("font_color", Config.COLOR_GEM)
+		Sfx.play("win" if infinite > 0 else "click")
+		return
 	var gems := Game.try_gem_code(code)
+	if gems >= 0:
+		# the gem code also opens the secret tab
+		_number_box.visible = true
+		_number_edit.text = ""
+		_number_edit.grab_focus()
 	if gems > 0:
 		_code_message.text = "+%s GEMS!\nSpend them in the SHOP." % Skins.format_gems(gems)
 		_code_message.add_theme_color_override("font_color", Config.COLOR_GEM)
